@@ -1,0 +1,14 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/jarRepositories.xml
+/.name
+/caches/build_file_checksums.ser
+/compiler.xml
+/encodings.xml
+/gradle.xml
+/libraries/
+/misc.xml
+/modules.xml
+/modules/
+/vcs.xml
