@@ -3,8 +3,8 @@ package net.opatry.game.wordle
 
 sealed class State(open val answers: List<String>) {
     data class Playing(override val answers: List<String>) : State(answers)
-    data class Won(override val answers: List<String>) : State(answers)
-    data class Lost(override val answers: List<String>) : State(answers)
+    data class Won(override val answers: List<String>, val selectedWord: String) : State(answers)
+    data class Lost(override val answers: List<String>, val selectedWord: String) : State(answers)
 }
 
 data class Answer(val words: List<String>,
@@ -17,10 +17,10 @@ data class Answer(val words: List<String>,
 }
 
 class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
-    val answer: Answer = answerProvider().run {
+    private val answer: Answer = answerProvider().run {
         copy(words = words.map(String::toWordle), selectedWord = selectedWord.toWordle())
     }
-    var state: State = if (maxTries > 0u) State.Playing(emptyList()) else State.Lost(emptyList())
+    var state: State = if (maxTries > 0u) State.Playing(emptyList()) else State.Lost(emptyList(), answer.selectedWord)
         private set
 
     init {
@@ -48,8 +48,8 @@ class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
         }.toList()
 
         state = when {
-            wordle == answer.selectedWord -> State.Won(answers)
-            answers.size.toUInt() == maxTries -> State.Lost(answers)
+            wordle == answer.selectedWord -> State.Won(answers, answer.selectedWord)
+            answers.size.toUInt() == maxTries -> State.Lost(answers, answer.selectedWord)
             else -> playingState.copy(answers = answers)
         }
 
