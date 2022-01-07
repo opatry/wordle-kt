@@ -1,7 +1,9 @@
 package net.opatry.game.wordle
 
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -110,5 +112,62 @@ class WordleTest {
         val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
         val game = Wordle { answer }
         assertTrue(game.isWordValid("TUTUT"))
+    }
+
+    @Test
+    fun `selected word accented is a valid answer`() {
+        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
+        val game = Wordle { answer }
+        assertTrue(game.isWordValid("  tûtüt "))
+    }
+
+    @Test
+    fun `play word on an end state does nothing`() {
+        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
+        val game = Wordle(maxTries = 0u) { answer }
+        val originalState = game.state
+        assertTrue(originalState !is State.Playing)
+        assertFalse(game.playWord("TUTUT"))
+        assertEquals(originalState, game.state)
+    }
+
+    @Test
+    fun `play invalid word does nothing`() {
+        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
+        val game = Wordle { answer }
+        val originalState = game.state
+        assertFalse(game.playWord("z"))
+        assertEquals(originalState, game.state)
+    }
+
+    @Test
+    fun `play valid word adds a new word to state`() {
+        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
+        val game = Wordle { answer }
+        val originalState = game.state
+        assertTrue(game.playWord("TOTOT"))
+        assertNotEquals(originalState, game.state)
+        assertArrayEquals(arrayOf("TOTOT"), game.state.answers.toTypedArray())
+    }
+
+    @Test
+    fun `playing correct answer ends the game to Won state`() {
+        val answer = Answer(listOf("TUTUT"), "TUTUT")
+        val game = Wordle { answer }
+        assertTrue(game.playWord("TUTUT"))
+        assertTrue(game.state is State.Won)
+        assertArrayEquals(arrayOf("TUTUT"), game.state.answers.toTypedArray())
+    }
+
+    @Test
+    fun `playing max allowed words without correct answer ends the game to Lost state`() {
+        val answer = Answer(listOf("ERROR", "MISSS", "TUTUT"), "TUTUT")
+        val game = Wordle(maxTries = 2u) { answer }
+        assertTrue(game.playWord("ERROR"))
+        assertTrue(game.state is State.Playing)
+        assertArrayEquals(arrayOf("ERROR"), game.state.answers.toTypedArray())
+        assertTrue(game.playWord("MISSS"))
+        assertTrue(game.state is State.Lost)
+        assertArrayEquals(arrayOf("ERROR", "MISSS"), game.state.answers.toTypedArray())
     }
 }

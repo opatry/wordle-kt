@@ -16,14 +16,15 @@ data class Answer(val words: List<String>,
     }
 }
 
-class Wordle(answerProvider: () -> Answer) {
+class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
     val answer: Answer = answerProvider().run {
         copy(words = words.map(String::toWordle), selectedWord = selectedWord.toWordle())
     }
-    val state: State = State.Playing(emptyList())
+    var state: State = if (maxTries > 0u) State.Playing(emptyList()) else State.Lost(emptyList())
+        private set
 
     init {
-        with (answer) {
+        with(answer) {
             require(words.all { it.matches(Regex("^[A-Z]{5}$")) }) {
                 "All words should be compound of 5 latin letters"
             }
@@ -34,6 +35,24 @@ class Wordle(answerProvider: () -> Answer) {
     }
 
     fun isWordValid(word: String): Boolean {
-        return answer.words.contains(word.trim().uppercase())
+        return answer.words.contains(word.toWordle())
+    }
+
+    fun playWord(word: String): Boolean {
+        val wordle = word.toWordle()
+        if (!isWordValid(wordle)) return false
+        val playingState = state as? State.Playing ?: return false
+
+        val answers = playingState.answers.toMutableList().apply {
+            add(wordle)
+        }.toList()
+
+        state = when {
+            wordle == answer.selectedWord -> State.Won(answers)
+            answers.size.toUInt() == maxTries -> State.Lost(answers)
+            else -> playingState.copy(answers = answers)
+        }
+
+        return true
     }
 }
