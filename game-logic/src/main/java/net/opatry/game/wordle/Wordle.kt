@@ -24,7 +24,7 @@ class Wordle(answerProvider: () -> Answer) {
 
     init {
         with (answer) {
-            require(words.all { it.matches(Regex("[A-Z]{5}")) }) {
+            require(words.all { it.matches(Regex("^[A-Z]{5}$")) }) {
                 "All words should be compound of 5 latin letters"
             }
             require(words.contains(selectedWord)) {
