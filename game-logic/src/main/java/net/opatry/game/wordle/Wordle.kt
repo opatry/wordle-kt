@@ -18,8 +18,7 @@ data class Answer(val words: List<String>,
 
 class Wordle(answerProvider: () -> Answer) {
     val answer: Answer = answerProvider().run {
-        copy(words = words.map { it.trim().uppercase() },
-                selectedWord = selectedWord.trim().uppercase())
+        copy(words = words.map(String::toWordle), selectedWord = selectedWord.toWordle())
     }
     val state: State = State.Playing(emptyList())
 

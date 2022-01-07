@@ -39,9 +39,6 @@ class WordleTest {
     @Test
     fun `only latin letters characters are allowed`() {
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(listOf("ééééé"), "ééééé") }
-        }
-        assertThrows(IllegalArgumentException::class.java) {
             Wordle { Answer(listOf("$$$$$"), "$$$$$") }
         }
         assertThrows(IllegalArgumentException::class.java) {
@@ -55,6 +52,20 @@ class WordleTest {
     fun `answer is returned as uppercase`() {
         val game = Wordle { Answer(listOf("ABCDE"), "abcde") }
         assertEquals("ABCDE", game.answer.selectedWord)
+    }
+
+    @Test
+    fun `accented words are normalized before checking for invalid characters`() {
+        // shouldn't throw IllegalArgumentException and accept "ANIME" as answer with "animé" in words
+        val game = Wordle { Answer(listOf("animé"), "ANIME") }
+        assertEquals("ANIME", game.answer.selectedWord)
+    }
+
+    @Test
+    fun `accented answer is normalized`() {
+        // shouldn't throw IllegalArgumentException and accept "animé" as answer with "ANIME" in words
+        val game = Wordle { Answer(listOf("ANIME"), "animé") }
+        assertEquals("ANIME", game.answer.selectedWord)
     }
 
     @Test
