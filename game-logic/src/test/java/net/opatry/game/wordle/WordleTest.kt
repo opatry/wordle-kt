@@ -172,4 +172,14 @@ class WordleTest {
         assertEquals("TUTUT", (game.state as? State.Lost)?.selectedWord)
         assertArrayEquals(arrayOf("ERROR", "MISSS"), game.state.answers.toTypedArray())
     }
+
+    @Test
+    fun `playing the same word twice consumes an answer`() {
+        val answer = Answer(listOf("ERROR", "TUTUT"), "TUTUT")
+        val game = Wordle { answer }
+        assertTrue(game.playWord("ERROR"))
+        assertArrayEquals(arrayOf("ERROR"), game.state.answers.toTypedArray())
+        assertTrue(game.playWord("ERROR"))
+        assertArrayEquals(arrayOf("ERROR", "ERROR"), game.state.answers.toTypedArray())
+    }
 }
