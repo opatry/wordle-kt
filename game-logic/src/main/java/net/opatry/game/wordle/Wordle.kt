@@ -2,7 +2,7 @@ package net.opatry.game.wordle
 
 
 sealed class State(open val answers: List<String>) {
-    data class Playing(override val answers: List<String>) : State(answers)
+    data class Playing(override val answers: List<String>, val maxTries: UInt) : State(answers)
     data class Won(override val answers: List<String>, val selectedWord: String) : State(answers)
     data class Lost(override val answers: List<String>, val selectedWord: String) : State(answers)
 }
@@ -20,7 +20,10 @@ class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
     private val answer: Answer = answerProvider().run {
         copy(words = words.map(String::toWordle), selectedWord = selectedWord.toWordle())
     }
-    var state: State = if (maxTries > 0u) State.Playing(emptyList()) else State.Lost(emptyList(), answer.selectedWord)
+    var state: State = when {
+        maxTries > 0u -> State.Playing(emptyList(), maxTries)
+        else -> State.Lost(emptyList(), answer.selectedWord)
+    }
         private set
 
     init {
