@@ -25,8 +25,8 @@ class Wordle(answerProvider: () -> Answer) {
 
     init {
         with (answer) {
-            require(words.all { it.matches(Regex("[A-Z]{6}")) }) {
-                "All words should be compound of 6 latin letters"
+            require(words.all { it.matches(Regex("[A-Z]{5}")) }) {
+                "All words should be compound of 5 latin letters"
             }
             require(words.contains(selectedWord)) {
                 "Selected word ($selectedWord) isn't part of available words ($words)"
