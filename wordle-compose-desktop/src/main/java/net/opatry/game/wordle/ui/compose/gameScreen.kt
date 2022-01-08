@@ -25,6 +25,7 @@ package net.opatry.game.wordle.ui.compose
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,10 +42,24 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.awtEvent
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.unit.dp
@@ -64,6 +79,7 @@ enum class AnswerFlag {
     EMPTY, PRESENT, ABSENT, CORRECT
 }
 
+@ExperimentalComposeUiApi
 @Composable
 fun GameScreen() {
     val answer = "HELLO"
@@ -79,9 +95,42 @@ fun GameScreen() {
         }
     }
 
+    val focusRequester = FocusRequester()
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+    var userInput by remember { mutableStateOf("") }
+
     // TODO Scaffold?
     Column(
         Modifier
+            .focusRequester(focusRequester)
+            .focusable(true)
+            .onKeyEvent { event ->
+                if (event.type != KeyEventType.KeyUp) {
+                    return@onKeyEvent false
+                }
+                if (event.key == Key.Backspace) {
+                    if (userInput.isNotEmpty()) {
+                        userInput = userInput.dropLast(1)
+                        println("User input: '$userInput'")
+                    }
+                }
+                if (event.key == Key.Enter) {
+                    if (userInput.length == 5) {
+                        println("DONE: '$userInput'")
+                        userInput = ""
+                    }
+                    true
+                } else if (event.key.keyCode in Key.A.keyCode..Key.Z.keyCode) {
+                    userInput += event.awtEvent.keyChar // FIXME how to do the same without relying on AWT?
+                    userInput = userInput.take(5)
+                    println("User input: '$userInput'")
+                    true
+                } else {
+                    false
+                }
+            }
             .fillMaxHeight()
             .width(400.dp)
             .padding(2.dp),
