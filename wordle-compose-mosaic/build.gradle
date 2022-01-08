@@ -1,0 +1,10 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'com.jakewharton.mosaic' version '0.1.0'
+    id 'application'
+}
+
+dependencies {
+    implementation(project(':word-data'))
+    implementation(project(':game-logic'))
+}

@@ -6,7 +6,9 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.4'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31'
+        // 1.6.10 doesn't seem to be compatible with mosaic 0.1.0
+        // but 1.5.10 isn't compatible with Jetbrains Compose 1.0.1
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10'
     }
 }
 
