@@ -22,6 +22,7 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -63,9 +64,12 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.Answer
+import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.ui.compose.theme.colorAbsent
 import net.opatry.game.wordle.ui.compose.theme.colorCorrect
 import net.opatry.game.wordle.ui.compose.theme.colorPresent
+import net.opatry.game.wordle.ui.compose.theme.darkGray
 import net.opatry.game.wordle.ui.compose.theme.keyBg
 import net.opatry.game.wordle.ui.compose.theme.keyEvaluatedTextColor
 import net.opatry.game.wordle.ui.compose.theme.keyTextColor
@@ -74,15 +78,10 @@ import net.opatry.game.wordle.ui.compose.theme.tileTextColor
 import net.opatry.game.wordle.ui.compose.theme.white
 import org.xml.sax.InputSource
 
-// FIXME depends on game logic module
-enum class AnswerFlag {
-    EMPTY, PRESENT, ABSENT, CORRECT
-}
-
 @ExperimentalComposeUiApi
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
-    val words by rememberUpdatedState(viewModel.words)
+    val grid by rememberUpdatedState(viewModel.grid)
     val userInput by rememberUpdatedState(viewModel.userInput)
     val answer by rememberUpdatedState(viewModel.answer)
 
@@ -125,7 +124,7 @@ fun GameScreen(viewModel: WordleViewModel) {
         Toolbar()
         Divider(Modifier.size(0.5.dp), MaterialTheme.colors.onSurface)
         AnswerPlaceHolder(answer, viewModel::restart)
-        WordleGrid(words)
+        WordleGrid(grid)
         Alphabet(viewModel.alphabet)
     }
 }
@@ -245,24 +244,19 @@ fun AlphabetLetterCell(letter: Char, flag: AnswerFlag) {
 }
 
 @Composable
-fun WordleGrid(words: List<String>) {
+fun WordleGrid(grid: List<Answer>) {
     Column {
-        words.forEach { word ->
-            WordleWordRow(word)
+        grid.forEach { row ->
+            WordleWordRow(row)
         }
     }
 }
 
 @Composable
-fun WordleWordRow(word: String) {
+fun WordleWordRow(row: Answer) {
     Row {
-        word.toCharArray().forEach { char ->
-            // FIXME STUB
-            val flag = when {
-                char.isWhitespace() -> AnswerFlag.EMPTY
-                else -> AnswerFlag.values().filterNot { it == AnswerFlag.EMPTY }.random()
-            }
-            WordleCharCell(char, flag)
+        row.letters.forEachIndexed { index, char ->
+            WordleCharCell(char, row.flags[index])
         }
     }
 }
@@ -276,24 +270,23 @@ fun AnswerFlag.cellColor(): Color = when (this) {
 
 @Composable
 fun WordleCharCell(char: Char, flag: AnswerFlag) {
-    // TODO animate color (and state transition?)
-
-    val flagColor = flag.cellColor()
-    val borderColor = when (flag) {
-        AnswerFlag.EMPTY -> lightGray
-        else -> flagColor
+    val backgroundColor by animateColorAsState(flag.cellColor())
+    val (foregroundColor, borderColor) = when (flag) {
+        AnswerFlag.EMPTY -> darkGray to lightGray
+        else -> tileTextColor to backgroundColor
     }
+
     Box(
         Modifier
             .size(48.dp)
             .padding(2.dp)
             .border(BorderStroke(1.dp, borderColor))
-            .background(flagColor),
+            .background(backgroundColor),
         Alignment.Center
     ) {
         Text(
             char.toString(),
-            color = tileTextColor,
+            color = foregroundColor,
             style = MaterialTheme.typography.body1
         )
     }

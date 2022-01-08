@@ -25,12 +25,13 @@ package net.opatry.game.wordle.ui.compose
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import net.opatry.game.wordle.Answer
+import net.opatry.game.wordle.AnswerFlag
+import net.opatry.game.wordle.State
+import net.opatry.game.wordle.Wordle
 
-class WordleViewModel(/*private val rules: Wordle*/) {
+class WordleViewModel(private var rules: Wordle) {
     var answer by mutableStateOf("")
-
-    private var tries = 0
-    private val maxTries = 6
 
     val alphabet = mutableMapOf<Char, AnswerFlag>().apply {
         var c = 'A'
@@ -39,52 +40,63 @@ class WordleViewModel(/*private val rules: Wordle*/) {
             ++c
         }
     }
-    private val wordsData = mutableListOf<String>().apply { repeat(6) { add(EMPTY_WORD) } }
-    var words by mutableStateOf<List<String>>(wordsData)
+
+    var grid by mutableStateOf<List<Answer>>(emptyList())
 
     var userInput by mutableStateOf("")
 
-    private fun updateWords() {
-        wordsData.apply {
-            if (tries in indices) {
-                this[tries] = userInput.padEnd(5, ' ')
-            }
-        }
-        words = wordsData.toList()
+    init {
+        updateGrid()
+    }
 
+    private fun updateGrid() {
+        val answers = rules.state.answers.toMutableList()
+        val turn = answers.size
+        val maxTries = rules.state.maxTries.toInt()
+        if (turn < maxTries) {
+            answers += Answer(userInput.padEnd(5, ' ').toCharArray(), Array(5) { AnswerFlag.EMPTY })
+        }
+        repeat(maxTries - turn - 1) {
+            answers += Answer.EMPTY
+        }
+        grid = answers.toList()
+    }
+
+    private fun updateAlphabet() {
+        // TODO
+    }
+
+    private fun updateAnswer() {
+        answer = when (val state = rules.state) {
+            is State.Playing -> ""
+            is State.Lost -> state.selectedWord
+            is State.Won -> state.selectedWord
+        }
     }
 
     fun updateUserInput(input: String) {
-        if (tries >= maxTries) return
-
         val normalized = input.take(5).uppercase()
         if (normalized != userInput) {
             userInput = normalized
-            updateWords()
+            updateGrid()
         }
     }
 
     fun validateUserInput() {
-        // TODO manage business logic
-        if (tries < maxTries && userInput.length == 5) {
-            ++tries
+        // TODO indicate error when input isn't valid
+        if (rules.playWord(userInput)) {
             userInput = ""
-            updateWords()
+            updateGrid()
+            updateAlphabet()
         }
-        answer = if (wordsData.any { it == "HELLO" } || tries == maxTries) "HELLO" else ""
-    }
-
-    companion object {
-        private val EMPTY_WORD = "".padEnd(5, ' ')
+        updateAnswer()
     }
 
     fun restart() {
-        tries = 0
-        answer = ""
+        rules = Wordle(rules.words)
         userInput = ""
-        wordsData.clear()
-        wordsData.apply { repeat(6) { add(EMPTY_WORD) } }
-        updateWords()
-        // TODO reset alphabet
+        updateGrid()
+        updateAlphabet()
+        updateAnswer()
     }
 }

@@ -127,7 +127,7 @@ class Wordle(
     inSelectedWord: String = inWords.random(),
     private val maxTries: UInt = 6u
 ) {
-    private val words = inWords.map(String::sanitizeForWordle)
+    val words = inWords.map(String::sanitizeForWordle)
     private val selectedWord = inSelectedWord.sanitizeForWordle()
     private val wordleId = words.indexOf(selectedWord)
     var state: State = when {

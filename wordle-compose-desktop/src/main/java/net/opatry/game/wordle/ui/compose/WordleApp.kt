@@ -28,8 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import net.opatry.game.wordle.Wordle
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 
+// FIXME singleton here otherwise recreated at each recomposition, need to be investigated
+val viewModel = WordleViewModel(Wordle(listOf("Hello", "great", "tiles", "tales")))
 
 @ExperimentalComposeUiApi
 @Composable
@@ -39,7 +42,6 @@ fun WordleApp() {
             Modifier.fillMaxSize(),
             Alignment.TopCenter
         ) {
-            val viewModel = WordleViewModel()
             GameScreen(viewModel)
         }
     }
