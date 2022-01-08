@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jetbrains.compose:compose-gradle-plugin:1.0.1'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    afterEvaluate { proj ->
+
+        if (proj.hasProperty('kotlin')) {
+            compileKotlin {
+                kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
+            }
+            compileTestKotlin {
+                kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
+            }
+        }
+
+        if (proj.hasProperty('test')) {
+            test {
+                // let JUnit report mark the job status in case of error
+                ignoreFailures = true
+                testLogging {
+                    events 'passed', 'skipped', 'failed'
+                    exceptionFormat 'short'
+
+                    debug {
+                        exceptionFormat 'full'
+                    }
+                }
+            }
+        }
+    }
+}
