@@ -38,5 +38,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("net.opatry.game.wordle.ui.compose.WordleKt")
+    mainClass.set("net.opatry.game.wordle.ui.compose.WordleComposeDesktopKt")
 }

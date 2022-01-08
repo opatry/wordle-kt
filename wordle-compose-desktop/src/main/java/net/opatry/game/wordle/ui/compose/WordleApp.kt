@@ -28,12 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import net.opatry.game.wordle.Wordle
+import net.opatry.game.wordle.WordleRules
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 import net.opatry.game.wordle.words
 
 // FIXME singleton here otherwise recreated at each recomposition, need to be investigated
-val viewModel = WordleViewModel(Wordle(words))
+val viewModel = WordleViewModel(WordleRules(words))
 
 @ExperimentalComposeUiApi
 @Composable

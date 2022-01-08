@@ -28,16 +28,16 @@ import androidx.compose.runtime.setValue
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
-import net.opatry.game.wordle.Wordle
+import net.opatry.game.wordle.WordleRules
 
-class WordleViewModel(private var rules: Wordle) {
+class WordleViewModel(private var rules: WordleRules) {
     var answer by mutableStateOf("")
-
-    var alphabet by mutableStateOf(emptyMap<Char, AnswerFlag>())
-
+        private set
     var grid by mutableStateOf<List<Answer>>(emptyList())
-
+        private set
     var userInput by mutableStateOf("")
+        private set
+    var alphabet by mutableStateOf(emptyMap<Char, AnswerFlag>())
 
     init {
         updateGrid()
@@ -117,7 +117,7 @@ class WordleViewModel(private var rules: Wordle) {
     }
 
     fun restart() {
-        rules = Wordle(rules.words)
+        rules = WordleRules(rules.words)
         userInput = ""
         updateGrid()
         updateAlphabet()

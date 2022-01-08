@@ -81,9 +81,7 @@ import org.xml.sax.InputSource
 @ExperimentalComposeUiApi
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
-    val grid by rememberUpdatedState(viewModel.grid)
     val userInput by rememberUpdatedState(viewModel.userInput)
-    val answer by rememberUpdatedState(viewModel.answer)
 
     val focusRequester = FocusRequester()
     LaunchedEffect(Unit) {
@@ -123,8 +121,8 @@ fun GameScreen(viewModel: WordleViewModel) {
     ) {
         Toolbar()
         Divider(Modifier.size(0.5.dp), MaterialTheme.colors.onSurface)
-        AnswerPlaceHolder(answer, viewModel::restart)
-        WordleGrid(grid)
+        AnswerPlaceHolder(viewModel.answer, viewModel::restart)
+        WordleGrid(viewModel.grid)
         Alphabet(viewModel.alphabet)
     }
 }
@@ -162,7 +160,7 @@ fun Toolbar() {
 fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
     val isAnswerVisible = answer.isNotEmpty()
     val animatedAlpha by animateFloatAsState(if (isAnswerVisible) 1f else 0f)
-    // force 0 without animation when reseting from "xxx" to "" to avoid poor visual
+    // force 0 without animation when resetting from "xxx" to "" to avoid poor visual
     val alpha = if (isAnswerVisible) animatedAlpha else 0f
 
     Row(

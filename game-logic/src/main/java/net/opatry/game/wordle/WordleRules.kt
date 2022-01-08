@@ -144,7 +144,7 @@ sealed class State(
     }
 }
 
-class Wordle(
+class WordleRules(
     inWords: List<String>,
     inSelectedWord: String = inWords.random(),
     private val maxTries: UInt = 6u

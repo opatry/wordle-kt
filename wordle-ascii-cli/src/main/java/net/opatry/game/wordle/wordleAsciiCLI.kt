@@ -25,7 +25,7 @@ package net.opatry.game.wordle
 fun main() {
     var playing = true
     while (playing) {
-        val game = Wordle(words)
+        val rules = WordleRules(words)
 
         println(
             """
@@ -35,17 +35,17 @@ fun main() {
             """.trimIndent()
         )
 
-        println(game.state.toString())
-        while (game.state is State.Playing) {
+        println(rules.state.toString())
+        while (rules.state is State.Playing) {
             print(" ➡️ Enter a 5 letter english word: ")
             val word = readLine().toString()
 
-            if (game.isWordValid(word)) {
-                game.playWord(word)
+            if (rules.isWordValid(word)) {
+                rules.playWord(word)
             } else {
                 println(" ❌ '$word' isn't in the list of words.")
             }
-            println(game.state.toString())
+            println(rules.state.toString())
         }
 
         print(" 🔄 Play again? (y/N) ")
