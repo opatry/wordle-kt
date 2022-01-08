@@ -16,6 +16,7 @@ test {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
+    implementation project(':game-logic')
 }
 compileKotlin {
     kotlinOptions {

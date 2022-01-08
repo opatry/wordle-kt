@@ -1,2 +1,3 @@
 rootProject.name = 'Wordle Kotlin'
 include('game-logic')
+include('wordle-ascii-cli')
