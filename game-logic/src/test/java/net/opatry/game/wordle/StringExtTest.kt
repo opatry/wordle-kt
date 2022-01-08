@@ -1,6 +1,5 @@
 package net.opatry.game.wordle
 
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,22 +8,22 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class StringExtTest {
     @Test
-    fun `toWordle makes text uppercase`() {
-        assertEquals("A", "a".toWordle())
+    fun `sanitizeForWordle makes text uppercase`() {
+        assertEquals("A", "a".sanitizeForWordle())
     }
 
     @Test
-    fun `toWordle removes leading & trailing spaces`() {
-        assertEquals("A", "  A  ".toWordle())
+    fun `sanitizeForWordle removes leading & trailing spaces`() {
+        assertEquals("A", "  A  ".sanitizeForWordle())
     }
 
     @Test
-    fun `toWordle normalizes accented characters`() {
-        assertEquals("A", "à".toWordle())
+    fun `sanitizeForWordle normalizes accented characters`() {
+        assertEquals("A", "à".sanitizeForWordle())
     }
 
     @Test
-    fun `toWordle normalizes accented uppercase characters`() {
-        assertEquals("A", "Ã".toWordle())
+    fun `sanitizeForWordle normalizes accented uppercase characters`() {
+        assertEquals("A", "Ã".sanitizeForWordle())
     }
 }

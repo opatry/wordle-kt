@@ -3,7 +3,7 @@ package net.opatry.game.wordle
 fun main() {
     var playing = true
     while (playing) {
-        val game = Wordle { Answer(words) }
+        val game = Wordle(words)
 
         println(
             """

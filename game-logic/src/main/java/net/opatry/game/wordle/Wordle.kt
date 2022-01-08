@@ -39,52 +39,44 @@ sealed class State(open val answers: List<String>, open val maxTries: UInt) {
     }
 }
 
-data class Answer(val words: List<String>,
-                  val selectedWord: String = words.random()) {
-
-    // TODO + see https://twitter.com/momoxmia/status/1479026969559789568?s=20 / https://wa11y.co/
-    override fun toString(): String {
-        return super.toString()
-    }
-}
-
-class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
-    private val answer: Answer = answerProvider().run {
-        copy(words = words.map(String::toWordle), selectedWord = selectedWord.toWordle())
-    }
+class Wordle(
+    inWords: List<String>,
+    inSelectedWord: String = inWords.random(),
+    private val maxTries: UInt = 6u
+) {
+    private val words = inWords.map(String::sanitizeForWordle)
+    private val selectedWord = inSelectedWord.sanitizeForWordle()
     var state: State = when {
         maxTries > 0u -> State.Playing(emptyList(), maxTries)
-        else -> State.Lost(emptyList(), maxTries, answer.selectedWord)
+        else -> State.Lost(emptyList(), maxTries, selectedWord)
     }
         private set
 
     init {
-        with(answer) {
-            require(words.all { it.matches(Regex("^[A-Z]{5}$")) }) {
-                "All words should be compound of 5 latin letters"
-            }
-            require(words.contains(selectedWord)) {
-                "Selected word ($selectedWord) isn't part of available words ($words)"
-            }
+        require(words.all { it.matches(Regex("^[A-Z]{5}$")) }) {
+            "All words should be compound of 5 latin letters"
+        }
+        require(words.contains(selectedWord)) {
+            "Selected word ($selectedWord) isn't part of available words ($words)"
         }
     }
 
     fun isWordValid(word: String): Boolean {
-        return answer.words.contains(word.toWordle())
+        return words.contains(word.sanitizeForWordle())
     }
 
     fun playWord(word: String): Boolean {
-        val wordle = word.toWordle()
-        if (!isWordValid(wordle)) return false
+        val sanitized = word.sanitizeForWordle()
+        if (!isWordValid(sanitized)) return false
         val playingState = state as? State.Playing ?: return false
 
         val answers = playingState.answers.toMutableList().apply {
-            add(wordle)
+            add(sanitized)
         }.toList()
 
         state = when {
-            wordle == answer.selectedWord -> State.Won(answers, maxTries, answer.selectedWord)
-            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, answer.selectedWord)
+            sanitized == selectedWord -> State.Won(answers, maxTries, selectedWord)
+            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, selectedWord)
             else -> playingState.copy(answers = answers)
         }
 

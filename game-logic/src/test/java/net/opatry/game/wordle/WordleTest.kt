@@ -16,64 +16,63 @@ class WordleTest {
     @Test
     fun `answer must be part of available words`() {
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(emptyList(), "TOTOT") }
+            Wordle(emptyList(), "TOTOT")
         }
-        Wordle { Answer(listOf("tOTot"), "tOTot") }
-        Wordle { Answer(listOf("TOTOT", "TITIT"), "TOTOT") }
-        Wordle { Answer(listOf("TUTUT", "TOTOT", "TITIT"), "TOTOT") }
+        Wordle(listOf("tOTot"), "tOTot")
+        Wordle(listOf("TOTOT", "TITIT"), "TOTOT")
+        Wordle(listOf("TUTUT", "TOTOT", "TITIT"), "TOTOT")
     }
 
     @Test
     fun `available words should all be 5 char long`() {
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(listOf("A"), "A") }
+            Wordle(listOf("A"), "A")
         }
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(listOf("ABCD"), "ABCD") }
+            Wordle(listOf("ABCD"), "ABCD")
         }
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(listOf("ABCDEF"), "ABCDEF") }
+            Wordle(listOf("ABCDEF"), "ABCDEF")
         }
-        val game = Wordle(0u) { Answer(listOf("ABCDE"), "ABCDE") }
+        val game = Wordle(listOf("ABCDE"), "ABCDE", 0u)
         assertEquals("ABCDE", (game.state as? State.Lost)?.selectedWord)
     }
 
     @Test
     fun `only latin letters characters are allowed`() {
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(listOf("$$$$$"), "$$$$$") }
+            Wordle(listOf("$$$$$"), "$$$$$")
         }
         assertThrows(IllegalArgumentException::class.java) {
-            Wordle { Answer(listOf("会会会会会"), "会会会会会") }
+            Wordle(listOf("会会会会会"), "会会会会会")
         }
-        val game = Wordle(0u) { Answer(listOf("ABCDE"), "ABCDE") }
+        val game = Wordle(listOf("ABCDE"), "ABCDE", 0u)
         assertEquals("ABCDE", (game.state as? State.Lost)?.selectedWord)
     }
 
     @Test
     fun `answer is returned as uppercase`() {
-        val game = Wordle(0u) { Answer(listOf("ABCDE"), "abcde") }
+        val game = Wordle(listOf("ABCDE"), "abcde", 0u)
         assertEquals("ABCDE", (game.state as? State.Lost)?.selectedWord)
     }
 
     @Test
     fun `accented words are normalized before checking for invalid characters`() {
         // shouldn't throw IllegalArgumentException and accept "ANIME" as answer with "animé" in words
-        val game = Wordle(0u) { Answer(listOf("animé"), "ANIME") }
+        val game = Wordle(listOf("animé"), "ANIME", 0u)
         assertEquals("ANIME", (game.state as? State.Lost)?.selectedWord)
     }
 
     @Test
     fun `accented answer is normalized`() {
         // shouldn't throw IllegalArgumentException and accept "animé" as answer with "ANIME" in words
-        val game = Wordle(0u) { Answer(listOf("ANIME"), "animé") }
+        val game = Wordle(listOf("ANIME"), "animé", 0u)
         assertEquals("ANIME", (game.state as? State.Lost)?.selectedWord)
     }
 
     @Test
     fun `initial state is playing and empty`() {
-        val answer = Answer(listOf("TOTOT"), "TOTOT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT"), "TOTOT")
         val state = game.state as? State.Playing
         assertNotNull(state)
         assertEquals(emptyList<String>(), state?.answers)
@@ -81,50 +80,43 @@ class WordleTest {
 
     @Test
     fun `too short word isn't a valid answer`() {
-        val answer = Answer(listOf("TOTOT"), "TOTOT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT"), "TOTOT")
         assertFalse(game.isWordValid("TOTO"))
     }
 
     @Test
     fun `too long word isn't a valid answer`() {
-        val answer = Answer(listOf("TOTOT"), "TOTOT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT"), "TOTOT")
         assertFalse(game.isWordValid("TOTOTOT"))
     }
 
     @Test
     fun `word not part of available words isn't a valid answer`() {
-        val answer = Answer(listOf("TOTOT"), "TOTOT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT"), "TOTOT")
         assertFalse(game.isWordValid("TITIT"))
     }
 
     @Test
     fun `word part of available words is a valid answer`() {
-        val answer = Answer(listOf("TOTOT", "TITIT"), "TOTOT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT", "TITIT"), "TOTOT")
         assertTrue(game.isWordValid("TITIT"))
     }
 
     @Test
     fun `selected word is a valid answer`() {
-        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT", "TUTUT"), "TUTUT")
         assertTrue(game.isWordValid("TUTUT"))
     }
 
     @Test
     fun `selected word accented is a valid answer`() {
-        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT", "TUTUT"), "TUTUT")
         assertTrue(game.isWordValid("  tûtüt "))
     }
 
     @Test
     fun `play word on an end state does nothing`() {
-        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
-        val game = Wordle(maxTries = 0u) { answer }
+        val game = Wordle(listOf("TOTOT", "TUTUT"), "TUTUT", 0u)
         val originalState = game.state
         assertTrue(originalState !is State.Playing)
         assertFalse(game.playWord("TUTUT"))
@@ -133,8 +125,7 @@ class WordleTest {
 
     @Test
     fun `play invalid word does nothing`() {
-        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT", "TUTUT"), "TUTUT")
         val originalState = game.state
         assertFalse(game.playWord("z"))
         assertEquals(originalState, game.state)
@@ -142,8 +133,7 @@ class WordleTest {
 
     @Test
     fun `play valid word adds a new word to state`() {
-        val answer = Answer(listOf("TOTOT", "TUTUT"), "TUTUT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TOTOT", "TUTUT"), "TUTUT")
         val originalState = game.state
         assertTrue(game.playWord("TOTOT"))
         assertNotEquals(originalState, game.state)
@@ -152,8 +142,7 @@ class WordleTest {
 
     @Test
     fun `playing correct answer ends the game to Won state`() {
-        val answer = Answer(listOf("TUTUT"), "TUTUT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("TUTUT"), "TUTUT")
         assertTrue(game.playWord("TUTUT"))
         assertTrue(game.state is State.Won)
         assertEquals("TUTUT", (game.state as? State.Won)?.selectedWord)
@@ -162,8 +151,7 @@ class WordleTest {
 
     @Test
     fun `playing max allowed words without correct answer ends the game to Lost state`() {
-        val answer = Answer(listOf("ERROR", "MISSS", "TUTUT"), "TUTUT")
-        val game = Wordle(maxTries = 2u) { answer }
+        val game = Wordle(listOf("ERROR", "MISSS", "TUTUT"), "TUTUT", maxTries = 2u)
         assertTrue(game.playWord("ERROR"))
         assertTrue(game.state is State.Playing)
         assertArrayEquals(arrayOf("ERROR"), game.state.answers.toTypedArray())
@@ -175,8 +163,7 @@ class WordleTest {
 
     @Test
     fun `playing the same word twice consumes an answer`() {
-        val answer = Answer(listOf("ERROR", "TUTUT"), "TUTUT")
-        val game = Wordle { answer }
+        val game = Wordle(listOf("ERROR", "TUTUT"), "TUTUT")
         assertTrue(game.playWord("ERROR"))
         assertArrayEquals(arrayOf("ERROR"), game.state.answers.toTypedArray())
         assertTrue(game.playWord("ERROR"))
