@@ -1,20 +1,22 @@
 package net.opatry.game.wordle
 
 
-sealed class State(open val answers: List<String>) {
-    data class Playing(override val answers: List<String>, val maxTries: UInt) : State(answers) {
+sealed class State(open val answers: List<String>, open val maxTries: UInt) {
+    data class Playing(override val answers: List<String>, override val maxTries: UInt) : State(answers, maxTries) {
         override fun toString(): String {
             return super.toString() + "Keep going… ${answers.size}/$maxTries"
         }
     }
 
-    data class Won(override val answers: List<String>, val selectedWord: String) : State(answers) {
+    data class Won(override val answers: List<String>, override val maxTries: UInt, val selectedWord: String) :
+        State(answers, maxTries) {
         override fun toString(): String {
             return super.toString() + "Congrats! You found the correct answer 🎉: $selectedWord"
         }
     }
 
-    data class Lost(override val answers: List<String>, val selectedWord: String) : State(answers) {
+    data class Lost(override val answers: List<String>, override val maxTries: UInt, val selectedWord: String) :
+        State(answers, maxTries) {
         override fun toString(): String {
             return super.toString() + "Doh! You didn't find the answer 🤭: $selectedWord"
         }
@@ -45,7 +47,7 @@ class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
     }
     var state: State = when {
         maxTries > 0u -> State.Playing(emptyList(), maxTries)
-        else -> State.Lost(emptyList(), answer.selectedWord)
+        else -> State.Lost(emptyList(), maxTries, answer.selectedWord)
     }
         private set
 
@@ -74,8 +76,8 @@ class Wordle(private val maxTries: UInt = 6u, answerProvider: () -> Answer) {
         }.toList()
 
         state = when {
-            wordle == answer.selectedWord -> State.Won(answers, answer.selectedWord)
-            answers.size.toUInt() == maxTries -> State.Lost(answers, answer.selectedWord)
+            wordle == answer.selectedWord -> State.Won(answers, maxTries, answer.selectedWord)
+            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, answer.selectedWord)
             else -> playingState.copy(answers = answers)
         }
 
