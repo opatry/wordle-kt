@@ -45,9 +45,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -83,25 +81,15 @@ enum class AnswerFlag {
 
 @ExperimentalComposeUiApi
 @Composable
-fun GameScreen() {
-    val answer = "HELLO"
-    val maxTries = 6
-    val words = mutableListOf("WORD1", "WORD2", "WORD3", "WORD4").apply {
-        repeat(maxTries - size) { add(" ".repeat(5)) }
-    }
-    val alphabet = mutableMapOf<Char, AnswerFlag>().apply {
-        var c = 'A'
-        while (c <= 'Z') {
-            this += c to AnswerFlag.values().random()
-            ++c
-        }
-    }
+fun GameScreen(viewModel: WordleViewModel) {
+    val words by rememberUpdatedState(viewModel.words)
+    val userInput by rememberUpdatedState(viewModel.userInput)
+    val answer by rememberUpdatedState(viewModel.answer)
 
     val focusRequester = FocusRequester()
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-    var userInput by remember { mutableStateOf("") }
 
     // TODO Scaffold?
     Column(
@@ -114,20 +102,15 @@ fun GameScreen() {
                 }
                 if (event.key == Key.Backspace) {
                     if (userInput.isNotEmpty()) {
-                        userInput = userInput.dropLast(1)
-                        println("User input: '$userInput'")
+                        viewModel.updateUserInput(userInput.dropLast(1))
                     }
                 }
                 if (event.key == Key.Enter) {
-                    if (userInput.length == 5) {
-                        println("DONE: '$userInput'")
-                        userInput = ""
-                    }
+                    viewModel.validateUserInput()
                     true
                 } else if (event.key.keyCode in Key.A.keyCode..Key.Z.keyCode) {
-                    userInput += event.awtEvent.keyChar // FIXME how to do the same without relying on AWT?
-                    userInput = userInput.take(5)
-                    println("User input: '$userInput'")
+                    // FIXME how to do the same without relying on AWT?
+                    viewModel.updateUserInput(userInput + event.awtEvent.keyChar)
                     true
                 } else {
                     false
@@ -141,9 +124,9 @@ fun GameScreen() {
     ) {
         Toolbar()
         Divider(Modifier.size(0.5.dp), MaterialTheme.colors.onSurface)
-        AnswerPlaceHolder(answer)
+        AnswerPlaceHolder(answer, viewModel::restart)
         WordleGrid(words)
-        Alphabet(alphabet)
+        Alphabet(viewModel.alphabet)
     }
 }
 
@@ -177,16 +160,19 @@ fun Toolbar() {
 }
 
 @Composable
-fun AnswerPlaceHolder(answer: String) {
+fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
+    val isAnswerVisible = answer.isNotEmpty()
+    val animatedAlpha by animateFloatAsState(if (isAnswerVisible) 1f else 0f)
+    // force 0 without animation when reseting from "xxx" to "" to avoid poor visual
+    val alpha = if (isAnswerVisible) animatedAlpha else 0f
+
     Row(
+        Modifier.alpha(alpha),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        val alpha by animateFloatAsState(if (answer.isEmpty()) 0f else 1f)
-
         Box(
             Modifier
-                .alpha(alpha)
                 .padding(2.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colors.primary)
@@ -198,16 +184,15 @@ fun AnswerPlaceHolder(answer: String) {
                 style = MaterialTheme.typography.h2
             )
         }
-        if (answer.isNotEmpty()) {
-            val density = LocalDensity.current
-            IconButton(onClick = {}) {
-                Icon(
-                    loadXmlImageVector(
-                        InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_refresh.xml")),
-                        density
-                    ), "Play again"
-                )
-            }
+
+        val density = LocalDensity.current
+        IconButton(onClick = { onRestart() }) {
+            Icon(
+                loadXmlImageVector(
+                    InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_refresh.xml")),
+                    density
+                ), "Play again"
+            )
         }
     }
 }
