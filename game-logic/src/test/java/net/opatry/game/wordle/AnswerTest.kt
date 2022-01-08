@@ -38,4 +38,30 @@ class AnswerTest {
     fun `all same is all correct`() {
         assertArrayEquals(Array(5) { AnswerFlag.CORRECT }, Answer.computeAnswer("aaaaa", "aaaaa").flags)
     }
+
+    @Test
+    fun `a letter is taken into account at most once`() {
+        // if 1 letter is present in selected word and user inputs a word with this letter twice, one being correctly placed, the other shouldn't be considered
+        val expected =
+            arrayOf(AnswerFlag.ABSENT, AnswerFlag.CORRECT, AnswerFlag.ABSENT, AnswerFlag.ABSENT, AnswerFlag.ABSENT)
+        assertArrayEquals(expected, Answer.computeAnswer("weeds", "hello").flags)
+    }
+
+    @Test
+    fun `several letters in common are properly handled`() {
+        // 1 properly placed, 2 others misplaced, misplaced 'e' comes first
+        assertArrayEquals(
+            arrayOf(AnswerFlag.ABSENT, AnswerFlag.PRESENT, AnswerFlag.CORRECT, AnswerFlag.PRESENT, AnswerFlag.PRESENT),
+            Answer.computeAnswer("weeds", "speed").flags
+        )
+    }
+
+    @Test
+    fun `several letters in common are properly handled variation`() {
+        // 1 properly placed, 2 others misplaced, properly placed 'e' comes first
+        assertArrayEquals(
+            arrayOf(AnswerFlag.PRESENT, AnswerFlag.ABSENT, AnswerFlag.CORRECT, AnswerFlag.PRESENT, AnswerFlag.PRESENT),
+            Answer.computeAnswer("speed", "weeds").flags
+        )
+    }
 }

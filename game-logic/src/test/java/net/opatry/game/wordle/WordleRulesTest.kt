@@ -193,4 +193,29 @@ class WordleTest {
         assertTrue(game.playWord("ERROR"))
         assertArrayEquals(arrayOf("ERROR", "ERROR"), game.state.answers.toWords())
     }
+
+    @Test
+    fun `test real game representative situation is properly handled`() {
+        val game = WordleRules(listOf("AAAAA", "WEEDS", "SPEED"), "SPEED")
+
+        // no in dictionary
+        assertTrue(game.playWord("BBBBB"))
+        assertArrayEquals(Array(5) { AnswerFlag.EMPTY }, game.state.answers.lastOrNull()?.flags)
+
+        // in dictionary, no match
+        assertTrue(game.playWord("AAAAA"))
+        assertArrayEquals(Array(5) { AnswerFlag.ABSENT }, game.state.answers.lastOrNull()?.flags)
+
+        // in dictionary exact and partial matches
+        assertTrue(game.playWord("WEEDS"))
+        assertArrayEquals(
+            arrayOf(AnswerFlag.ABSENT, AnswerFlag.PRESENT, AnswerFlag.CORRECT, AnswerFlag.PRESENT, AnswerFlag.PRESENT),
+            game.state.answers.lastOrNull()?.flags
+        )
+
+        // in dictionary selected word
+        assertTrue(game.playWord("SPEED"))
+        assertArrayEquals(Array(5) { AnswerFlag.CORRECT }, game.state.answers.lastOrNull()?.flags)
+        assertTrue(game.state is State.Won)
+    }
 }

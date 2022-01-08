@@ -27,13 +27,6 @@ enum class AnswerFlag {
     PRESENT,
     ABSENT,
     CORRECT;
-
-    override fun toString(): String = when (this) {
-        EMPTY -> "_"
-        PRESENT -> "-"
-        ABSENT -> " "
-        CORRECT -> "+"
-    }
 }
 
 class Answer(
