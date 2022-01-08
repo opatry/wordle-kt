@@ -116,8 +116,8 @@ sealed class State(
     ) :
         State(answers, maxTries) {
         override fun toString(): String {
-            return super.toString() +
-                    "Wordle $wordleId ${answers.size + 1}/$maxTries\n" +
+            return "Wordle $wordleId ${answers.size + 1}/$maxTries\n" +
+                    super.toString() +
                     "Congrats! You found the correct answer 🎉: $selectedWord"
         }
     }
@@ -130,8 +130,8 @@ sealed class State(
     ) :
         State(answers, maxTries) {
         override fun toString(): String {
-            return super.toString() +
-                    "Wordle $wordleId X/$maxTries\n" +
+            return "Wordle $wordleId X/$maxTries\n" +
+                    super.toString() +
                     "Doh! You didn't find the answer 🤭: $selectedWord"
         }
     }
