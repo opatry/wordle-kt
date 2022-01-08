@@ -224,20 +224,21 @@ fun AnswerFlag.keyForegroundColor(): Color = when (this) {
 
 @Composable
 fun AlphabetLetterCell(letter: Char, flag: AnswerFlag) {
-    // TODO animate color (and state transition?)
+    val backgroundColor by animateColorAsState(flag.keyBackgroundColor())
+    val foregroundColor by animateColorAsState(flag.keyForegroundColor())
 
     Box(
         Modifier
             .size(width = 36.dp, height = 48.dp)
             .padding(2.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(flag.keyBackgroundColor())
+            .background(backgroundColor)
             .padding(horizontal = 2.dp, vertical = 4.dp),
         Alignment.Center,
     ) {
         Text(
             letter.toString(),
-            color = flag.keyForegroundColor(),
+            color = foregroundColor,
             style = MaterialTheme.typography.body2
         )
     }

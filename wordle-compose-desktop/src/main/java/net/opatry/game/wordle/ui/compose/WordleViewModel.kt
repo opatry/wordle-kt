@@ -33,13 +33,7 @@ import net.opatry.game.wordle.Wordle
 class WordleViewModel(private var rules: Wordle) {
     var answer by mutableStateOf("")
 
-    val alphabet = mutableMapOf<Char, AnswerFlag>().apply {
-        var c = 'A'
-        while (c <= 'Z') {
-            this += c to AnswerFlag.values().random()
-            ++c
-        }
-    }
+    var alphabet by mutableStateOf(emptyMap<Char, AnswerFlag>())
 
     var grid by mutableStateOf<List<Answer>>(emptyList())
 
@@ -47,6 +41,7 @@ class WordleViewModel(private var rules: Wordle) {
 
     init {
         updateGrid()
+        updateAlphabet()
     }
 
     private fun updateGrid() {
@@ -63,7 +58,36 @@ class WordleViewModel(private var rules: Wordle) {
     }
 
     private fun updateAlphabet() {
-        // TODO
+        // TODO couldn't we make this smarter?
+        val answers = rules.state.answers
+        val absent = mutableSetOf<Char>()
+        val present = mutableSetOf<Char>()
+        val correct = mutableSetOf<Char>()
+
+        answers.forEach {
+            it.flags.forEachIndexed { index, flag ->
+                when (flag) {
+                    AnswerFlag.ABSENT -> absent += it.letters[index]
+                    AnswerFlag.PRESENT -> present += it.letters[index]
+                    AnswerFlag.CORRECT -> correct += it.letters[index]
+                    else -> Unit
+                }
+            }
+        }
+
+        val alphabet = mutableMapOf<Char, AnswerFlag>().apply {
+            var c = 'A'
+            while (c <= 'Z') {
+                this += c to when {
+                    correct.contains(c) -> AnswerFlag.CORRECT
+                    present.contains(c) -> AnswerFlag.PRESENT
+                    absent.contains(c) -> AnswerFlag.ABSENT
+                    else -> AnswerFlag.EMPTY
+                }
+                ++c
+            }
+        }
+        this.alphabet = alphabet.toMap()
     }
 
     private fun updateAnswer() {
