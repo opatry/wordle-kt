@@ -22,6 +22,7 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -176,20 +178,37 @@ fun Toolbar() {
 
 @Composable
 fun AnswerPlaceHolder(answer: String) {
-    Box(
-        Modifier
-            .padding(2.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colors.primary)
-            .padding(4.dp),
-        Alignment.Center
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
-        // TODO styling
-        Text(
-            answer,
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.h2
-        )
+        val alpha by animateFloatAsState(if (answer.isEmpty()) 0f else 1f)
+
+        Box(
+            Modifier
+                .alpha(alpha)
+                .padding(2.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colors.primary)
+                .padding(4.dp)
+        ) {
+            Text(
+                answer,
+                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.h2
+            )
+        }
+        if (answer.isNotEmpty()) {
+            val density = LocalDensity.current
+            IconButton(onClick = {}) {
+                Icon(
+                    loadXmlImageVector(
+                        InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_refresh.xml")),
+                        density
+                    ), "Play again"
+                )
+            }
+        }
     }
 }
 
