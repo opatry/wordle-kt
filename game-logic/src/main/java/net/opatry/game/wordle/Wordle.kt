@@ -2,9 +2,32 @@ package net.opatry.game.wordle
 
 
 sealed class State(open val answers: List<String>) {
-    data class Playing(override val answers: List<String>, val maxTries: UInt) : State(answers)
-    data class Won(override val answers: List<String>, val selectedWord: String) : State(answers)
-    data class Lost(override val answers: List<String>, val selectedWord: String) : State(answers)
+    data class Playing(override val answers: List<String>, val maxTries: UInt) : State(answers) {
+        override fun toString(): String {
+            return super.toString() + "Keep going… ${answers.size}/$maxTries"
+        }
+    }
+
+    data class Won(override val answers: List<String>, val selectedWord: String) : State(answers) {
+        override fun toString(): String {
+            return super.toString() + "Congrats! You found the correct answer 🎉: $selectedWord"
+        }
+    }
+
+    data class Lost(override val answers: List<String>, val selectedWord: String) : State(answers) {
+        override fun toString(): String {
+            return super.toString() + "Doh! You didn't find the answer 🤭: $selectedWord"
+        }
+    }
+
+    override fun toString(): String {
+        val buffer = StringBuffer()
+        answers.forEach { word ->
+            word.toCharArray().joinTo(buffer, "") { "[ $it ]" }
+            buffer.append("\n")
+        }
+        return buffer.toString()
+    }
 }
 
 data class Answer(val words: List<String>,
