@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.2'
+    implementation(project(':word-data'))
     implementation(project(':game-logic'))
 }

@@ -33,6 +33,7 @@ version = "1.0.0"
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation(project(":word-data"))
     implementation(project(":game-logic"))
 }
 
