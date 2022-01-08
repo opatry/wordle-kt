@@ -13,6 +13,7 @@ fun main() {
             """.trimIndent()
         )
 
+        println(game.state.toString())
         while (game.state is State.Playing) {
             print(" ➡️ Enter a 5 letter english word: ")
             val word = readLine().toString()

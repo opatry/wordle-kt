@@ -4,7 +4,11 @@ package net.opatry.game.wordle
 sealed class State(open val answers: List<String>, open val maxTries: UInt) {
     data class Playing(override val answers: List<String>, override val maxTries: UInt) : State(answers, maxTries) {
         override fun toString(): String {
-            return super.toString() + "Keep going… ${answers.size}/$maxTries"
+            return if (answers.isNotEmpty()) {
+                super.toString() + "Keep going… ${answers.size}/$maxTries"
+            } else {
+                super.toString()
+            }
         }
     }
 
@@ -22,12 +26,15 @@ sealed class State(open val answers: List<String>, open val maxTries: UInt) {
         }
     }
 
+    private fun StringBuffer.appendWord(word: String) {
+        word.toCharArray().joinTo(this, "") { "[ $it ]" }
+        append("\n")
+    }
+
     override fun toString(): String {
         val buffer = StringBuffer()
-        answers.forEach { word ->
-            word.toCharArray().joinTo(buffer, "") { "[ $it ]" }
-            buffer.append("\n")
-        }
+        answers.forEach { buffer.appendWord(it) }
+        repeat(maxTries.toInt() - answers.size) { buffer.appendWord("     ") }
         return buffer.toString()
     }
 }
