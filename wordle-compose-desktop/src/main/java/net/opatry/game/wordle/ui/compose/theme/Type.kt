@@ -56,6 +56,14 @@ val typography = Typography(
         fontSize = 18.sp,
         textAlign = TextAlign.Center
     ),
+    body1 = TextStyle(
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 18.sp,
+    ),
+    body2 = TextStyle(
+        fontWeight = FontWeight.Bold,
+        fontSize = 12.sp,
+    ),
     button = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,

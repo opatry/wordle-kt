@@ -20,22 +20,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import org.jetbrains.compose.compose
+package net.opatry.game.wordle.ui.compose
 
-plugins {
-    kotlin("jvm")
-    id("org.jetbrains.compose")
-    application
-}
-
-group = "net.opatry.game"
-version = "1.0.0"
-
-dependencies {
-    implementation(compose.desktop.currentOs)
-//    implementation(project(":game-logic"))
-}
-
-application {
-    mainClass.set("net.opatry.game.wordle.ui.compose.WordleKt")
-}
+object ResourceLoader

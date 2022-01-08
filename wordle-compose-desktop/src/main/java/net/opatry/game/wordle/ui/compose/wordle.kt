@@ -33,7 +33,7 @@ fun main() {
     singleWindowApplication(
         title = "Wordle Compose",
         icon = BitmapPainter(useResource("/icon.png", ::loadImageBitmap)),
-        state = WindowState(width = 300.dp, height = 500.dp),
+        state = WindowState(width = 500.dp, height = 700.dp),
         resizable = false,
     ) {
         WordleApp()

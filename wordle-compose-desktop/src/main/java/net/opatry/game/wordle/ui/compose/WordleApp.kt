@@ -22,13 +22,22 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 
 
 @Composable
 fun WordleApp() {
     WordleComposeTheme {
-        GameScreen()
+        Box(
+            Modifier.fillMaxSize(),
+            Alignment.TopCenter
+        ) {
+            GameScreen()
+        }
     }
 }

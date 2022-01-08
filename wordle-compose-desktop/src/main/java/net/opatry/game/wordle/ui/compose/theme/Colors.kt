@@ -33,5 +33,24 @@ val gray = Color(0xFF86888A)
 val darkGray = Color(0xFF939598)
 val white = Color(0xFFFFFFFF)
 val black = Color(0xFF212121)
-val orange = Color(0xFFf5793A)
-val blue = Color(0xFF85C0f9)
+val orange = Color(0xFFf5793A) // used for high contrast mode
+val blue = Color(0xFF85C0f9) // used for high contrast mode
+
+val colorTone1 = Color(0xFF1A1A1B)
+val colorTone2 = Color(0xFF787C7E)
+val colorTone3 = Color(0xFF878A8C)
+val colorTone4 = Color(0xFFD3D6DA)
+val colorTone5 = Color(0xFFEDEFF1)
+val colorTone6 = Color(0xFFF6f7F8)
+val colorTone7 = Color(0xFFFFFFFF)
+
+val colorPresent = yellow
+val colorCorrect = green
+val colorAbsent = colorTone2
+val tileTextColor = colorTone7
+val keyTextColor = colorTone1
+val keyEvaluatedTextColor = colorTone7
+val keyBg = colorTone4
+val keyBgPresent = colorPresent
+val keyBgCorrect = colorCorrect
+val keyBgAbsent = colorAbsent
