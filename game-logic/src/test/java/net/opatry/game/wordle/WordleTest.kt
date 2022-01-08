@@ -11,6 +11,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+private fun List<Answer>.toWords(): Array<String> = map { it.letters.concatToString() }.toTypedArray()
+
 @RunWith(JUnit4::class)
 class WordleTest {
     @Test
@@ -137,7 +139,7 @@ class WordleTest {
         val originalState = game.state
         assertTrue(game.playWord("TOTOT"))
         assertNotEquals(originalState, game.state)
-        assertArrayEquals(arrayOf("TOTOT"), game.state.answers.toTypedArray())
+        assertArrayEquals(arrayOf("TOTOT"), game.state.answers.toWords())
     }
 
     @Test
@@ -146,7 +148,7 @@ class WordleTest {
         assertTrue(game.playWord("TUTUT"))
         assertTrue(game.state is State.Won)
         assertEquals("TUTUT", (game.state as? State.Won)?.selectedWord)
-        assertArrayEquals(arrayOf("TUTUT"), game.state.answers.toTypedArray())
+        assertArrayEquals(arrayOf("TUTUT"), game.state.answers.toWords())
     }
 
     @Test
@@ -154,19 +156,19 @@ class WordleTest {
         val game = Wordle(listOf("ERROR", "MISSS", "TUTUT"), "TUTUT", maxTries = 2u)
         assertTrue(game.playWord("ERROR"))
         assertTrue(game.state is State.Playing)
-        assertArrayEquals(arrayOf("ERROR"), game.state.answers.toTypedArray())
+        assertArrayEquals(arrayOf("ERROR"), game.state.answers.toWords())
         assertTrue(game.playWord("MISSS"))
         assertTrue(game.state is State.Lost)
         assertEquals("TUTUT", (game.state as? State.Lost)?.selectedWord)
-        assertArrayEquals(arrayOf("ERROR", "MISSS"), game.state.answers.toTypedArray())
+        assertArrayEquals(arrayOf("ERROR", "MISSS"), game.state.answers.toWords())
     }
 
     @Test
     fun `playing the same word twice consumes an answer`() {
         val game = Wordle(listOf("ERROR", "TUTUT"), "TUTUT")
         assertTrue(game.playWord("ERROR"))
-        assertArrayEquals(arrayOf("ERROR"), game.state.answers.toTypedArray())
+        assertArrayEquals(arrayOf("ERROR"), game.state.answers.toWords())
         assertTrue(game.playWord("ERROR"))
-        assertArrayEquals(arrayOf("ERROR", "ERROR"), game.state.answers.toTypedArray())
+        assertArrayEquals(arrayOf("ERROR", "ERROR"), game.state.answers.toWords())
     }
 }

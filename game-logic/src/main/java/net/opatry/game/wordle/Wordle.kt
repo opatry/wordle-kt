@@ -1,8 +1,94 @@
 package net.opatry.game.wordle
 
+/*
+Wordle 203 X/6
 
-sealed class State(open val answers: List<String>, open val maxTries: UInt) {
-    data class Playing(override val answers: List<String>, override val maxTries: UInt) : State(answers, maxTries) {
+⬛🟩⬛⬛⬛
+⬛🟩⬛🟨⬛
+⬛⬛⬛⬛⬛
+⬛🟩🟩⬛⬛
+⬛🟩🟩🟨🟩
+🟩🟩🟩⬛🟩
+*/
+
+enum class AnswerFlag {
+    EMPTY,
+    MISPLACED,
+    WRONG,
+    CORRECT;
+
+    override fun toString(): String = when (this) {
+        EMPTY -> "⬜"
+        MISPLACED -> "🟨"
+        WRONG -> "⬛"
+        CORRECT -> "🟩"
+    }
+}
+
+class Answer(
+    val letters: CharArray,
+    val flags: Array<AnswerFlag>
+) {
+
+    override fun hashCode(): Int {
+        var hash = 7
+        hash = 31 * hash + letters.contentHashCode()
+        hash = 31 * hash + flags.contentHashCode()
+        return hash
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is Answer) {
+            return letters.contentEquals(other.letters)
+                    && flags.contentEquals(other.flags)
+        }
+        return false
+    }
+
+    // TODO + see https://twitter.com/momoxmia/status/1479026969559789568?s=20 / https://wa11y.co/
+    override fun toString(): String {
+        return flags.joinToString("")
+    }
+
+    companion object {
+        val EMPTY = Answer(CharArray(5) { ' ' }, Array(5) { AnswerFlag.EMPTY })
+        fun computeAnswer(word: String, selectedWord: String): Answer {
+            require(word.length == selectedWord.length) { "'$word' and '$selectedWord' should have the same size" }
+            val flags = Array(word.length) { AnswerFlag.WRONG }
+            // need to go in 2 passes, 1 to spot correct position first, to ignore such position in next contains check
+            word.forEachIndexed { index, char ->
+                if (char == selectedWord[index]) {
+                    flags[index] = AnswerFlag.CORRECT
+                }
+            }
+            word.forEachIndexed { index, char ->
+                if (selectedWord.contains(char) && flags[index] != AnswerFlag.CORRECT) {
+                    flags[index] = AnswerFlag.MISPLACED
+                }
+            }
+            return Answer(word.toCharArray(), flags)
+        }
+    }
+}
+
+private fun StringBuffer.appendWord(word: String) {
+    word.toCharArray().joinTo(this, " ")
+    append("\n")
+}
+
+private fun StringBuffer.appendAnswer(answer: Answer) {
+    append(answer)
+    append("\n")
+}
+
+sealed class State(
+    open val answers: List<Answer>,
+    open val maxTries: UInt
+) {
+    data class Playing(
+        override val answers: List<Answer>,
+        override val maxTries: UInt
+    ) : State(answers, maxTries) {
         override fun toString(): String {
             return if (answers.isNotEmpty()) {
                 super.toString() + "Keep going… ${answers.size}/$maxTries"
@@ -12,29 +98,41 @@ sealed class State(open val answers: List<String>, open val maxTries: UInt) {
         }
     }
 
-    data class Won(override val answers: List<String>, override val maxTries: UInt, val selectedWord: String) :
+    data class Won(
+        override val answers: List<Answer>,
+        override val maxTries: UInt,
+        val wordleId: Int,
+        val selectedWord: String
+    ) :
         State(answers, maxTries) {
         override fun toString(): String {
-            return super.toString() + "Congrats! You found the correct answer 🎉: $selectedWord"
+            return super.toString() +
+                    "Wordle $wordleId ${answers.size + 1}/$maxTries\n" +
+                    "Congrats! You found the correct answer 🎉: $selectedWord"
         }
     }
 
-    data class Lost(override val answers: List<String>, override val maxTries: UInt, val selectedWord: String) :
+    data class Lost(
+        override val answers: List<Answer>,
+        override val maxTries: UInt,
+        val wordleId: Int,
+        val selectedWord: String
+    ) :
         State(answers, maxTries) {
         override fun toString(): String {
-            return super.toString() + "Doh! You didn't find the answer 🤭: $selectedWord"
+            return super.toString() +
+                    "Wordle $wordleId X/$maxTries\n" +
+                    "Doh! You didn't find the answer 🤭: $selectedWord"
         }
-    }
-
-    private fun StringBuffer.appendWord(word: String) {
-        word.toCharArray().joinTo(this, "") { "[ $it ]" }
-        append("\n")
     }
 
     override fun toString(): String {
         val buffer = StringBuffer()
-        answers.forEach { buffer.appendWord(it) }
-        repeat(maxTries.toInt() - answers.size) { buffer.appendWord("     ") }
+        answers.forEach {
+            buffer.appendWord(it.letters.concatToString())
+            buffer.appendAnswer(it)
+        }
+        repeat(maxTries.toInt() - answers.size) { buffer.appendAnswer(Answer.EMPTY) }
         return buffer.toString()
     }
 }
@@ -46,9 +144,10 @@ class Wordle(
 ) {
     private val words = inWords.map(String::sanitizeForWordle)
     private val selectedWord = inSelectedWord.sanitizeForWordle()
+    private val wordleId = words.indexOf(selectedWord)
     var state: State = when {
         maxTries > 0u -> State.Playing(emptyList(), maxTries)
-        else -> State.Lost(emptyList(), maxTries, selectedWord)
+        else -> State.Lost(emptyList(), maxTries, wordleId, selectedWord)
     }
         private set
 
@@ -71,12 +170,12 @@ class Wordle(
         val playingState = state as? State.Playing ?: return false
 
         val answers = playingState.answers.toMutableList().apply {
-            add(sanitized)
+            add(Answer.computeAnswer(sanitized, selectedWord))
         }.toList()
 
         state = when {
-            sanitized == selectedWord -> State.Won(answers, maxTries, selectedWord)
-            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, selectedWord)
+            sanitized == selectedWord -> State.Won(answers, maxTries, wordleId, selectedWord)
+            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, wordleId, selectedWord)
             else -> playingState.copy(answers = answers)
         }
 
