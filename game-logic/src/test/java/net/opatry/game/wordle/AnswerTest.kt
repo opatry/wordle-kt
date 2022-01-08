@@ -9,7 +9,7 @@ import org.junit.runners.JUnit4
 class AnswerTest {
     @Test
     fun `all different is all wrong`() {
-        assertArrayEquals(Array(5) { AnswerFlag.WRONG }, Answer.computeAnswer("aaaaa", "bbbbb").flags)
+        assertArrayEquals(Array(5) { AnswerFlag.ABSENT }, Answer.computeAnswer("aaaaa", "bbbbb").flags)
     }
 
     @Test

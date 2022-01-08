@@ -2,14 +2,14 @@ package net.opatry.game.wordle
 
 enum class AnswerFlag {
     EMPTY,
-    MISPLACED,
-    WRONG,
+    PRESENT,
+    ABSENT,
     CORRECT;
 
     override fun toString(): String = when (this) {
         EMPTY -> "_"
-        MISPLACED -> "-"
-        WRONG -> " "
+        PRESENT -> "-"
+        ABSENT -> " "
         CORRECT -> "+"
     }
 }
@@ -42,8 +42,11 @@ class Answer(
         val EMPTY = Answer(CharArray(5) { ' ' }, Array(5) { AnswerFlag.EMPTY })
         fun computeAnswer(word: String, selectedWord: String): Answer {
             require(word.length == selectedWord.length) { "'$word' and '$selectedWord' should have the same size" }
-            val flags = Array(word.length) { AnswerFlag.WRONG }
+            val flags = Array(word.length) { AnswerFlag.ABSENT }
             // need to go in 2 passes, 1 to spot correct position first, to ignore such position in next contains check
+            // FIXME iterated on selectedWord rather than word for correct result?
+            //  If 1 'e' is present in selected word and user inputs a word with 2 'e', one being correctly placed, the other shouldn't be yellow
+
             word.forEachIndexed { index, char ->
                 if (char == selectedWord[index]) {
                     flags[index] = AnswerFlag.CORRECT
@@ -51,7 +54,7 @@ class Answer(
             }
             word.forEachIndexed { index, char ->
                 if (selectedWord.contains(char) && flags[index] != AnswerFlag.CORRECT) {
-                    flags[index] = AnswerFlag.MISPLACED
+                    flags[index] = AnswerFlag.PRESENT
                 }
             }
             return Answer(word.toCharArray(), flags)
