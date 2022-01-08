@@ -1,16 +1,5 @@
 package net.opatry.game.wordle
 
-/*
-Wordle 203 X/6
-
-⬛🟩⬛⬛⬛
-⬛🟩⬛🟨⬛
-⬛⬛⬛⬛⬛
-⬛🟩🟩⬛⬛
-⬛🟩🟩🟨🟩
-🟩🟩🟩⬛🟩
-*/
-
 enum class AnswerFlag {
     EMPTY,
     MISPLACED,
@@ -18,10 +7,10 @@ enum class AnswerFlag {
     CORRECT;
 
     override fun toString(): String = when (this) {
-        EMPTY -> "⬜"
-        MISPLACED -> "🟨"
-        WRONG -> "⬛"
-        CORRECT -> "🟩"
+        EMPTY -> "_"
+        MISPLACED -> "-"
+        WRONG -> " "
+        CORRECT -> "+"
     }
 }
 
@@ -45,7 +34,6 @@ class Answer(
         return false
     }
 
-    // TODO + see https://twitter.com/momoxmia/status/1479026969559789568?s=20 / https://wa11y.co/
     override fun toString(): String {
         return flags.joinToString("")
     }
@@ -71,13 +59,10 @@ class Answer(
     }
 }
 
-private fun StringBuffer.appendWord(word: String) {
-    word.toCharArray().joinTo(this, " ")
-    append("\n")
-}
-
 private fun StringBuffer.appendAnswer(answer: Answer) {
-    append(answer)
+    answer.letters.forEachIndexed { index, char ->
+        append("$char${answer.flags[index].toEmoji()}")
+    }
     append("\n")
 }
 
@@ -128,10 +113,7 @@ sealed class State(
 
     override fun toString(): String {
         val buffer = StringBuffer()
-        answers.forEach {
-            buffer.appendWord(it.letters.concatToString())
-            buffer.appendAnswer(it)
-        }
+        answers.forEach(buffer::appendAnswer)
         repeat(maxTries.toInt() - answers.size) { buffer.appendAnswer(Answer.EMPTY) }
         return buffer.toString()
     }
