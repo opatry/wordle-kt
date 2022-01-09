@@ -21,9 +21,9 @@
  */
 
 plugins {
-    id 'kotlin'
-    id 'application'
+    id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.compose'
+    id 'application'
 }
 
 group 'net.opatry.game'
