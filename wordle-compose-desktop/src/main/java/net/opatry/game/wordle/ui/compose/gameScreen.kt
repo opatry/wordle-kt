@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -67,15 +68,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
-import net.opatry.game.wordle.ui.compose.theme.black
 import net.opatry.game.wordle.ui.compose.theme.colorAbsent
 import net.opatry.game.wordle.ui.compose.theme.colorCorrect
 import net.opatry.game.wordle.ui.compose.theme.colorPresent
-import net.opatry.game.wordle.ui.compose.theme.darkGray
 import net.opatry.game.wordle.ui.compose.theme.keyBg
 import net.opatry.game.wordle.ui.compose.theme.keyEvaluatedTextColor
 import net.opatry.game.wordle.ui.compose.theme.keyTextColor
-import net.opatry.game.wordle.ui.compose.theme.lightGray
 import net.opatry.game.wordle.ui.compose.theme.tileTextColor
 import net.opatry.game.wordle.ui.compose.theme.white
 import org.xml.sax.InputSource
@@ -273,9 +271,13 @@ fun AnswerFlag.cellColor(): Color = when (this) {
 @Composable
 fun WordleCharCell(char: Char, flag: AnswerFlag) {
     val backgroundColor by animateColorAsState(flag.cellColor())
-    val (foregroundColor, borderColor) = when (flag) {
-        AnswerFlag.EMPTY -> darkGray to lightGray
-        else -> tileTextColor to backgroundColor
+    val (foregroundColor, borderColor) = when {
+        flag == AnswerFlag.EMPTY && char.isWhitespace() ->
+            Color.Transparent to MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled)
+        flag == AnswerFlag.EMPTY ->
+            MaterialTheme.colors.onBackground to MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)
+        else ->
+            tileTextColor to backgroundColor
     }
 
     Box(
