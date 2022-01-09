@@ -63,9 +63,11 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
+import net.opatry.game.wordle.ui.compose.theme.black
 import net.opatry.game.wordle.ui.compose.theme.colorAbsent
 import net.opatry.game.wordle.ui.compose.theme.colorCorrect
 import net.opatry.game.wordle.ui.compose.theme.colorPresent
@@ -237,7 +239,8 @@ fun AlphabetLetterCell(letter: Char, flag: AnswerFlag) {
         Text(
             letter.toString(),
             color = foregroundColor,
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.body2,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -286,7 +289,7 @@ fun WordleCharCell(char: Char, flag: AnswerFlag) {
         Text(
             char.toString(),
             color = foregroundColor,
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.h3
         )
     }
 }
