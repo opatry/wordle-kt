@@ -22,11 +22,8 @@
 
 package net.opatry.game.wordle.ui.compose
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,10 +32,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -56,7 +51,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -64,18 +58,9 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import net.opatry.game.wordle.Answer
-import net.opatry.game.wordle.AnswerFlag
-import net.opatry.game.wordle.ui.compose.theme.colorAbsent
-import net.opatry.game.wordle.ui.compose.theme.colorCorrect
-import net.opatry.game.wordle.ui.compose.theme.colorPresent
-import net.opatry.game.wordle.ui.compose.theme.keyBg
-import net.opatry.game.wordle.ui.compose.theme.keyEvaluatedTextColor
-import net.opatry.game.wordle.ui.compose.theme.keyTextColor
-import net.opatry.game.wordle.ui.compose.theme.tileTextColor
-import net.opatry.game.wordle.ui.compose.theme.white
+import net.opatry.game.wordle.ui.compose.component.Alphabet
+import net.opatry.game.wordle.ui.compose.component.WordleGrid
 import org.xml.sax.InputSource
 
 @ExperimentalComposeUiApi
@@ -183,7 +168,7 @@ fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
         }
 
         val density = LocalDensity.current
-        IconButton(onClick = { onRestart() }) {
+        IconButton(onClick = onRestart) {
             Icon(
                 loadXmlImageVector(
                     InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_refresh.xml")),
@@ -191,107 +176,5 @@ fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
                 ), "Play again"
             )
         }
-    }
-}
-
-@Composable
-fun Alphabet(alphabet: Map<Char, AnswerFlag>) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        alphabet.keys.chunked(9).forEach { row ->
-            Row(horizontalArrangement = Arrangement.SpaceAround) {
-                row.forEach { letter ->
-                    AlphabetLetterCell(letter, alphabet[letter]!!)
-                }
-            }
-        }
-    }
-}
-
-
-fun AnswerFlag.keyBackgroundColor(): Color = when (this) {
-    AnswerFlag.EMPTY -> keyBg
-    AnswerFlag.PRESENT -> colorPresent
-    AnswerFlag.ABSENT -> colorAbsent
-    AnswerFlag.CORRECT -> colorCorrect
-}
-
-fun AnswerFlag.keyForegroundColor(): Color = when (this) {
-    AnswerFlag.EMPTY -> keyTextColor
-    else -> keyEvaluatedTextColor
-}
-
-@Composable
-fun AlphabetLetterCell(letter: Char, flag: AnswerFlag) {
-    val backgroundColor by animateColorAsState(flag.keyBackgroundColor())
-    val foregroundColor by animateColorAsState(flag.keyForegroundColor())
-
-    Box(
-        Modifier
-            .size(width = 36.dp, height = 48.dp)
-            .padding(2.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(backgroundColor)
-            .padding(horizontal = 2.dp, vertical = 4.dp),
-        Alignment.Center,
-    ) {
-        Text(
-            letter.toString(),
-            color = foregroundColor,
-            style = MaterialTheme.typography.body2,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun WordleGrid(grid: List<Answer>) {
-    Column {
-        grid.forEach { row ->
-            WordleWordRow(row)
-        }
-    }
-}
-
-@Composable
-fun WordleWordRow(row: Answer, modifier: Modifier = Modifier) {
-    Row(modifier) {
-        row.letters.forEachIndexed { index, char ->
-            WordleCharCell(char, row.flags[index])
-        }
-    }
-}
-
-fun AnswerFlag.cellColor(): Color = when (this) {
-    AnswerFlag.EMPTY -> white
-    AnswerFlag.PRESENT -> colorPresent
-    AnswerFlag.ABSENT -> colorAbsent
-    AnswerFlag.CORRECT -> colorCorrect
-}
-
-@Composable
-fun WordleCharCell(char: Char, flag: AnswerFlag) {
-    val backgroundColor by animateColorAsState(flag.cellColor())
-    val (foregroundColor, borderColor) = when {
-        flag == AnswerFlag.EMPTY && char.isWhitespace() ->
-            Color.Transparent to MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled)
-        flag == AnswerFlag.EMPTY ->
-            MaterialTheme.colors.onBackground to MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)
-        else ->
-            tileTextColor to backgroundColor
-    }
-
-    Box(
-        Modifier
-            .size(48.dp)
-            .padding(2.dp)
-            .border(BorderStroke(1.dp, borderColor))
-            .background(backgroundColor),
-        Alignment.Center
-    ) {
-        Text(
-            char.toString(),
-            color = foregroundColor,
-            style = MaterialTheme.typography.h3
-        )
     }
 }
