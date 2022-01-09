@@ -52,9 +52,8 @@ val typography = Typography(
         textAlign = TextAlign.Start
     ),
     subtitle1 = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
-        textAlign = TextAlign.Center
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp,
     ),
     body1 = TextStyle(
         fontSize = 14.sp,

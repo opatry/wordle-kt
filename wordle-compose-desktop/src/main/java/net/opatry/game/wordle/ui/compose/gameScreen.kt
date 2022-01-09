@@ -77,7 +77,8 @@ import org.xml.sax.InputSource
 fun GameScreen(viewModel: WordleViewModel) {
     val userInput by rememberUpdatedState(viewModel.userInput)
     var showHowTo by remember { mutableStateOf(false) }
-    val modalVisible = arrayOf(showHowTo).any { it }
+    var showSettings by remember { mutableStateOf(false) }
+    val modalVisible = arrayOf(showHowTo, showSettings).any { it }
 
     val focusRequester = FocusRequester()
     LaunchedEffect(Unit) {
@@ -122,7 +123,8 @@ fun GameScreen(viewModel: WordleViewModel) {
             Toolbar(
                 enabled = !modalVisible,
                 onHowToClick = { showHowTo = true },
-                onSettingsClick = { })
+                onSettingsClick = { showSettings = true }
+            )
             Divider()
             AnswerPlaceHolder(viewModel.answer, viewModel::restart)
             WordleGrid(viewModel.grid)
@@ -136,6 +138,16 @@ fun GameScreen(viewModel: WordleViewModel) {
         ) {
             PopupOverlay("How to play", onClose = { showHowTo = false }) {
                 HowToPanel()
+            }
+        }
+
+        AnimatedVisibility(
+            showSettings,
+            enter = fadeIn() + slideInVertically(),
+            exit = slideOutVertically() + fadeOut()
+        ) {
+            PopupOverlay("Settings", onClose = { showSettings = false }) {
+                SettingsPanel()
             }
         }
     }
