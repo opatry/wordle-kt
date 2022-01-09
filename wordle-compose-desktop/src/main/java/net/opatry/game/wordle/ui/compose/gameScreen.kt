@@ -120,7 +120,7 @@ fun GameScreen(viewModel: WordleViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Toolbar()
-        Divider(Modifier.size(0.5.dp), MaterialTheme.colors.onSurface)
+        Divider()
         AnswerPlaceHolder(viewModel.answer, viewModel::restart)
         WordleGrid(viewModel.grid)
         Alphabet(viewModel.alphabet)
