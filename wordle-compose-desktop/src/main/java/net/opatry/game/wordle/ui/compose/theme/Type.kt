@@ -43,7 +43,7 @@ val typography = Typography(
     ),
     h3 = TextStyle(
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 18.sp,
+        fontSize = 20.sp,
         textAlign = TextAlign.Center,
     ),
     h4 = TextStyle(

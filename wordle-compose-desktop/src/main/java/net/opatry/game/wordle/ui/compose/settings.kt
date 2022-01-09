@@ -44,6 +44,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
+import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import org.xml.sax.InputSource
 
 @Composable
@@ -60,11 +62,11 @@ fun SettingsPanel() {
         }
         Divider()
         Setting("Dark Theme") {
-            Switch(false, onCheckedChange = { }, enabled = false)
+            Switch(isSystemInDarkTheme, onCheckedChange = { isSystemInDarkTheme = it })
         }
         Divider()
         Setting("Color Blind Mode", "High contrast colors") {
-            Switch(false, onCheckedChange = { }, enabled = false)
+            Switch(isHighContrastMode, onCheckedChange = { isHighContrastMode = it })
         }
         Divider()
         Setting(label = "Feedback") {

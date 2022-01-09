@@ -42,10 +42,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.AnswerFlag
-import net.opatry.game.wordle.ui.compose.theme.colorAbsent
-import net.opatry.game.wordle.ui.compose.theme.colorCorrect
-import net.opatry.game.wordle.ui.compose.theme.colorPresent
 import net.opatry.game.wordle.ui.compose.theme.keyBg
+import net.opatry.game.wordle.ui.compose.theme.keyBgAbsent
+import net.opatry.game.wordle.ui.compose.theme.keyBgCorrect
+import net.opatry.game.wordle.ui.compose.theme.keyBgPresent
 import net.opatry.game.wordle.ui.compose.theme.keyEvaluatedTextColor
 import net.opatry.game.wordle.ui.compose.theme.keyTextColor
 
@@ -65,9 +65,9 @@ fun Alphabet(alphabet: Map<Char, AnswerFlag>) {
 
 fun AnswerFlag.keyBackgroundColor(): Color = when (this) {
     AnswerFlag.NONE -> keyBg
-    AnswerFlag.PRESENT -> colorPresent
-    AnswerFlag.ABSENT -> colorAbsent
-    AnswerFlag.CORRECT -> colorCorrect
+    AnswerFlag.PRESENT -> keyBgPresent
+    AnswerFlag.ABSENT -> keyBgAbsent
+    AnswerFlag.CORRECT -> keyBgCorrect
 }
 
 fun AnswerFlag.keyForegroundColor(): Color = when (this) {

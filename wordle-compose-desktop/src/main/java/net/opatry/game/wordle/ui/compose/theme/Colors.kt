@@ -36,21 +36,31 @@ val black = Color(0xFF212121)
 val orange = Color(0xFFf5793A) // used for high contrast mode
 val blue = Color(0xFF85C0f9) // used for high contrast mode
 
-val colorTone1 = Color(0xFF1A1A1B)
-val colorTone2 = Color(0xFF787C7E)
-val colorTone3 = Color(0xFF878A8C)
-val colorTone4 = Color(0xFFD3D6DA)
-val colorTone5 = Color(0xFFEDEFF1)
-val colorTone6 = Color(0xFFF6f7F8)
-val colorTone7 = Color(0xFFFFFFFF)
+val colorTone1: Color get() = Color(if (isSystemInDarkTheme) 0xFFD7DADC else 0xFF1A1A1B)
+val colorTone2: Color get() = Color(if (isSystemInDarkTheme) 0xFF818384 else 0xFF787C7E)
+val colorTone3: Color get() = Color(if (isSystemInDarkTheme) 0xFF565758 else 0xFF878A8C)
+val colorTone4: Color get() = Color(if (isSystemInDarkTheme) 0xFF3A3A3C else 0xFFD3D6DA)
+val colorTone5: Color get() = Color(if (isSystemInDarkTheme) 0xFF272729 else 0xFFEDEFF1)
+val colorTone6: Color get() = Color(if (isSystemInDarkTheme) 0xFF1A1A1B else 0xFFF6f7F8)
+val colorTone7: Color get() = Color(if (isSystemInDarkTheme) 0xFF121213 else 0xFFFFFFFF)
 
-val colorPresent = yellow
-val colorCorrect = green
-val colorAbsent = colorTone2
-val tileTextColor = colorTone7
-val keyTextColor = colorTone1
-val keyEvaluatedTextColor = colorTone7
-val keyBg = colorTone4
-val keyBgPresent = colorPresent
-val keyBgCorrect = colorCorrect
-val keyBgAbsent = colorAbsent
+val colorPresent: Color
+    get() = when {
+        isHighContrastMode -> blue
+        isSystemInDarkTheme -> darkenYellow
+        else -> yellow
+    }
+val colorCorrect: Color
+    get() = when {
+        isHighContrastMode -> orange
+        isSystemInDarkTheme -> darkenGreen
+        else -> green
+    }
+val colorAbsent: Color get() = if (isSystemInDarkTheme) colorTone4 else colorTone2
+val tileTextColor: Color get() = if (isSystemInDarkTheme) colorTone1 else colorTone7
+val keyTextColor: Color get() = colorTone1
+val keyEvaluatedTextColor: Color get() = if (isSystemInDarkTheme) colorTone1 else colorTone7
+val keyBg: Color get() = if (isSystemInDarkTheme) colorTone2 else colorTone4
+val keyBgPresent: Color get() = colorPresent
+val keyBgCorrect: Color get() = colorCorrect
+val keyBgAbsent: Color get() = colorAbsent

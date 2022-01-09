@@ -24,43 +24,66 @@ package net.opatry.game.wordle.ui.compose.theme
 
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Surface
+import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-private val LightColorPalette = lightColors(
-    primary = green,
-    primaryVariant = darkenGreen,
-    background = white,
-    surface = white,
-    onPrimary = white,
-    onBackground = black,
-    onSurface = black,
-)
 
-private val DarkColorPalette = lightColors(
-    primary = green,
-    primaryVariant = darkenGreen,
-    background = black,
-    surface = black,
-    onPrimary = white,
-    onBackground = white,
-    onSurface = white,
-)
+var isSystemInDarkTheme by mutableStateOf(false)
+var isHighContrastMode by mutableStateOf(false)
 
-@Composable
-fun isSystemInDarkTheme() = false
+private fun accentColor(highContrastMode: Boolean): Color = if (highContrastMode) orange else green
+private fun accentColorVariant(highContrastMode: Boolean): Color = if (highContrastMode) orange else darkenGreen
+
+private fun lightColorPalette(highContrastMode: Boolean): Colors {
+    val accentColor = accentColor(highContrastMode)
+    val accentColorVariant = accentColorVariant(highContrastMode)
+    return lightColors(
+        primary = accentColor,
+        primaryVariant = accentColorVariant,
+        secondary = accentColor,
+        secondaryVariant = accentColorVariant,
+        background = colorTone7,
+        surface = colorTone7,
+        onPrimary = white,
+        onBackground = colorTone1,
+        onSurface = colorTone1,
+    )
+}
+
+private fun darkColorPalette(highContrastMode: Boolean): Colors {
+    val accentColor = accentColor(highContrastMode)
+    val accentColorVariant = accentColorVariant(highContrastMode)
+    return darkColors(
+        primary = accentColor,
+        primaryVariant = accentColorVariant,
+        secondary = accentColor,
+        secondaryVariant = accentColorVariant,
+        background = colorTone7,
+        surface = colorTone7,
+        onPrimary = white,
+        onBackground = colorTone1,
+        onSurface = colorTone1,
+    )
+}
 
 @Composable
 fun WordleComposeTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme,
+    highContrastMode: Boolean = isHighContrastMode,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colors = if (darkTheme) DarkColorPalette else LightColorPalette,
+        colors = if (darkTheme) darkColorPalette(highContrastMode) else lightColorPalette(highContrastMode),
         typography = typography,
         shapes = Shapes(medium = RoundedCornerShape(4.dp)),
         content = {
