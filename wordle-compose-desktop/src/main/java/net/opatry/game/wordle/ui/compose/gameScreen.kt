@@ -70,16 +70,21 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import net.opatry.game.wordle.ui.compose.component.Alphabet
 import net.opatry.game.wordle.ui.compose.component.PopupOverlay
 import net.opatry.game.wordle.ui.compose.component.WordleGrid
+import net.opatry.game.wordle.ui.compose.theme.colorTone1
+import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import org.xml.sax.InputSource
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
+    val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val userInput by rememberUpdatedState(viewModel.userInput)
     var showHowTo by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
@@ -143,6 +148,14 @@ fun GameScreen(viewModel: WordleViewModel) {
             Alphabet(viewModel.alphabet)
         }
 
+        Column(Modifier.padding(top = 80.dp)) {
+            userFeedback.forEach { message ->
+                Toast(message, Modifier.padding(bottom = 4.dp)) {
+                    viewModel.consumed(message)
+                }
+            }
+        }
+
         AnimatedVisibility(
             showHowTo,
             enter = fadeIn() + slideInVertically(),
@@ -176,6 +189,33 @@ fun GameScreen(viewModel: WordleViewModel) {
                 onClose = { showResultsSheet = false }
             )
         }
+    }
+}
+
+@Composable
+fun Toast(label: String, modifier: Modifier = Modifier, onDismiss: (String) -> Unit) {
+    var visible by remember { mutableStateOf(true) }
+    LaunchedEffect(label) {
+        delay(1000)
+        visible = false
+        delay(300)
+        onDismiss(label)
+    }
+
+    AnimatedVisibility(
+        visible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Text(
+            label,
+            modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(colorTone1)
+                .padding(8.dp),
+            color = colorTone7,
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
+        )
     }
 }
 

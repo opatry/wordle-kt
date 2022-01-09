@@ -64,6 +64,10 @@ class WordleViewModel(private var rules: WordleRules) {
         private set
     var alphabet by mutableStateOf(emptyMap<Char, AnswerFlag>())
 
+    private val _userFeedback = mutableListOf<String>()
+    var userFeedback by mutableStateOf(_userFeedback.toList())
+        private set
+
     init {
         updateGrid()
         updateAlphabet()
@@ -139,16 +143,22 @@ class WordleViewModel(private var rules: WordleRules) {
                 updateAlphabet()
             }
             InputState.NOT_IN_DICTIONARY -> {
-                // TODO send an EVENT to indicate the error cause (to display a Toast)
+                _userFeedback.add("Not in word list")
+                userFeedback = _userFeedback.toList()
                 updateGrid()
             }
             InputState.TOO_SHORT -> {
-                // TODO send an EVENT to indicate the error cause (to display a Toast)
+                _userFeedback.add("Not enough letters")
+                userFeedback = _userFeedback.toList()
                 updateGrid()
             }
             else -> Unit
         }
         victory = rules.state is State.Won
+        if (victory) {
+            _userFeedback.add("Genius")
+            userFeedback = _userFeedback.toList()
+        }
         updateAnswer()
     }
 
@@ -156,8 +166,15 @@ class WordleViewModel(private var rules: WordleRules) {
         rules = WordleRules(rules.words)
         victory = rules.state is State.Won
         userInput = ""
+        _userFeedback.clear()
+        userFeedback = _userFeedback.toList()
         updateGrid()
         updateAlphabet()
         updateAnswer()
+    }
+
+    fun consumed(message: String) {
+        _userFeedback.remove(message)
+        userFeedback = _userFeedback.toList()
     }
 }
