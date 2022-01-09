@@ -46,7 +46,6 @@ import net.opatry.game.wordle.ui.compose.theme.colorAbsent
 import net.opatry.game.wordle.ui.compose.theme.colorCorrect
 import net.opatry.game.wordle.ui.compose.theme.colorPresent
 import net.opatry.game.wordle.ui.compose.theme.tileTextColor
-import net.opatry.game.wordle.ui.compose.theme.white
 
 
 @Composable
@@ -69,7 +68,7 @@ fun WordleWordRow(row: Answer, modifier: Modifier = Modifier) {
 
 @Composable
 fun AnswerFlag.cellColor(): Color = when (this) {
-    AnswerFlag.EMPTY -> white
+    AnswerFlag.NONE -> MaterialTheme.colors.background
     AnswerFlag.PRESENT -> colorPresent
     AnswerFlag.ABSENT -> colorAbsent
     AnswerFlag.CORRECT -> colorCorrect
@@ -79,9 +78,9 @@ fun AnswerFlag.cellColor(): Color = when (this) {
 fun WordleCharCell(char: Char, flag: AnswerFlag) {
     val backgroundColor by animateColorAsState(flag.cellColor())
     val (foregroundColor, borderColor) = when {
-        flag == AnswerFlag.EMPTY && char.isWhitespace() ->
+        flag == AnswerFlag.NONE && char.isWhitespace() ->
             Color.Transparent to MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled)
-        flag == AnswerFlag.EMPTY ->
+        flag == AnswerFlag.NONE ->
             MaterialTheme.colors.onBackground to MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)
         else ->
             tileTextColor to backgroundColor

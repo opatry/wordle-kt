@@ -23,10 +23,10 @@
 package net.opatry.game.wordle
 
 enum class AnswerFlag {
-    EMPTY,
+    NONE,
     PRESENT,
     ABSENT,
-    CORRECT;
+    CORRECT
 }
 
 class Answer(
@@ -54,7 +54,7 @@ class Answer(
     }
 
     companion object {
-        val EMPTY = Answer(CharArray(5) { ' ' }, Array(5) { AnswerFlag.EMPTY })
+        val EMPTY = Answer(CharArray(5) { ' ' }, Array(5) { AnswerFlag.NONE })
         fun computeAnswer(word: String, selectedWord: String): Answer {
             require(word.length == selectedWord.length) { "'$word' and '$selectedWord' should have the same size" }
             val flags = Array(word.length) { AnswerFlag.ABSENT }

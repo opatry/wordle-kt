@@ -64,14 +64,14 @@ fun Alphabet(alphabet: Map<Char, AnswerFlag>) {
 }
 
 fun AnswerFlag.keyBackgroundColor(): Color = when (this) {
-    AnswerFlag.EMPTY -> keyBg
+    AnswerFlag.NONE -> keyBg
     AnswerFlag.PRESENT -> colorPresent
     AnswerFlag.ABSENT -> colorAbsent
     AnswerFlag.CORRECT -> colorCorrect
 }
 
 fun AnswerFlag.keyForegroundColor(): Color = when (this) {
-    AnswerFlag.EMPTY -> keyTextColor
+    AnswerFlag.NONE -> keyTextColor
     else -> keyEvaluatedTextColor
 }
 

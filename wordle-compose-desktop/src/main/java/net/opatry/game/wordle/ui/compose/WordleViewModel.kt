@@ -50,7 +50,7 @@ class WordleViewModel(private var rules: WordleRules) {
         val turn = answers.size
         val maxTries = rules.state.maxTries.toInt()
         if (turn < maxTries) {
-            answers += Answer(userInput.padEnd(5, ' ').toCharArray(), Array(5) { AnswerFlag.EMPTY })
+            answers += Answer(userInput.padEnd(5, ' ').toCharArray(), Array(5) { AnswerFlag.NONE })
         }
         repeat(maxTries - turn - 1) {
             answers += Answer.EMPTY
@@ -83,7 +83,7 @@ class WordleViewModel(private var rules: WordleRules) {
                     correct.contains(c) -> AnswerFlag.CORRECT
                     present.contains(c) -> AnswerFlag.PRESENT
                     absent.contains(c) -> AnswerFlag.ABSENT
-                    else -> AnswerFlag.EMPTY
+                    else -> AnswerFlag.NONE
                 }
                 ++c
             }
