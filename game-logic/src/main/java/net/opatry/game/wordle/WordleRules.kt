@@ -59,17 +59,29 @@ class Answer(
             require(word.length == selectedWord.length) { "'$word' and '$selectedWord' should have the same size" }
             val flags = Array(word.length) { AnswerFlag.ABSENT }
             // need to go in 2 passes, 1 to spot correct position first, to ignore such position in next contains check
-            // FIXME iterated on selectedWord rather than word for correct result?
-            //  If 1 'e' is present in selected word and user inputs a word with 2 'e', one being correctly placed, the other shouldn't be yellow
+
+            val pickedIndices = mutableSetOf<Int>()
 
             word.forEachIndexed { index, char ->
                 if (char == selectedWord[index]) {
                     flags[index] = AnswerFlag.CORRECT
+                    pickedIndices += index
                 }
             }
-            word.forEachIndexed { index, char ->
-                if (selectedWord.contains(char) && flags[index] != AnswerFlag.CORRECT) {
-                    flags[index] = AnswerFlag.PRESENT
+            for (index in word.indices) {
+                if (flags[index] == AnswerFlag.CORRECT) continue
+
+                val char = word[index]
+                var pickedIndex = selectedWord.indexOf(char)
+                if (pickedIndex != -1) {
+                    var searchIndex = pickedIndex
+                    while (pickedIndices.contains(pickedIndex)) {
+                        pickedIndex = selectedWord.indexOf(char, ++searchIndex)
+                    }
+                    if (pickedIndex in flags.indices && !pickedIndices.contains(pickedIndex)) {
+                        flags[index] = AnswerFlag.PRESENT
+                        pickedIndices += pickedIndex
+                    }
                 }
             }
             return Answer(word.toCharArray(), flags)
