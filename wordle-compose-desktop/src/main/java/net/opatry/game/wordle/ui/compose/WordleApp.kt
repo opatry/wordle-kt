@@ -22,6 +22,7 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ import net.opatry.game.wordle.words
 // FIXME singleton here otherwise recreated at each recomposition, need to be investigated
 val viewModel = WordleViewModel(WordleRules(words))
 
+@ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
 fun WordleApp() {

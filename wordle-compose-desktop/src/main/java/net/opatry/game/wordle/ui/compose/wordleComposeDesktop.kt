@@ -22,6 +22,7 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.loadImageBitmap
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 
+@ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 fun main() {
     singleWindowApplication(

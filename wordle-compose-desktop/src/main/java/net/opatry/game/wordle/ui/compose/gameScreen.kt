@@ -23,9 +23,12 @@
 package net.opatry.game.wordle.ui.compose
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -37,6 +40,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -72,13 +76,20 @@ import net.opatry.game.wordle.ui.compose.component.PopupOverlay
 import net.opatry.game.wordle.ui.compose.component.WordleGrid
 import org.xml.sax.InputSource
 
+@ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
     val userInput by rememberUpdatedState(viewModel.userInput)
     var showHowTo by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
-    val modalVisible = arrayOf(showHowTo, showSettings).any { it }
+    var showResultsSheet by remember { mutableStateOf(false) }
+    val modalVisible = arrayOf(showHowTo, showSettings, showResultsSheet).any { it }
+
+    LaunchedEffect(viewModel.victory) {
+        // FIXME this causes a small freeze when transitioning from !victory to victory
+        showResultsSheet = viewModel.victory
+    }
 
     val focusRequester = FocusRequester()
     LaunchedEffect(Unit) {
@@ -89,7 +100,8 @@ fun GameScreen(viewModel: WordleViewModel) {
         Modifier
             .fillMaxHeight()
             .width(400.dp)
-            .padding(2.dp)
+            .padding(2.dp),
+        contentAlignment = Alignment.TopCenter
     ) {
         // TODO Scaffold?
         Column(
@@ -149,6 +161,20 @@ fun GameScreen(viewModel: WordleViewModel) {
             PopupOverlay("Settings", onClose = { showSettings = false }) {
                 SettingsPanel()
             }
+        }
+
+        AnimatedVisibility(
+            showResultsSheet,
+            enter = fadeIn() + scaleIn(),
+            exit = scaleOut() + fadeOut()
+        ) {
+            ResultsSheet(
+                Modifier
+                    .size(width = 300.dp, height = 400.dp)
+                    .padding(top = 50.dp),
+                onShare = {},
+                onClose = { showResultsSheet = false }
+            )
         }
     }
 }
