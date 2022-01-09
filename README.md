@@ -109,11 +109,16 @@ Congrats! You found the correct answer 🎉: HELLO
 
 </details>
 
+### Compose Mosaic mode
+
+![](raw/wordle-mosaic.png)
+
 ## Tech Stack
 
 * [Kotlin](https://kotlinlang.org/)
 * [Jetbrains Compose for Desktop](https://www.jetbrains.com/lp/compose/)
 * [Jetpack Compose for Android](https://developer.android.com/jetpack/compose)
+* [Mosaic Compose for Console UI](https://github.com/JakeWharton/mosaic)
 
 ## Development
 
