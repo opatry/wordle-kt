@@ -35,6 +35,8 @@ accompanist-insets = "com.google.accompanist:accompanist-insets:0.25.1"
 
 gson = "com.google.code.gson:gson:2.10.1"
 
+jline = "org.jline:jline:3.25.0"
+
 junit4 = "junit:junit:4.13.2"
 
 [bundles]

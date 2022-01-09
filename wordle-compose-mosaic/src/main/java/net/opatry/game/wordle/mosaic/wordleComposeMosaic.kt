@@ -28,12 +28,14 @@ import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.runMosaic
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
 import net.opatry.game.wordle.ui.toEmoji
+import org.jline.terminal.TerminalBuilder
 
 private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
     answer.flags.map(AnswerFlag::toEmoji).forEach(::append)
@@ -67,28 +69,34 @@ suspend fun main() = runMosaic {
         GameScreen(viewModel)
     }
 
-    while (playing) {
-        delay(16)
-        while (viewModel.state is State.Playing) {
-            delay(16)
-            print(" ➡️ Enter a 5 letter english word: ") // FIXME shouldn't be done with compose/mosaic
-            val word = readLine().toString() // FIXME how to scan with compose/mosaic
-//            delay(16)
-            viewModel.playWord(word)
-        }
+    withContext(Dispatchers.IO) {
+        val terminal = TerminalBuilder.terminal()
+        terminal.enterRawMode()
+        terminal.reader().use { reader ->
+            while (playing) {
+                while (viewModel.state is State.Playing) {
+                    val userInput = viewModel.userInput
+                    val read = reader.read()
+                    when (val char = read.toChar()) {
+                        13.toChar(), '\n' -> viewModel.playWord()
+                        127.toChar(), '\b' -> if (userInput.isNotEmpty()) {
+                            viewModel.updateUserInput(userInput.dropLast(1))
+                        }
+                        in 'a'..'z',
+                        in 'A'..'Z' -> viewModel.updateUserInput(userInput + char)
+                        // '?' -> viewModel.showHelp()
+                        // ',' -> viewModel.showSettings()
+                        // 27.toChar() -> break
+                        else -> Unit // TODO display something to user
+                    }
+                }
 
-        delay(16)
-
-        // TODO
-//        viewModel.state.toClipboard()
-//        println("Results copied to clipboard!")
-        println(viewModel.state.toClipboard())
-
-        print(" 🔄 Play again? (y/N) ") // FIXME shouldn't be done with compose/mosaic
-        playing = readLine().toString().equals("y", ignoreCase = true) // FIXME how to scan with compose/mosaic
-//        delay(16)
-        if (playing) {
-            viewModel.restart()
+                val read = reader.read()
+                playing = read.toChar().equals('y', ignoreCase = true)
+                if (playing) {
+                    viewModel.restart()
+                }
+            }
         }
     }
 }
@@ -96,20 +104,33 @@ suspend fun main() = runMosaic {
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
     Column {
-        Toolbar()
-        AnswerPlaceHolder(viewModel.answer)
         WordleGrid(viewModel.grid)
+
+        when (val state = viewModel.state) {
+            is State.Won -> {
+                Text("Wordle <TODO_wordleId> ${state.answers.size}/${state.maxTries}")
+                Text(viewModel.answer)
+            }
+            is State.Lost -> {
+                Text("Wordle <TODO_wordleId> X/${state.maxTries}")
+                Text(viewModel.answer)
+            }
+            is State.Playing -> {
+                Text(" ➡️ Enter a 5 letter english word")
+                Text("") // TODO display error here if any or define a placeholder on top of grid
+            }
+        }
+
+//        viewModel.state.toClipboard()
+//        println("Results copied to clipboard!")
+
+        // there must be stable number of lines for nice UI state
+        if (viewModel.state !is State.Playing) {
+            Text(" 🔄 Play again? (y/N)? ${viewModel.userInput}")
+        } else {
+            Text("")
+        }
     }
-}
-
-@Composable
-fun Toolbar() {
-    Text("Wordle")
-}
-
-@Composable
-fun AnswerPlaceHolder(answer: String) {
-    Text(answer)
 }
 
 @Composable
@@ -131,7 +152,7 @@ fun WordleWordRow(row: Answer) {
 }
 
 fun AnswerFlag.cellColors(): Pair<Color, Color> = when (this) {
-    AnswerFlag.NONE -> Color.Black to Color.White
+    AnswerFlag.NONE -> Color.Black to Color.BrightWhite
     AnswerFlag.PRESENT -> Color.Black to Color.Yellow
     AnswerFlag.ABSENT -> Color.White to Color.Black
     AnswerFlag.CORRECT -> Color.Black to Color.Green
@@ -152,6 +173,6 @@ fun WordleCharCell(char: Char, flag: AnswerFlag) {
             )
             Text(" ")
         }
-        Text("    ")
+        Text("")
     }
 }

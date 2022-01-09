@@ -32,6 +32,7 @@ import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
 
 class WordleViewModel(private var rules: WordleRules) {
+    var userInput by mutableStateOf("")
     var state by mutableStateOf(rules.state)
     var answer by mutableStateOf("")
         private set
@@ -48,7 +49,10 @@ class WordleViewModel(private var rules: WordleRules) {
         val maxTries = rules.state.maxTries
         val wordSize = rules.wordSize
         val emptyAnswer = Answer(CharArray(wordSize) { ' ' }, Array(wordSize) { AnswerFlag.NONE })
-        repeat(maxTries - turn) {
+        if (turn < maxTries) {
+            answers += Answer(userInput.padEnd(wordSize, ' ').toCharArray(), Array(wordSize) { AnswerFlag.NONE })
+        }
+        repeat(maxTries - turn - 1) {
             answers += emptyAnswer
         }
         grid = answers.toList()
@@ -62,10 +66,18 @@ class WordleViewModel(private var rules: WordleRules) {
         }
     }
 
-    fun playWord(word: String) {
-        val normalized = word.take(5).uppercase()
+    fun updateUserInput(input: String) {
+        val normalized = input.take(5).uppercase()
+        if (normalized != userInput) {
+            userInput = normalized
+            updateGrid()
+        }
+    }
+
+    fun playWord() {
         // TODO indicate error when input isn't valid
-        if (rules.playWord(normalized) == InputState.VALID) {
+        if (rules.playWord(userInput) == InputState.VALID) {
+            userInput = ""
             updateGrid()
         }
         updateAnswer()
@@ -74,6 +86,7 @@ class WordleViewModel(private var rules: WordleRules) {
 
     fun restart() {
         rules = WordleRules(rules.words)
+        userInput = ""
         updateGrid()
         updateAnswer()
         state = rules.state
