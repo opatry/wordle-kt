@@ -255,8 +255,8 @@ fun WordleGrid(grid: List<Answer>) {
 }
 
 @Composable
-fun WordleWordRow(row: Answer) {
-    Row {
+fun WordleWordRow(row: Answer, modifier: Modifier = Modifier) {
+    Row(modifier) {
         row.letters.forEachIndexed { index, char ->
             WordleCharCell(char, row.flags[index])
         }
