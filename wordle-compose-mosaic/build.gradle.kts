@@ -8,3 +8,7 @@ dependencies {
     implementation(project(":word-data"))
     implementation(project(":game-logic"))
 }
+
+application {
+    mainClass = "net.opatry.game.wordle.mosaic.WordleComposeMosaicKt"
+}

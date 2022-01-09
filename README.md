@@ -113,6 +113,19 @@ Congrats! You found the correct answer 🎉: HELLO
 
 ![](raw/wordle-mosaic.png)
 
+In a compatible terminal, build the binary distribution and execute it:
+
+```bash
+$ ./gradlew wordle-compose-mosaic:installDist
+$ ./wordle-compose-mosaic/build/install/wordle-compose-mosaic/bin/wordle-compose-mosaic
+```
+
+Or you can simply execute the convenience `runWordleMosaic.sh` script doing the same.
+
+```bash
+$ ./runWordleMosaic.sh 
+```
+
 ## Tech Stack
 
 * [Kotlin](https://kotlinlang.org/)
