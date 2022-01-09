@@ -149,6 +149,14 @@ sealed class State(
     }
 }
 
+enum class InputState {
+    TOO_SHORT,
+    TOO_LONG,
+    NOT_IN_DICTIONARY,
+    NOT_PLAYING,
+    VALID
+}
+
 class WordleRules(
     inWords: List<String>,
     inSelectedWord: String = inWords.random(),
@@ -172,14 +180,23 @@ class WordleRules(
         }
     }
 
-    fun isWordValid(word: String): Boolean {
-        return words.contains(word.sanitizeForWordle())
+    fun isWordValid(word: String): InputState {
+        val sanitized = word.sanitizeForWordle()
+        // when checking for a word, no need to consider the game state
+        return when {
+            sanitized.length < 5 -> InputState.TOO_SHORT
+            sanitized.length > 5 -> InputState.TOO_LONG
+            !words.contains(sanitized) -> InputState.NOT_IN_DICTIONARY
+            else -> InputState.VALID
+        }
     }
 
-    fun playWord(word: String): Boolean {
+    fun playWord(word: String): InputState {
+        val playingState = state as? State.Playing ?: return InputState.NOT_PLAYING
+
         val sanitized = word.sanitizeForWordle()
-        if (!isWordValid(sanitized)) return false
-        val playingState = state as? State.Playing ?: return false
+        val inputState = isWordValid(sanitized)
+        if (inputState != InputState.VALID) return inputState
 
         val answers = playingState.answers.toMutableList().apply {
             add(Answer.computeAnswer(sanitized, selectedWord))
@@ -191,6 +208,6 @@ class WordleRules(
             else -> playingState.copy(answers = answers)
         }
 
-        return true
+        return inputState
     }
 }

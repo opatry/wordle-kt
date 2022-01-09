@@ -24,7 +24,6 @@ package net.opatry.game.wordle
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThrows
@@ -105,37 +104,37 @@ class WordleTest {
     @Test
     fun `too short word isn't a valid answer`() {
         val game = WordleRules(listOf("TOTOT"), "TOTOT")
-        assertFalse(game.isWordValid("TOTO"))
+        assertEquals(InputState.TOO_SHORT, game.isWordValid("TOTO"))
     }
 
     @Test
     fun `too long word isn't a valid answer`() {
         val game = WordleRules(listOf("TOTOT"), "TOTOT")
-        assertFalse(game.isWordValid("TOTOTOT"))
+        assertEquals(InputState.TOO_LONG, game.isWordValid("TOTOTOT"))
     }
 
     @Test
     fun `word not part of available words isn't a valid answer`() {
         val game = WordleRules(listOf("TOTOT"), "TOTOT")
-        assertFalse(game.isWordValid("TITIT"))
+        assertEquals(InputState.NOT_IN_DICTIONARY, game.isWordValid("TITIT"))
     }
 
     @Test
     fun `word part of available words is a valid answer`() {
         val game = WordleRules(listOf("TOTOT", "TITIT"), "TOTOT")
-        assertTrue(game.isWordValid("TITIT"))
+        assertEquals(InputState.VALID, game.isWordValid("TITIT"))
     }
 
     @Test
     fun `selected word is a valid answer`() {
         val game = WordleRules(listOf("TOTOT", "TUTUT"), "TUTUT")
-        assertTrue(game.isWordValid("TUTUT"))
+        assertEquals(InputState.VALID, game.isWordValid("TUTUT"))
     }
 
     @Test
     fun `selected word accented is a valid answer`() {
         val game = WordleRules(listOf("TOTOT", "TUTUT"), "TUTUT")
-        assertTrue(game.isWordValid("  tûtüt "))
+        assertEquals(InputState.VALID, game.isWordValid("  tûtüt "))
     }
 
     @Test
@@ -143,7 +142,7 @@ class WordleTest {
         val game = WordleRules(listOf("TOTOT", "TUTUT"), "TUTUT", 0u)
         val originalState = game.state
         assertTrue(originalState !is State.Playing)
-        assertFalse(game.playWord("TUTUT"))
+        assertEquals(InputState.NOT_PLAYING, game.playWord("TUTUT"))
         assertEquals(originalState, game.state)
     }
 
@@ -151,7 +150,7 @@ class WordleTest {
     fun `play invalid word does nothing`() {
         val game = WordleRules(listOf("TOTOT", "TUTUT"), "TUTUT")
         val originalState = game.state
-        assertFalse(game.playWord("z"))
+        assertEquals(InputState.TOO_SHORT, game.playWord("z"))
         assertEquals(originalState, game.state)
     }
 
@@ -159,7 +158,7 @@ class WordleTest {
     fun `play valid word adds a new word to state`() {
         val game = WordleRules(listOf("TOTOT", "TUTUT"), "TUTUT")
         val originalState = game.state
-        assertTrue(game.playWord("TOTOT"))
+        assertEquals(InputState.VALID, game.playWord("TOTOT"))
         assertNotEquals(originalState, game.state)
         assertArrayEquals(arrayOf("TOTOT"), game.state.answers.toWords())
     }
@@ -167,7 +166,7 @@ class WordleTest {
     @Test
     fun `playing correct answer ends the game to Won state`() {
         val game = WordleRules(listOf("TUTUT"), "TUTUT")
-        assertTrue(game.playWord("TUTUT"))
+        assertEquals(InputState.VALID, game.playWord("TUTUT"))
         assertTrue(game.state is State.Won)
         assertEquals("TUTUT", (game.state as? State.Won)?.selectedWord)
         assertArrayEquals(arrayOf("TUTUT"), game.state.answers.toWords())
@@ -176,10 +175,10 @@ class WordleTest {
     @Test
     fun `playing max allowed words without correct answer ends the game to Lost state`() {
         val game = WordleRules(listOf("ERROR", "MISSS", "TUTUT"), "TUTUT", maxTries = 2u)
-        assertTrue(game.playWord("ERROR"))
+        assertEquals(InputState.VALID, game.playWord("ERROR"))
         assertTrue(game.state is State.Playing)
         assertArrayEquals(arrayOf("ERROR"), game.state.answers.toWords())
-        assertTrue(game.playWord("MISSS"))
+        assertEquals(InputState.VALID, game.playWord("MISSS"))
         assertTrue(game.state is State.Lost)
         assertEquals("TUTUT", (game.state as? State.Lost)?.selectedWord)
         assertArrayEquals(arrayOf("ERROR", "MISSS"), game.state.answers.toWords())
@@ -188,9 +187,9 @@ class WordleTest {
     @Test
     fun `playing the same word twice consumes an answer`() {
         val game = WordleRules(listOf("ERROR", "TUTUT"), "TUTUT")
-        assertTrue(game.playWord("ERROR"))
+        assertEquals(InputState.VALID, game.playWord("ERROR"))
         assertArrayEquals(arrayOf("ERROR"), game.state.answers.toWords())
-        assertTrue(game.playWord("ERROR"))
+        assertEquals(InputState.VALID, game.playWord("ERROR"))
         assertArrayEquals(arrayOf("ERROR", "ERROR"), game.state.answers.toWords())
     }
 
@@ -199,22 +198,22 @@ class WordleTest {
         val game = WordleRules(listOf("AAAAA", "WEEDS", "SPEED"), "SPEED")
 
         // no in dictionary
-        assertTrue(game.playWord("BBBBB"))
-        assertArrayEquals(Array(5) { AnswerFlag.EMPTY }, game.state.answers.lastOrNull()?.flags)
+        assertEquals(InputState.NOT_IN_DICTIONARY, game.playWord("BBBBB"))
+        assertArrayEquals(null, game.state.answers.lastOrNull()?.flags)
 
         // in dictionary, no match
-        assertTrue(game.playWord("AAAAA"))
+        assertEquals(InputState.VALID, game.playWord("AAAAA"))
         assertArrayEquals(Array(5) { AnswerFlag.ABSENT }, game.state.answers.lastOrNull()?.flags)
 
         // in dictionary exact and partial matches
-        assertTrue(game.playWord("WEEDS"))
+        assertEquals(InputState.VALID, game.playWord("WEEDS"))
         assertArrayEquals(
             arrayOf(AnswerFlag.ABSENT, AnswerFlag.PRESENT, AnswerFlag.CORRECT, AnswerFlag.PRESENT, AnswerFlag.PRESENT),
             game.state.answers.lastOrNull()?.flags
         )
 
         // in dictionary selected word
-        assertTrue(game.playWord("SPEED"))
+        assertEquals(InputState.VALID, game.playWord("SPEED"))
         assertArrayEquals(Array(5) { AnswerFlag.CORRECT }, game.state.answers.lastOrNull()?.flags)
         assertTrue(game.state is State.Won)
     }

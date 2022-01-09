@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
+import net.opatry.game.wordle.InputState
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
 
@@ -107,11 +108,21 @@ class WordleViewModel(private var rules: WordleRules) {
     }
 
     fun validateUserInput() {
-        // TODO indicate error when input isn't valid
-        if (rules.playWord(userInput)) {
-            userInput = ""
-            updateGrid()
-            updateAlphabet()
+        when (rules.playWord(userInput)) {
+            InputState.VALID -> {
+                userInput = ""
+                updateGrid()
+                updateAlphabet()
+            }
+            InputState.NOT_IN_DICTIONARY -> {
+                // TODO send an EVENT to indicate the error cause (to display a Toast)
+                updateGrid()
+            }
+            InputState.TOO_SHORT -> {
+                // TODO send an EVENT to indicate the error cause (to display a Toast)
+                updateGrid()
+            }
+            else -> Unit
         }
         updateAnswer()
     }

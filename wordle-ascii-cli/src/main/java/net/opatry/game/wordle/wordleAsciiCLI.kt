@@ -22,6 +22,15 @@
 
 package net.opatry.game.wordle
 
+private val InputState.cause: String
+    get() = when (this) {
+        InputState.VALID -> ""
+        InputState.TOO_SHORT -> "too short"
+        InputState.TOO_LONG -> "too long"
+        InputState.NOT_IN_DICTIONARY -> "not in dictionary"
+        InputState.NOT_PLAYING -> "not playing"
+    }
+
 fun main() {
     var playing = true
     while (playing) {
@@ -40,10 +49,11 @@ fun main() {
             print(" ➡️ Enter a 5 letter english word: ")
             val word = readLine().toString()
 
-            if (rules.isWordValid(word)) {
+            val inputState = rules.isWordValid(word)
+            if (inputState == InputState.VALID) {
                 rules.playWord(word)
             } else {
-                println(" ❌ '$word' isn't in the list of words.")
+                println(" ❌ '$word' is invalid: ${inputState.cause}")
             }
             println(rules.state.toString())
         }
