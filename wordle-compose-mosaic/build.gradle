@@ -5,6 +5,9 @@ plugins {
 }
 
 dependencies {
+    implementation('org.jline:jline:3.17.1') {
+        because 'need to handle terminal keyboard input'
+    }
     implementation(project(':word-data'))
     implementation(project(':game-logic'))
 }
