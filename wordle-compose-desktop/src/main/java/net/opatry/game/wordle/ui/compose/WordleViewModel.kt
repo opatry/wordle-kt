@@ -52,6 +52,8 @@ private fun State.toClipboard(): String {
 }
 
 class WordleViewModel(private var rules: WordleRules) {
+    var firstLaunch by mutableStateOf(true)
+        private set
     val stateLabel: String
         get() = rules.state.toClipboard()
     var victory by mutableStateOf(rules.state is State.Won)
@@ -176,5 +178,9 @@ class WordleViewModel(private var rules: WordleRules) {
     fun consumed(message: String) {
         _userFeedback.remove(message)
         userFeedback = _userFeedback.toList()
+    }
+
+    fun firstLaunchDone() {
+        firstLaunch = false
     }
 }

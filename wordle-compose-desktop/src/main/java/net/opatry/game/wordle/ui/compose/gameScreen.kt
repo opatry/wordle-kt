@@ -74,6 +74,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import net.opatry.game.wordle.ui.compose.component.Alphabet
+import net.opatry.game.wordle.ui.compose.component.Dialog
 import net.opatry.game.wordle.ui.compose.component.PopupOverlay
 import net.opatry.game.wordle.ui.compose.component.WordleGrid
 import net.opatry.game.wordle.ui.compose.theme.colorTone1
@@ -86,10 +87,11 @@ import org.xml.sax.InputSource
 fun GameScreen(viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val userInput by rememberUpdatedState(viewModel.userInput)
+    val showFirstLaunchSheet by rememberUpdatedState(viewModel.firstLaunch)
     var showHowTo by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showResultsSheet by remember { mutableStateOf(false) }
-    val modalVisible = arrayOf(showHowTo, showSettings, showResultsSheet).any { it }
+    val modalVisible = arrayOf(showFirstLaunchSheet, showHowTo, showSettings, showResultsSheet).any { it }
 
     LaunchedEffect(viewModel.victory) {
         // FIXME this causes a small freeze when transitioning from !victory to victory
@@ -167,6 +169,21 @@ fun GameScreen(viewModel: WordleViewModel) {
         }
 
         AnimatedVisibility(
+            showFirstLaunchSheet,
+            enter = fadeIn() + slideInVertically(),
+            exit = slideOutVertically() + fadeOut()
+        ) {
+            Dialog(
+                Modifier
+                    .size(width = 380.dp, height = 520.dp)
+                    .padding(top = 50.dp),
+                onClose = { viewModel.firstLaunchDone() }
+            ) {
+                HowToPanel()
+            }
+        }
+
+        AnimatedVisibility(
             showSettings,
             enter = fadeIn() + slideInVertically(),
             exit = slideOutVertically() + fadeOut()
@@ -181,13 +198,14 @@ fun GameScreen(viewModel: WordleViewModel) {
             enter = fadeIn() + scaleIn(),
             exit = scaleOut() + fadeOut()
         ) {
-            ResultsSheet(
+            Dialog(
                 Modifier
                     .size(width = 300.dp, height = 400.dp)
                     .padding(top = 50.dp),
-                onShare = {},
                 onClose = { showResultsSheet = false }
-            )
+            ) {
+                ResultsSheet {}
+            }
         }
     }
 }

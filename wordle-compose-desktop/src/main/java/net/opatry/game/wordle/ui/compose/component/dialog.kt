@@ -20,50 +20,52 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.opatry.game.wordle.ui.compose
+package net.opatry.game.wordle.ui.compose.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.ui.compose.ResourceLoader
 import org.xml.sax.InputSource
 
+
 @Composable
-fun ResultsSheet(modifier: Modifier = Modifier, onShare: () -> Unit) {
+fun Dialog(modifier: Modifier = Modifier, onClose: () -> Unit, content: @Composable () -> Unit) {
     val density = LocalDensity.current
 
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            "Statistics",
-            Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.h3
-        )
-
-        Spacer(Modifier.height(8.dp))
-        Text(viewModel.stateLabel, textAlign = TextAlign.Center)
-        Spacer(Modifier.weight(1f))
-
-        Button(onClick = onShare) {
-            Text("Share")
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                loadXmlImageVector(
-                    InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_share.xml")),
-                    density
-                ), null
-            )
+    Column(
+        modifier
+            .shadow(24.dp)
+            .clip(RoundedCornerShape(5.dp))
+            .background(MaterialTheme.colors.surface)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
+            IconButton(onClick = onClose) {
+                Icon(
+                    loadXmlImageVector(
+                        InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_close.xml")),
+                        density
+                    ), "Close"
+                )
+            }
         }
+
+        content()
     }
 }
