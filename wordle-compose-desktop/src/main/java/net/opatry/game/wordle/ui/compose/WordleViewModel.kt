@@ -30,8 +30,32 @@ import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.InputState
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.toEmoji
+
+private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
+    answer.flags.forEach { append(it.toEmoji()).append(' ') }
+    append('\n')
+}
+
+private fun State.toClipboard(): String {
+    val buffer = StringBuffer()
+    buffer.append(
+        when (this) {
+            is State.Lost -> "Wordle $wordleId X/$maxTries\n"
+            is State.Won -> "Wordle $wordleId ${answers.size}/$maxTries\n"
+            else -> ""
+        }
+    )
+    answers.forEach(buffer::appendClipboardAnswer)
+
+    return buffer.toString()
+}
 
 class WordleViewModel(private var rules: WordleRules) {
+    val stateLabel: String
+        get() = rules.state.toClipboard()
+    var victory by mutableStateOf(rules.state is State.Won)
+        private set
     var answer by mutableStateOf("")
         private set
     var grid by mutableStateOf<List<Answer>>(emptyList())
@@ -124,11 +148,13 @@ class WordleViewModel(private var rules: WordleRules) {
             }
             else -> Unit
         }
+        victory = rules.state is State.Won
         updateAnswer()
     }
 
     fun restart() {
         rules = WordleRules(rules.words)
+        victory = rules.state is State.Won
         userInput = ""
         updateGrid()
         updateAlphabet()
