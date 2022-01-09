@@ -120,21 +120,20 @@ fun GameScreen(viewModel: WordleViewModel) {
                     if (event.type != KeyEventType.KeyUp) {
                         return@onKeyEvent false
                     }
-                    if (event.key == Key.Backspace) {
-                        if (userInput.isNotEmpty()) {
-                            viewModel.updateUserInput(userInput.dropLast(1))
-                        }
+                    when (event.key.keyCode) {
+                        in Key.A.keyCode..Key.Z.keyCode ->
+                            // FIXME how to do the same without relying on AWT?
+                            viewModel.updateUserInput(userInput + event.awtEvent.keyChar)
+                        Key.Backspace.keyCode ->
+                            if (userInput.isNotEmpty()) {
+                                viewModel.updateUserInput(userInput.dropLast(1))
+                            }
+                        Key.Enter.keyCode ->
+                            viewModel.validateUserInput()
+                        else ->
+                            return@onKeyEvent false
                     }
-                    if (event.key == Key.Enter) {
-                        viewModel.validateUserInput()
-                        true
-                    } else if (event.key.keyCode in Key.A.keyCode..Key.Z.keyCode) {
-                        // FIXME how to do the same without relying on AWT?
-                        viewModel.updateUserInput(userInput + event.awtEvent.keyChar)
-                        true
-                    } else {
-                        false
-                    }
+                    true
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
