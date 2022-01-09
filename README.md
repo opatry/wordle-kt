@@ -8,24 +8,33 @@
 
 ### Compose for Desktop
 
-| In game                          | End of game                     |
-|----------------------------------|---------------------------------|
-| ![](raw/wordle-compose-input.png) | ![](raw/wordle-compose-won.png) |
+#### Main screens
 
-### ASCII CLI mode
+| Playing                                               | Victory                                   | End of game                               | Settings                                   | How to play                             |
+|-------------------------------------------------------|-------------------------------------------|-------------------------------------------|--------------------------------------------|-----------------------------------------|
+| ![](raw/wordle-compose-playing-light.png)             | ![](raw/wordle-compose-victory-light.png) | ![](raw/wordle-compose-restart-light.png) | ![](raw/wordle-compose-settings-light.png) | ![](raw/wordle-compose-howto-light.png) |
+
+#### Light & Dark mode
+
+| Light 🌞                                               | Dark 🌛                                               |
+|--------------------------------------------------------|-------------------------------------------------------|
+| ![](raw/wordle-compose-playing-light.png)              | ![](raw/wordle-compose-playing-dark.png)              |
+| ![](raw/wordle-compose-playing-light-highcontrast.png) | ![](raw/wordle-compose-playing-dark-highcontrast.png) |
+
+### ASCII/Console mode
 
 ```
 .---------------.
 | Hello Wordle! |
 '---------------'
  ➡️ Enter a 5 letter english word: hello
+Wordle 189 4/6
 T⬛I⬛L🟩E🟨S⬛
 G⬛R⬛E🟨A⬛T⬛
 T⬛A⬛L🟩E🟨S⬛
 H🟩E🟩L🟩L🟩O🟩
  ⬜ ⬜ ⬜ ⬜ ⬜
  ⬜ ⬜ ⬜ ⬜ ⬜
-Wordle 0 5/6
 Congrats! You found the correct answer 🎉: HELLO
  🔄 Play again? (y/N) 
  ```
@@ -69,13 +78,13 @@ T⬛A⬛L🟩E🟨S⬛
  ⬜ ⬜ ⬜ ⬜ ⬜
 Keep going… 3/6
  ➡️ Enter a 5 letter english word: hello
+Wordle 189 4/6
 T⬛I⬛L🟩E🟨S⬛
 G⬛R⬛E🟨A⬛T⬛
 T⬛A⬛L🟩E🟨S⬛
 H🟩E🟩L🟩L🟩O🟩
  ⬜ ⬜ ⬜ ⬜ ⬜
  ⬜ ⬜ ⬜ ⬜ ⬜
-Wordle 0 5/6
 Congrats! You found the correct answer 🎉: HELLO
  🔄 Play again? (y/N) 
 ```
@@ -85,8 +94,8 @@ Congrats! You found the correct answer 🎉: HELLO
 ## Tech Stack
 
 * [Kotlin](https://kotlinlang.org/)
-* [Jetpack Compose](https://developer.android.com/jetpack/compose) (
-  and [Jetbrains Compose for Desktop](https://www.jetbrains.com/lp/compose/))
+* [Jetbrains Compose for Desktop](https://www.jetbrains.com/lp/compose/)
+  ([Jetpack Compose](https://developer.android.com/jetpack/compose) for Android later)
 
 ## Development
 
