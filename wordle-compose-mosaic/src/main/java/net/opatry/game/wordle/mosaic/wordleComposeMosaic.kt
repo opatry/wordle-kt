@@ -105,6 +105,8 @@ fun main() = runMosaic {
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
     Column {
+        Text("")
+
         WordleGrid(viewModel.grid)
 
         when (val state = viewModel.state) {

@@ -7,4 +7,7 @@ origin=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) || exit
 cd "$origin"
 
 ./gradlew wordle-compose-mosaic:installDist
+
+echo ""
+
 ./wordle-compose-mosaic/build/install/wordle-compose-mosaic/bin/wordle-compose-mosaic
