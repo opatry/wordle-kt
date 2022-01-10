@@ -21,6 +21,24 @@
 | ![](raw/wordle-compose-playing-light.png)              | ![](raw/wordle-compose-playing-dark.png)              |
 | ![](raw/wordle-compose-playing-light-highcontrast.png) | ![](raw/wordle-compose-playing-dark-highcontrast.png) |
 
+### Compose for Android
+
+The main UI is displayed in Android devices.
+
+For now, the setup is made quick & dirty and needs improvements (maybe using Kotlin Multi Platform project?).
+Sources from the desktop version needs to be copied into the Android project.
+
+```sh
+./syncComposeSharedSources.sh
+```
+
+Any edit made in the Android copy should be done in the original desktop module afterwards.
+
+Extracting Compose code common to Desktop & Android apps in a shared module would clean this mess but might require specific Gradle setup.
+Reason why it might be better to use KMP project setup.
+
+Android support is still very rough and a nice to have for now.
+
 ### ASCII/Console mode
 
 ```
@@ -95,7 +113,7 @@ Congrats! You found the correct answer 🎉: HELLO
 
 * [Kotlin](https://kotlinlang.org/)
 * [Jetbrains Compose for Desktop](https://www.jetbrains.com/lp/compose/)
-  ([Jetpack Compose](https://developer.android.com/jetpack/compose) for Android later)
+* [Jetpack Compose for Android](https://developer.android.com/jetpack/compose)
 
 ## Development
 
