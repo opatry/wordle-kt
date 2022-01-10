@@ -26,11 +26,26 @@ plugins {
     id 'application'
 }
 
+repositories {
+    // Needed to fetch material icons for Desktop
+    maven {
+        url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+    }
+}
+
 group 'net.opatry.game'
 version '1.0.0'
 
 dependencies {
     implementation(compose.desktop.currentOs)
+
+    // TODO depends on such icons when compatible with up to date compiler & runtime
+    //  For now, having this as dependency leads to `Unresolved reference: loadImageBitmap`
+    //  If using compiler plugin 1.0.0 (instead of 1.0.1) with Kotlin 1.5.31, still compilation issue
+    //  When removed such error, crashes at runtime: java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.DpKt.DpSize-YgX7TsA(float, float)'
+//    implementation 'androidx.compose.material:material-icons-core-desktop:1.0.0-beta06'
+//    implementation 'androidx.compose.material:material-icons-extended-desktop:1.0.0-beta06'
+
     implementation(project(':word-data'))
     implementation(project(':game-logic'))
 }
