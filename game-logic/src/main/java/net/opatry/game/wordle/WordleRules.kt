@@ -58,30 +58,27 @@ class Answer(
         fun computeAnswer(word: String, selectedWord: String): Answer {
             require(word.length == selectedWord.length) { "'$word' and '$selectedWord' should have the same size" }
             val flags = Array(word.length) { AnswerFlag.ABSENT }
-            // need to go in 2 passes, 1 to spot correct position first, to ignore such position in next contains check
 
-            val pickedIndices = mutableSetOf<Int>()
+            // each time a letter is flagged (CORRECT or PRESENT), we remove from here
+            // it allows managing multiple occurrence of the same letter more easily
+            val candidates = selectedWord.toMutableList()
 
+            // need to go in two passes, first to flag correct position
+            // to ignore such indices in next contains iteration
             word.forEachIndexed { index, char ->
                 if (char == selectedWord[index]) {
                     flags[index] = AnswerFlag.CORRECT
-                    pickedIndices += index
+                    candidates -= char
                 }
             }
+
             for (index in word.indices) {
                 if (flags[index] == AnswerFlag.CORRECT) continue
 
                 val char = word[index]
-                var pickedIndex = selectedWord.indexOf(char)
-                if (pickedIndex != -1) {
-                    var searchIndex = pickedIndex
-                    while (pickedIndices.contains(pickedIndex)) {
-                        pickedIndex = selectedWord.indexOf(char, ++searchIndex)
-                    }
-                    if (pickedIndex in flags.indices && !pickedIndices.contains(pickedIndex)) {
-                        flags[index] = AnswerFlag.PRESENT
-                        pickedIndices += pickedIndex
-                    }
+                if (char in candidates) {
+                    flags[index] = AnswerFlag.PRESENT
+                    candidates -= char
                 }
             }
             return Answer(word.toCharArray(), flags)
