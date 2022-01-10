@@ -20,7 +20,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.opatry.game.wordle.ui.compose
+package net.opatry.game.wordle.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

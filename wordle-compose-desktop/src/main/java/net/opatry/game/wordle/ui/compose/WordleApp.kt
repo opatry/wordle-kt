@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 import net.opatry.game.wordle.words
 
