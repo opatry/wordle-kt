@@ -26,41 +26,83 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
-import androidx.compose.ui.Alignment
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
+import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
-import net.opatry.game.wordle.WordleRules
-import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
-import net.opatry.game.wordle.words
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import net.opatry.game.wordle.Dictionary
+import net.opatry.game.wordle.R
+import net.opatry.game.wordle.allDictionaries
+import net.opatry.game.wordle.data.Settings
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
+import net.opatry.game.wordle.ui.compose.theme.IconProvider
+import net.opatry.game.wordle.ui.compose.theme.LocalIconProvider
+import java.io.File
 
-// FIXME singleton here otherwise recreated at each config change
-val viewModel = WordleViewModel(WordleRules(words))
 
+object AndroidIconProvider : IconProvider {
+    @Composable
+    override fun providePainter(icon: AppIcon): Painter {
+        val drawableRes = when (icon) {
+            AppIcon.Open -> R.drawable.ic_open_in
+            AppIcon.Help -> R.drawable.ic_help_outline
+            AppIcon.Settings -> R.drawable.ic_settings_outline
+            AppIcon.Refresh -> R.drawable.ic_refresh
+            AppIcon.Close -> R.drawable.ic_close
+            AppIcon.Share -> R.drawable.ic_share_outline
+            AppIcon.Leaderboard -> R.drawable.ic_leaderboard_outline
+        }
+        return painterResource(drawableRes)
+    }
+}
+
+@ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO inject
+        val dataFile = File(filesDir, "records.json")
+        val settingsFile = File(filesDir, "settings.json")
+
+        // TODO inject
+        val settings = Settings(settingsFile)
+
+        // TODO inject
+        val validDictionaries = allDictionaries
+            .filter { it.wordSize in 4..8 }
+            .sortedWith(compareBy(Dictionary::language, Dictionary::wordSize))
+
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            WordleComposeTheme {
-                ProvideWindowInsets {
+            ProvideWindowInsets {
+                CompositionLocalProvider(LocalIconProvider provides AndroidIconProvider) {
                     Box(
                         Modifier
-                            .fillMaxSize()
-                            .padding(top = 24.dp),
-                        Alignment.TopCenter
+                            .background(MaterialTheme.colors.surface)
+                            .padding(
+                                rememberInsetsPaddingValues(
+                                    insets = LocalWindowInsets.current.systemBars,
+                                    applyTop = true,
+                                    applyBottom = true,
+                                )
+                            )
                     ) {
-                        //GameScreen(viewModel)
-                        Text("TODO")
+                        WordleApp(settings, dataFile, validDictionaries)
                     }
                 }
             }

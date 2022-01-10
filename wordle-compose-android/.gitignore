@@ -1,1 +1,5 @@
 /target/
+src/main/java/net/opatry/game/wordle/data/
+src/main/java/net/opatry/game/wordle/WordleStats.kt
+src/main/java/net/opatry/game/wordle/ui/
+!src/main/java/net/opatry/game/wordle/ui/MainActivity.kt
