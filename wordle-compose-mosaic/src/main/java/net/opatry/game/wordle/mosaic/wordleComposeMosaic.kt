@@ -27,6 +27,7 @@ import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Text
+import com.jakewharton.mosaic.ui.TextStyle
 import com.jakewharton.mosaic.runMosaic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -173,7 +174,8 @@ fun WordleCharCell(char: Char, flag: AnswerFlag) {
             Text(
                 " $char ",
                 color = foregroundColor,
-                background = backgroundColor
+                background = backgroundColor,
+                style = TextStyle.Bold
             )
             Text(" ")
         }
