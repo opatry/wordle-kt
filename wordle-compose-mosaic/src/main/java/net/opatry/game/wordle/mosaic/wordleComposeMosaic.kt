@@ -24,17 +24,13 @@ package net.opatry.game.wordle.mosaic
 
 import androidx.compose.runtime.Composable
 import com.jakewharton.mosaic.runMosaic
-import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Column
-import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Text
-import com.jakewharton.mosaic.ui.TextStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.opatry.game.wordle.Answer
-import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.mosaic.component.WordleGrid
 import net.opatry.game.wordle.ui.WordleViewModel
 import org.jline.terminal.TerminalBuilder
 
@@ -113,54 +109,5 @@ fun GameScreen(viewModel: WordleViewModel) {
         } else {
             Text("")
         }
-    }
-}
-
-@Composable
-fun WordleGrid(grid: List<Answer>) {
-    Column {
-        grid.forEach { row ->
-            WordleWordRow(row)
-        }
-    }
-}
-
-@Composable
-fun WordleWordRow(row: Answer) {
-    Row {
-        row.letters.forEachIndexed { index, char ->
-            WordleCharCell(char, row.flags[index])
-        }
-    }
-}
-
-fun AnswerFlag.cellColors(): Pair<Color, Color> = when (this) {
-    AnswerFlag.NONE -> Color.Black to Color.White
-    AnswerFlag.PRESENT -> Color.Black to Color.Yellow
-    AnswerFlag.ABSENT -> Color.White to Color.Black
-    AnswerFlag.CORRECT -> Color.Black to Color.Green
-}
-
-@Composable
-fun WordleCharCell(char: Char, flag: AnswerFlag) {
-    val (foregroundColor, backgroundColor) =
-        if (flag == AnswerFlag.NONE && !char.isWhitespace())
-            Color.Black to Color.BrightWhite
-        else
-            flag.cellColors()
-
-    // TODO AnnotatedString " $char " https://github.com/JakeWharton/mosaic/issues/9
-    Column {
-        Row {
-            Text(" ")
-            Text(
-                " $char ",
-                color = foregroundColor,
-                background = backgroundColor,
-                style = TextStyle.Bold
-            )
-            Text(" ")
-        }
-        Text("")
     }
 }
