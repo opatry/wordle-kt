@@ -43,10 +43,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,9 +67,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -79,6 +81,24 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone1
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import net.opatry.game.wordle.ui.compose.theme.painterResource
+
+@ExperimentalComposeUiApi
+fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
+    val userInput = viewModel.userInput
+    when (key.keyCode) {
+        in Key.A.keyCode..Key.Z.keyCode ->
+            viewModel.updateUserInput(userInput + key.nativeKeyCode.toChar())
+        Key.Backspace.keyCode ->
+            if (userInput.isNotEmpty()) {
+                viewModel.updateUserInput(userInput.dropLast(1))
+            }
+        Key.NumPadEnter.keyCode,
+        Key.Enter.keyCode ->
+            viewModel.validateUserInput()
+        else -> return false
+    }
+    return true
+}
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -119,19 +139,7 @@ fun GameScreen(viewModel: WordleViewModel) {
                     if (event.type != KeyEventType.KeyUp) {
                         return@onKeyEvent false
                     }
-                    when (event.key.keyCode) {
-                        in Key.A.keyCode..Key.Z.keyCode ->
-                            viewModel.updateUserInput(userInput + event.utf16CodePoint.toChar())
-                        Key.Backspace.keyCode ->
-                            if (userInput.isNotEmpty()) {
-                                viewModel.updateUserInput(userInput.dropLast(1))
-                            }
-                        Key.Enter.keyCode ->
-                            viewModel.validateUserInput()
-                        else ->
-                            return@onKeyEvent false
-                    }
-                    true
+                    handleKey(viewModel, event.key)
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -144,7 +152,17 @@ fun GameScreen(viewModel: WordleViewModel) {
             Divider()
             AnswerPlaceHolder(viewModel.answer, viewModel::restart)
             WordleGrid(viewModel.grid)
-            Alphabet(viewModel.alphabet)
+            Alphabet(viewModel.alphabet) { key ->
+                handleKey(viewModel, key)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { handleKey(viewModel, Key.Backspace) }) {
+                    Text("⌫")
+                }
+                Button(onClick = { handleKey(viewModel, Key.Enter) }) {
+                    Text("Enter")
+                }
+            }
         }
 
         Column(Modifier.padding(top = 80.dp)) {

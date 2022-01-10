@@ -24,6 +24,7 @@ package net.opatry.game.wordle.ui.compose.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.AnswerFlag
@@ -51,12 +53,14 @@ import net.opatry.game.wordle.ui.compose.theme.keyTextColor
 
 
 @Composable
-fun Alphabet(alphabet: Map<Char, AnswerFlag>) {
+fun Alphabet(alphabet: Map<Char, AnswerFlag>, onLetterClick: (Key) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         alphabet.keys.chunked(9).forEach { row ->
             Row(horizontalArrangement = Arrangement.SpaceAround) {
                 row.forEach { letter ->
-                    AlphabetLetterCell(letter, alphabet[letter]!!)
+                    AlphabetLetterCell(letter, alphabet[letter]!!) {
+                        onLetterClick(Key(letter.code))
+                    }
                 }
             }
         }
@@ -76,7 +80,7 @@ fun AnswerFlag.keyForegroundColor(): Color = when (this) {
 }
 
 @Composable
-fun AlphabetLetterCell(letter: Char, flag: AnswerFlag) {
+fun AlphabetLetterCell(letter: Char, flag: AnswerFlag, onClick: () -> Unit) {
     val backgroundColor by animateColorAsState(flag.keyBackgroundColor())
     val foregroundColor by animateColorAsState(flag.keyForegroundColor())
 
@@ -86,6 +90,7 @@ fun AlphabetLetterCell(letter: Char, flag: AnswerFlag) {
             .padding(2.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(backgroundColor)
+            .clickable { onClick() }
             .padding(horizontal = 2.dp, vertical = 4.dp),
         Alignment.Center,
     ) {
