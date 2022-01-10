@@ -1,10 +1,11 @@
 buildscript {
     repositories {
         mavenCentral()
+        google()
     }
 
     dependencies {
-        classpath 'org.jetbrains.compose:compose-gradle-plugin:1.0.0'
+        classpath 'com.android.tools.build:gradle:7.0.4'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31'
     }
 }
@@ -12,13 +13,44 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+        google()
     }
 }
 
 subprojects {
     afterEvaluate { proj ->
 
-        if (proj.hasProperty('kotlin')) {
+        if (proj.hasProperty('android')) {
+            android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                    targetCompatibility JavaVersion.VERSION_1_8
+                }
+
+                if (proj.hasProperty('kotlin')) {
+                    kotlinOptions {
+                        jvmTarget = JavaVersion.VERSION_1_8.toString()
+                    }
+                }
+
+                testOptions {
+                    unitTests.all {
+                        // let JUnit report mark the job status in case of error
+                        ignoreFailures = true
+                        testLogging {
+                            events "passed", "skipped", "failed"
+                            exceptionFormat "short"
+
+                            debug {
+                                exceptionFormat "full"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (proj.hasProperty('kotlin') && !proj.hasProperty('android')) {
             compileKotlin {
                 kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
             }

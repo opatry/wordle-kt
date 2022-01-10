@@ -22,7 +22,7 @@
 
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id 'org.jetbrains.compose'
+    id 'org.jetbrains.compose' version '1.0.0'
     id 'application'
 }
 
