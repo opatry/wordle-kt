@@ -68,8 +68,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -79,7 +78,6 @@ import net.opatry.game.wordle.ui.compose.component.PopupOverlay
 import net.opatry.game.wordle.ui.compose.component.WordleGrid
 import net.opatry.game.wordle.ui.compose.theme.colorTone1
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
-import org.xml.sax.InputSource
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -237,30 +235,18 @@ fun Toast(label: String, modifier: Modifier = Modifier, onDismiss: (String) -> U
 
 @Composable
 fun Toolbar(enabled: Boolean, onHowToClick: () -> Unit, onSettingsClick: () -> Unit) {
-    val density = LocalDensity.current
-
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onHowToClick, enabled = enabled) {
-            Icon(
-                loadXmlImageVector(
-                    InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_help_outline.xml")),
-                    density
-                ), "How to play"
-            )
+            Icon(painterResource("ic_help_outline.xml"), "How to play")
         }
 
         Text("Wordle", Modifier.weight(1f), style = MaterialTheme.typography.h1)
 
         IconButton(onClick = onSettingsClick, enabled = enabled) {
-            Icon(
-                loadXmlImageVector(
-                    InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_settings_outline.xml")),
-                    density
-                ), "Settings"
-            )
+            Icon(painterResource("ic_settings_outline.xml"), "Settings")
         }
     }
 }
@@ -291,14 +277,8 @@ fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
             )
         }
 
-        val density = LocalDensity.current
         IconButton(onClick = onRestart) {
-            Icon(
-                loadXmlImageVector(
-                    InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_refresh.xml")),
-                    density
-                ), "Play again"
-            )
+            Icon(painterResource("ic_refresh.xml"), "Play again")
         }
     }
 }

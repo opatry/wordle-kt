@@ -34,15 +34,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadXmlImageVector
-import net.opatry.game.wordle.ui.compose.ResourceLoader
-import org.xml.sax.InputSource
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
-    val density = LocalDensity.current
-
     // TODO Scaffold?
     Column(
         Modifier.background(MaterialTheme.colors.background).fillMaxSize()
@@ -54,12 +49,7 @@ fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable () -> 
                 style = MaterialTheme.typography.h3
             )
             IconButton(onClick = onClose) {
-                Icon(
-                    loadXmlImageVector(
-                        InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_close.xml")),
-                        density
-                    ), "Close"
-                )
+                Icon(painterResource("ic_close.xml"), "Close")
             }
         }
         content()

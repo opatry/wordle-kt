@@ -22,6 +22,7 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,18 +41,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
-import org.xml.sax.InputSource
 
 @Composable
 fun SettingsPanel() {
-    val density = LocalDensity.current
-
     Column(
         Modifier
             .fillMaxHeight()
@@ -71,12 +67,7 @@ fun SettingsPanel() {
         Divider()
         Setting(label = "Feedback") {
             IconButton(onClick = { }, enabled = false) {
-                Icon(
-                    loadXmlImageVector(
-                        InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_open_in.xml")),
-                        density
-                    ), "Open outside to provide feedback"
-                )
+                Icon(painterResource("ic_open_in.xml"), "Open outside to provide feedback")
             }
         }
         Divider()

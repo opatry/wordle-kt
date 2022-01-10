@@ -36,17 +36,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import net.opatry.game.wordle.ui.compose.ResourceLoader
-import org.xml.sax.InputSource
 
 
 @Composable
 fun Dialog(modifier: Modifier = Modifier, onClose: () -> Unit, content: @Composable () -> Unit) {
-    val density = LocalDensity.current
-
     Column(
         modifier
             .shadow(24.dp)
@@ -57,12 +52,7 @@ fun Dialog(modifier: Modifier = Modifier, onClose: () -> Unit, content: @Composa
     ) {
         Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
             IconButton(onClick = onClose) {
-                Icon(
-                    loadXmlImageVector(
-                        InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_close.xml")),
-                        density
-                    ), "Close"
-                )
+                Icon(painterResource("ic_close.xml"), "Close")
             }
         }
 

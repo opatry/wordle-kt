@@ -34,16 +34,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.xml.sax.InputSource
 
 @Composable
 fun ResultsSheet(modifier: Modifier = Modifier, onShare: () -> Unit) {
-    val density = LocalDensity.current
-
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             "Statistics",
@@ -58,12 +54,7 @@ fun ResultsSheet(modifier: Modifier = Modifier, onShare: () -> Unit) {
         Button(onClick = onShare) {
             Text("Share")
             Spacer(Modifier.width(8.dp))
-            Icon(
-                loadXmlImageVector(
-                    InputSource(ResourceLoader::class.java.getResourceAsStream("/ic_share.xml")),
-                    density
-                ), null
-            )
+            Icon(painterResource("ic_share.xml"), null)
         }
     }
 }
