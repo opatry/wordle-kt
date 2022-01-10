@@ -35,6 +35,8 @@ import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.mosaic.component.Alphabet
+import net.opatry.game.wordle.mosaic.component.WordleGrid
 import net.opatry.game.wordle.toEmoji
 import net.opatry.game.wordle.ui.WordleViewModel
 import org.jline.terminal.TerminalBuilder
@@ -108,7 +110,12 @@ fun GameScreen(viewModel: WordleViewModel) {
     Column {
         Text("")
 
-        WordleGrid(viewModel.grid)
+        Row {
+            Text("            ")
+            WordleGrid(viewModel.grid)
+            Text("            ")
+            Alphabet(viewModel.alphabet)
+        }
 
         when (val state = viewModel.state) {
             is State.Won -> {
