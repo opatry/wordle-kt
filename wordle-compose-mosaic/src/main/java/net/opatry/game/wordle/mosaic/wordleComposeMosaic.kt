@@ -36,6 +36,7 @@ import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
 import net.opatry.game.wordle.toEmoji
+import net.opatry.game.wordle.ui.WordleViewModel
 import org.jline.terminal.TerminalBuilder
 
 private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
@@ -79,7 +80,7 @@ fun main() = runMosaic {
                     val userInput = viewModel.userInput
                     val read = reader.read()
                     when (val char = read.toChar()) {
-                        13.toChar(), '\n' -> viewModel.playWord()
+                        13.toChar(), '\n' -> viewModel.validateUserInput()
                         127.toChar(), '\b' -> if (userInput.isNotEmpty()) {
                             viewModel.updateUserInput(userInput.dropLast(1))
                         }
