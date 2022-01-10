@@ -7,3 +7,4 @@ build/
 
 game-logic/out/
 wordle-compose-desktop/out/
+.DS_Store
