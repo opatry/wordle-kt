@@ -23,43 +23,20 @@
 package net.opatry.game.wordle.mosaic
 
 import androidx.compose.runtime.Composable
+import com.jakewharton.mosaic.runMosaic
 import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle
-import com.jakewharton.mosaic.runMosaic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
-import net.opatry.game.wordle.ui.toEmoji
+import net.opatry.game.wordle.ui.WordleViewModel
 import org.jline.terminal.TerminalBuilder
-
-private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
-    answer.flags.map(AnswerFlag::toEmoji).forEach(::append)
-    append('\n')
-}
-
-fun State.toClipboard(): String {
-    val buffer = StringBuffer()
-    buffer.append(
-        when (this) {
-            is State.Lost -> "Wordle <TODO_wordleId> X/$maxTries\n"
-            is State.Won -> "Wordle <TODO_wordleId> ${answers.size}/$maxTries\n"
-            else -> ""
-        }
-    )
-    answers.forEach(buffer::appendClipboardAnswer)
-
-    val clipboard = buffer.toString()
-
-    // FIXME might not be cross platform/portable
-    // TODO "pbcopy <<< $clipboard".runCommand(File(System.getProperty("user.dir")))
-    return clipboard
-}
 
 suspend fun main() = runMosaic {
     // TODO check terminal is compatible (eg. IDEA is not!)
@@ -79,10 +56,11 @@ suspend fun main() = runMosaic {
                     val userInput = viewModel.userInput
                     val read = reader.read()
                     when (val char = read.toChar()) {
-                        13.toChar(), '\n' -> viewModel.playWord()
+                        13.toChar(), '\n' -> viewModel.validateUserInput()
                         127.toChar(), '\b' -> if (userInput.isNotEmpty()) {
                             viewModel.updateUserInput(userInput.dropLast(1))
                         }
+
                         in 'a'..'z',
                         in 'A'..'Z' -> viewModel.updateUserInput(userInput + char)
                         // '?' -> viewModel.showHelp()
@@ -114,10 +92,12 @@ fun GameScreen(viewModel: WordleViewModel) {
                 Text("Wordle <TODO_wordleId> ${state.answers.size}/${state.maxTries}")
                 Text(viewModel.answer)
             }
+
             is State.Lost -> {
                 Text("Wordle <TODO_wordleId> X/${state.maxTries}")
                 Text(viewModel.answer)
             }
+
             is State.Playing -> {
                 Text(" ➡️ Enter a 5 letter english word")
                 Text("") // TODO display error here if any or define a placeholder on top of grid
