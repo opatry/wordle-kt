@@ -44,6 +44,8 @@ fun GameScreen(viewModel: WordleViewModel) {
             Alphabet(viewModel.alphabet)
         }
 
+        Text("")
+
         when (val state = viewModel.state) {
             is State.Won -> {
                 Text("Wordle <TODO_wordleId> ${state.answers.size}/${state.maxTries}")

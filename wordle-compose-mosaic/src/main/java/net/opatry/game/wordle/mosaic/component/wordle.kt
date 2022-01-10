@@ -35,18 +35,29 @@ import net.opatry.game.wordle.AnswerFlag
 @Composable
 fun WordleGrid(grid: List<Answer>) {
     Column {
-        grid.forEach { row ->
-            WordleWordRow(row)
-        }
-    }
-}
+        // Box drawing: https://en.wikipedia.org/wiki/Box-drawing_character#Box_Drawing
+        // FIXME dividers length depends on max of row.letters
+        //  good enough for now given that we know it's a 5x6 grid
+        Text("╭─────┬─────┬─────┬─────┬─────╮")
+        grid.forEachIndexed { rowIndex, row ->
+            if (rowIndex > 0) {
+                Text("├─────┼─────┼─────┼─────┼─────┤")
+            }
+            Row {
+                row.letters.forEachIndexed { cellIndex, char ->
+                    if (cellIndex == 0)
+                        Text("│ ")
+                    else
+                        Text(" │ ")
 
-@Composable
-fun WordleWordRow(row: Answer) {
-    Row {
-        row.letters.forEachIndexed { index, char ->
-            WordleCharCell(char, row.flags[index])
+                    WordleCharCell(char, row.flags[cellIndex])
+
+                    if (cellIndex == row.letters.size - 1)
+                        Text(" │")
+                }
+            }
         }
+        Text("╰─────┴─────┴─────┴─────┴─────╯")
     }
 }
 
@@ -68,15 +79,12 @@ fun WordleCharCell(char: Char, flag: AnswerFlag) {
     // TODO AnnotatedString " $char " https://github.com/JakeWharton/mosaic/issues/9
     Column {
         Row {
-            Text(" ")
             Text(
                 " $char ",
                 color = foregroundColor,
                 background = backgroundColor,
                 style = TextStyle.Bold
             )
-            Text(" ")
         }
-        Text("")
     }
 }

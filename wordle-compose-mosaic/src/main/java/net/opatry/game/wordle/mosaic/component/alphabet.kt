@@ -25,6 +25,7 @@ package net.opatry.game.wordle.mosaic.component
 import androidx.compose.runtime.Composable
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Row
+import com.jakewharton.mosaic.ui.Text
 import net.opatry.game.wordle.AnswerFlag
 
 @Composable
@@ -33,9 +34,12 @@ fun Alphabet(alphabet: Map<Char, AnswerFlag>) {
         alphabet.keys.chunked(9).forEach { row ->
             Row {
                 row.forEach { letter ->
+                    Text(" ")
                     WordleCharCell(letter, alphabet[letter]!!)
+                    Text(" ")
                 }
             }
+            Text(" ")
         }
     }
 }
