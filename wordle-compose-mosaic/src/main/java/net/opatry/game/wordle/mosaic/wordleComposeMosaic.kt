@@ -152,7 +152,7 @@ fun WordleWordRow(row: Answer) {
 }
 
 fun AnswerFlag.cellColors(): Pair<Color, Color> = when (this) {
-    AnswerFlag.NONE -> Color.Black to Color.BrightWhite
+    AnswerFlag.NONE -> Color.Black to Color.White
     AnswerFlag.PRESENT -> Color.Black to Color.Yellow
     AnswerFlag.ABSENT -> Color.White to Color.Black
     AnswerFlag.CORRECT -> Color.Black to Color.Green
@@ -160,7 +160,11 @@ fun AnswerFlag.cellColors(): Pair<Color, Color> = when (this) {
 
 @Composable
 fun WordleCharCell(char: Char, flag: AnswerFlag) {
-    val (foregroundColor, backgroundColor) = flag.cellColors()
+    val (foregroundColor, backgroundColor) =
+        if (flag == AnswerFlag.NONE && !char.isWhitespace())
+            Color.Black to Color.BrightWhite
+        else
+            flag.cellColors()
 
     // TODO AnnotatedString " $char " https://github.com/JakeWharton/mosaic/issues/9
     Column {
