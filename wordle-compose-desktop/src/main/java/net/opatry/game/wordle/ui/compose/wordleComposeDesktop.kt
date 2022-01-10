@@ -23,13 +23,35 @@
 package net.opatry.game.wordle.ui.compose
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
+import net.opatry.game.wordle.ui.compose.theme.IconProvider
+import net.opatry.game.wordle.ui.compose.theme.LocalIconProvider
+
+object DesktopIconProvider : IconProvider {
+    @Composable
+    override fun providePainter(icon: AppIcon): Painter {
+        val resourcePath = when (icon) {
+            AppIcon.Open -> "ic_open_in.xml"
+            AppIcon.Help -> "ic_help_outline.xml"
+            AppIcon.Settings -> "ic_settings_outline.xml"
+            AppIcon.Refresh -> "ic_refresh.xml"
+            AppIcon.Close -> "ic_close.xml"
+            AppIcon.Share -> "ic_share.xml"
+        }
+        return painterResource(resourcePath)
+    }
+}
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -40,6 +62,8 @@ fun main() {
         state = WindowState(width = 500.dp, height = 700.dp),
         resizable = false,
     ) {
-        WordleApp()
+        CompositionLocalProvider(LocalIconProvider provides DesktopIconProvider) {
+            WordleApp()
+        }
     }
 }

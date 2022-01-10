@@ -34,7 +34,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
+import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
 fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
@@ -49,7 +50,7 @@ fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable () -> 
                 style = MaterialTheme.typography.h3
             )
             IconButton(onClick = onClose) {
-                Icon(painterResource("ic_close.xml"), "Close")
+                Icon(painterResource(AppIcon.Close), "Close")
             }
         }
         content()

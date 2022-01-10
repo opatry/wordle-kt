@@ -68,7 +68,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -76,8 +75,10 @@ import net.opatry.game.wordle.ui.compose.component.Alphabet
 import net.opatry.game.wordle.ui.compose.component.Dialog
 import net.opatry.game.wordle.ui.compose.component.PopupOverlay
 import net.opatry.game.wordle.ui.compose.component.WordleGrid
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone1
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
+import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -240,13 +241,13 @@ fun Toolbar(enabled: Boolean, onHowToClick: () -> Unit, onSettingsClick: () -> U
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onHowToClick, enabled = enabled) {
-            Icon(painterResource("ic_help_outline.xml"), "How to play")
+            Icon(painterResource(AppIcon.Help), "How to play")
         }
 
         Text("Wordle", Modifier.weight(1f), style = MaterialTheme.typography.h1)
 
         IconButton(onClick = onSettingsClick, enabled = enabled) {
-            Icon(painterResource("ic_settings_outline.xml"), "Settings")
+            Icon(painterResource(AppIcon.Settings), "Settings")
         }
     }
 }
@@ -278,7 +279,7 @@ fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
         }
 
         IconButton(onClick = onRestart) {
-            Icon(painterResource("ic_refresh.xml"), "Play again")
+            Icon(painterResource(AppIcon.Refresh), "Play again")
         }
     }
 }

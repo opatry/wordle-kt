@@ -34,9 +34,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
+import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
 fun ResultsSheet(modifier: Modifier = Modifier, onShare: () -> Unit) {
@@ -54,7 +55,7 @@ fun ResultsSheet(modifier: Modifier = Modifier, onShare: () -> Unit) {
         Button(onClick = onShare) {
             Text("Share")
             Spacer(Modifier.width(8.dp))
-            Icon(painterResource("ic_share.xml"), null)
+            Icon(painterResource(AppIcon.Share), null)
         }
     }
 }

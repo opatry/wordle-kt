@@ -22,7 +22,6 @@
 
 package net.opatry.game.wordle.ui.compose
 
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,8 +42,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
+import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
 fun SettingsPanel() {
@@ -67,7 +68,7 @@ fun SettingsPanel() {
         Divider()
         Setting(label = "Feedback") {
             IconButton(onClick = { }, enabled = false) {
-                Icon(painterResource("ic_open_in.xml"), "Open outside to provide feedback")
+                Icon(painterResource(AppIcon.Open), "Open outside to provide feedback")
             }
         }
         Divider()

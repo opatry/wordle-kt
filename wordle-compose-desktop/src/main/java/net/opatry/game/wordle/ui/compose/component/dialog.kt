@@ -36,8 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
+import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 
 @Composable
@@ -52,7 +53,7 @@ fun Dialog(modifier: Modifier = Modifier, onClose: () -> Unit, content: @Composa
     ) {
         Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
             IconButton(onClick = onClose) {
-                Icon(painterResource("ic_close.xml"), "Close")
+                Icon(painterResource(AppIcon.Close), "Close")
             }
         }
 
