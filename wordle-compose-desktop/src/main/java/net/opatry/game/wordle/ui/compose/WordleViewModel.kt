@@ -32,6 +32,24 @@ import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
 import net.opatry.game.wordle.toEmoji
 
+private val victoryMessages = arrayOf(
+    "Genius",
+    "Magnificent",
+    "Impressive",
+    "Splendid",
+    "Great",
+    "Nice"
+)
+private val State.message: String
+    get() {
+        val index = answers.size - 1
+        return if (this is State.Won && index in victoryMessages.indices) {
+            victoryMessages[index]
+        } else {
+            ""
+        }
+    }
+
 private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
     answer.flags.forEach { append(it.toEmoji()).append(' ') }
     append('\n')
@@ -158,7 +176,7 @@ class WordleViewModel(private var rules: WordleRules) {
         }
         victory = rules.state is State.Won
         if (victory) {
-            _userFeedback.add("Genius")
+            _userFeedback.add(rules.state.message)
             userFeedback = _userFeedback.toList()
         }
         updateAnswer()
