@@ -22,17 +22,11 @@
 
 package net.opatry.game.wordle.mosaic
 
-import androidx.compose.runtime.Composable
 import com.jakewharton.mosaic.runMosaic
-import com.jakewharton.mosaic.ui.Column
-import com.jakewharton.mosaic.ui.Row
-import com.jakewharton.mosaic.ui.Text
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
-import net.opatry.game.wordle.mosaic.component.Alphabet
-import net.opatry.game.wordle.mosaic.component.WordleGrid
 import net.opatry.game.wordle.ui.WordleViewModel
 import org.jline.terminal.TerminalBuilder
 
@@ -74,47 +68,6 @@ suspend fun main() = runMosaic {
                     viewModel.restart()
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun GameScreen(viewModel: WordleViewModel) {
-    Column {
-        Text("")
-
-        Row {
-            Text("            ")
-            WordleGrid(viewModel.grid)
-            Text("            ")
-            Alphabet(viewModel.alphabet)
-        }
-
-        when (val state = viewModel.state) {
-            is State.Won -> {
-                Text("Wordle <TODO_wordleId> ${state.answers.size}/${state.maxTries}")
-                Text(viewModel.answer)
-            }
-
-            is State.Lost -> {
-                Text("Wordle <TODO_wordleId> X/${state.maxTries}")
-                Text(viewModel.answer)
-            }
-
-            is State.Playing -> {
-                Text(" ➡️ Enter a 5 letter english word")
-                Text("") // TODO display error here if any or define a placeholder on top of grid
-            }
-        }
-
-//        viewModel.state.toClipboard()
-//        println("Results copied to clipboard!")
-
-        // there must be stable number of lines for nice UI state
-        if (viewModel.state !is State.Playing) {
-            Text(" 🔄 Play again? (y/N)? ${viewModel.userInput}")
-        } else {
-            Text("")
         }
     }
 }
