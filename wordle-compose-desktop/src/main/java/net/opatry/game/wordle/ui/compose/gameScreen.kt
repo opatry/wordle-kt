@@ -106,7 +106,6 @@ fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
 @Composable
 fun GameScreen(viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
-    val userInput by rememberUpdatedState(viewModel.userInput)
     val showFirstLaunchSheet by rememberUpdatedState(viewModel.firstLaunch)
     var showHowTo by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
