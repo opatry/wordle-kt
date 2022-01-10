@@ -31,15 +31,28 @@ import net.opatry.game.wordle.AnswerFlag
 @Composable
 fun Alphabet(alphabet: Map<Char, AnswerFlag>) {
     Column {
-        alphabet.keys.chunked(9).forEach { row ->
+        val colCount = 9
+        val cellWidth = 5
+        Text("╭" + "─".repeat(cellWidth * colCount) + "╮")
+        alphabet.keys.chunked(colCount).forEachIndexed { index, row ->
+            if (index > 0) {
+                Text("│" + "     ".repeat(colCount) + "│")
+            }
             Row {
+                Text("│")
                 row.forEach { letter ->
+                    // cell width is leading & trailing space + WordleCharCell compound of 3 characters
                     Text(" ")
                     WordleCharCell(letter, alphabet[letter]!!)
                     Text(" ")
                 }
+                // pad empty space for partial rows to align left border
+                repeat(colCount - row.size) {
+                    Text(" ".repeat(cellWidth))
+                }
+                Text("│")
             }
-            Text(" ")
         }
+        Text("╰" + "─".repeat(cellWidth * colCount) + "╯")
     }
 }
