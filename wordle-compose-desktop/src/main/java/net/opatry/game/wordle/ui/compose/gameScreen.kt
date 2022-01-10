@@ -58,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.awtEvent
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -68,6 +67,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -122,8 +122,7 @@ fun GameScreen(viewModel: WordleViewModel) {
                     }
                     when (event.key.keyCode) {
                         in Key.A.keyCode..Key.Z.keyCode ->
-                            // FIXME how to do the same without relying on AWT?
-                            viewModel.updateUserInput(userInput + event.awtEvent.keyChar)
+                            viewModel.updateUserInput(userInput + event.utf16CodePoint.toChar())
                         Key.Backspace.keyCode ->
                             if (userInput.isNotEmpty()) {
                                 viewModel.updateUserInput(userInput.dropLast(1))
