@@ -111,13 +111,14 @@ fun GameScreen(viewModel: WordleViewModel) {
     var showStats by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showResultsDialog by remember { mutableStateOf(false) }
-    val actionsEnabled = arrayOf(
+    val dialogVisible = arrayOf(
         showFirstLaunchSheet,
         showHowTo,
         showStats,
         showSettings,
         showResultsDialog
-    ).none { it }
+    ).any { it }
+    val actionsEnabled = !dialogVisible
 
     // TODO retrieve from ViewModel
     val stats = WordleStats(12, intArrayOf(0, 0, 1, 2, 3, 0), 3, 1, 1)
@@ -146,10 +147,20 @@ fun GameScreen(viewModel: WordleViewModel) {
                 .focusRequester(focusRequester)
                 .focusable(true)
                 .onKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyUp) {
-                        return@onKeyEvent false
+                    when {
+                        event.type != KeyEventType.KeyUp -> false
+                        dialogVisible && event.key == Key.Escape -> {
+                            // FIXME a bit fragile if a new one is added
+                            showHowTo = false
+                            showStats = false
+                            showSettings = false
+                            showResultsDialog = false
+                            viewModel.firstLaunchDone()
+                            true
+                        }
+                        actionsEnabled -> handleKey(viewModel, event.key)
+                        else -> false
                     }
-                    handleKey(viewModel, event.key)
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
