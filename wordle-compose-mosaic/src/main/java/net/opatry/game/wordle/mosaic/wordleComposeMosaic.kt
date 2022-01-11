@@ -27,13 +27,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.allDictionaries
+import net.opatry.game.wordle.loadWords
 import net.opatry.game.wordle.ui.WordleViewModel
 import org.jline.terminal.TerminalBuilder
 
 suspend fun main() = runMosaic {
     // TODO check terminal is compatible (eg. IDEA is not!)
+    val words = allDictionaries
+        .find { it.language == "en" && it.wordSize == 5 }
+        ?.loadWords()
+        ?: error("Can't find default dictionary")
     var playing = true
-    val viewModel = WordleViewModel(WordleRules(listOf("Hello", "Great", "Tiles", "Tales")))
+    val viewModel = WordleViewModel(WordleRules(words))
 
     setContent {
         GameScreen(viewModel)
