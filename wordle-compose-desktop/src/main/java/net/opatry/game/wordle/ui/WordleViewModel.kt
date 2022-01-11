@@ -25,12 +25,20 @@ package net.opatry.game.wordle.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.InputState
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.WordleStats
+import net.opatry.game.wordle.data.WordleRecord
+import net.opatry.game.wordle.data.WordleRepository
+import net.opatry.game.wordle.stats
 import net.opatry.game.wordle.toEmoji
+import java.util.*
 
 private val victoryMessages = arrayOf(
     "Genius",
@@ -69,8 +77,10 @@ private fun State.toClipboard(): String {
     return buffer.toString()
 }
 
-class WordleViewModel(private var rules: WordleRules) {
+class WordleViewModel(private var rules: WordleRules, private val repository: WordleRepository) {
     var firstLaunch by mutableStateOf(true)
+        private set
+    var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
     val stateLabel: String
         get() = rules.state.toClipboard()
@@ -89,6 +99,11 @@ class WordleViewModel(private var rules: WordleRules) {
         private set
 
     init {
+        GlobalScope.launch(Dispatchers.Main) {
+            repository.loadRecords()
+            statistics = repository.allRecords.stats()
+        }
+
         updateGrid()
         updateAlphabet()
     }
@@ -148,6 +163,8 @@ class WordleViewModel(private var rules: WordleRules) {
     }
 
     fun updateUserInput(input: String) {
+        if (rules.state !is State.Playing) return
+
         val normalized = input.take(5).uppercase()
         if (normalized != userInput) {
             userInput = normalized
@@ -156,6 +173,8 @@ class WordleViewModel(private var rules: WordleRules) {
     }
 
     fun validateUserInput() {
+        if (rules.state !is State.Playing) return
+
         when (rules.playWord(userInput)) {
             InputState.VALID -> {
                 userInput = ""
@@ -175,12 +194,32 @@ class WordleViewModel(private var rules: WordleRules) {
             else -> Unit
         }
         val oldVictory = victory
+        updateAnswer()
+
+        // save data and compute stats
+        if (rules.state !is State.Playing && answer.isNotEmpty()) {
+            repository.addRecord(
+                WordleRecord(
+                    Calendar.getInstance().time,
+                    answer,
+                    rules.state.answers.map {
+                        it.letters.concatToString()
+                    }
+                )
+            )
+            GlobalScope.launch(Dispatchers.Default) {
+                repository.saveRecords()
+            }
+
+            statistics = repository.allRecords.stats()
+        }
+
+        // notify user
         victory = rules.state is State.Won
         if (victory && !oldVictory) {
             _userFeedback.add(rules.state.message)
             userFeedback = _userFeedback.toList()
         }
-        updateAnswer()
     }
 
     fun restart() {

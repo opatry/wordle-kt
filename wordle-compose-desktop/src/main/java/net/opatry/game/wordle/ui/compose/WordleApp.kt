@@ -30,12 +30,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.data.WordleRepository
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 import net.opatry.game.wordle.words
+import java.io.File
+
+private val appDir = File(System.getProperty("user.home"), ".wordle-kt")
+private val dataFile = File(appDir, "records.json").apply {
+    parentFile?.mkdirs()
+}
 
 // FIXME singleton here otherwise recreated at each recomposition, need to be investigated
-val viewModel = WordleViewModel(WordleRules(words))
+private val viewModel = WordleViewModel(WordleRules(words), WordleRepository(dataFile))
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi

@@ -120,8 +120,7 @@ fun GameScreen(viewModel: WordleViewModel) {
     ).any { it }
     val actionsEnabled = !dialogVisible
 
-    // TODO retrieve from ViewModel
-    val stats = WordleStats(12, intArrayOf(0, 0, 1, 2, 3, 0), 3, 1, 1)
+    val statistics by rememberUpdatedState(viewModel.statistics)
 
     LaunchedEffect(viewModel.victory) {
         // FIXME this causes a small freeze when transitioning from !victory to victory
@@ -233,7 +232,7 @@ fun GameScreen(viewModel: WordleViewModel) {
                     .padding(top = 50.dp),
                 onClose = { showStats = false }
             ) {
-                StatsPanel(stats)
+                StatsPanel(statistics)
             }
         }
 
@@ -259,7 +258,7 @@ fun GameScreen(viewModel: WordleViewModel) {
                     .padding(top = 50.dp),
                 onClose = { showResultsDialog = false }
             ) {
-                ResultsPanel(stats, viewModel.stateLabel) { }
+                ResultsPanel(statistics, viewModel.stateLabel) { }
             }
         }
     }

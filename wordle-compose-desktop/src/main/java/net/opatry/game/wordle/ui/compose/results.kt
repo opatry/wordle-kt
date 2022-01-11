@@ -44,31 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.WordleStats
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone3
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import net.opatry.game.wordle.ui.compose.theme.painterResource
-
-data class WordleStats(
-    val playedCount: Int,
-    val victoryDistribution: IntArray,
-    val lastScore: Int, // 0 means lost game
-    val currentStreak: Int,
-    val bestStreak: Int,
-) {
-    val victoryCount: Int = victoryDistribution.sum()
-    val victoryRatio: Float = if (playedCount > 0) victoryCount / playedCount.toFloat() else 0f
-
-    init {
-        require(victoryDistribution.size == 6) { "Invalid victory distribution" }
-        require(victoryCount <= playedCount) { "There are more victories than played games" }
-        if (lastScore > 0) {
-            require(victoryDistribution[lastScore - 1] > 0) { "Last score not in victory distribution" }
-        }
-        require(bestStreak >= currentStreak) { "Best streak is lower than current one" }
-        require(bestStreak <= victoryCount) { "Best streal exceeds victory count" }
-    }
-}
 
 @Composable
 fun StatsPanel(stats: WordleStats, highlightLastScore: Boolean = true) {
