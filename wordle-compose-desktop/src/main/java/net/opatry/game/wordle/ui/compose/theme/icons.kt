@@ -34,6 +34,7 @@ enum class AppIcon {
     Refresh,
     Close,
     Share,
+    Leaderboard,
 }
 
 interface IconProvider {

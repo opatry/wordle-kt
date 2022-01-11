@@ -108,13 +108,17 @@ fun GameScreen(viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val showFirstLaunchSheet by rememberUpdatedState(viewModel.firstLaunch)
     var showHowTo by remember { mutableStateOf(false) }
+    var showStats by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
-    var showResultsSheet by remember { mutableStateOf(false) }
-    val modalVisible = arrayOf(showFirstLaunchSheet, showHowTo, showSettings, showResultsSheet).any { it }
+    var showResultsDialog by remember { mutableStateOf(false) }
+    val modalVisible = arrayOf(showFirstLaunchSheet, showHowTo, showStats, showSettings, showResultsDialog).any { it }
+
+    // TODO retrieve from ViewModel
+    val stats = WordleStats(12, intArrayOf(0, 0, 1, 2, 3, 0), 1, 1)
 
     LaunchedEffect(viewModel.victory) {
         // FIXME this causes a small freeze when transitioning from !victory to victory
-        showResultsSheet = viewModel.victory
+        showResultsDialog = viewModel.victory
     }
 
     val focusRequester = FocusRequester()
@@ -147,6 +151,7 @@ fun GameScreen(viewModel: WordleViewModel) {
             Toolbar(
                 enabled = !modalVisible,
                 onHowToClick = { showHowTo = true },
+                onStatsClick = { showStats = true },
                 onSettingsClick = { showSettings = true }
             )
             Divider()
@@ -189,12 +194,29 @@ fun GameScreen(viewModel: WordleViewModel) {
             exit = slideOutVertically() + fadeOut()
         ) {
             Dialog(
+                title = null,
                 Modifier
                     .size(width = 380.dp, height = 520.dp)
                     .padding(top = 50.dp),
                 onClose = { viewModel.firstLaunchDone() }
             ) {
                 HowToPanel()
+            }
+        }
+
+        AnimatedVisibility(
+            showStats,
+            enter = fadeIn() + slideInVertically(),
+            exit = slideOutVertically() + fadeOut()
+        ) {
+            Dialog(
+                title = "Statistics",
+                Modifier
+                    .size(width = 380.dp, height = 460.dp)
+                    .padding(top = 50.dp),
+                onClose = { showStats = false }
+            ) {
+                StatsPanel(stats)
             }
         }
 
@@ -209,17 +231,18 @@ fun GameScreen(viewModel: WordleViewModel) {
         }
 
         AnimatedVisibility(
-            showResultsSheet,
+            showResultsDialog,
             enter = fadeIn() + scaleIn(),
             exit = scaleOut() + fadeOut()
         ) {
             Dialog(
+                title = "Statistics",
                 Modifier
-                    .size(width = 300.dp, height = 400.dp)
+                    .size(width = 380.dp, height = 500.dp)
                     .padding(top = 50.dp),
-                onClose = { showResultsSheet = false }
+                onClose = { showResultsDialog = false }
             ) {
-                ResultsSheet {}
+                ResultsPanel(stats, viewModel.stateLabel) { }
             }
         }
     }
@@ -253,7 +276,12 @@ fun Toast(label: String, modifier: Modifier = Modifier, onDismiss: (String) -> U
 }
 
 @Composable
-fun Toolbar(enabled: Boolean, onHowToClick: () -> Unit, onSettingsClick: () -> Unit) {
+fun Toolbar(
+    enabled: Boolean,
+    onHowToClick: () -> Unit,
+    onStatsClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -264,8 +292,14 @@ fun Toolbar(enabled: Boolean, onHowToClick: () -> Unit, onSettingsClick: () -> U
 
         Text("Wordle", Modifier.weight(1f), style = MaterialTheme.typography.h1)
 
-        IconButton(onClick = onSettingsClick, enabled = enabled) {
-            Icon(painterResource(AppIcon.Settings), "Settings")
+        Row {
+            IconButton(onClick = onStatsClick, enabled = enabled) {
+                Icon(painterResource(AppIcon.Leaderboard), "Statistics")
+            }
+
+            IconButton(onClick = onSettingsClick, enabled = enabled) {
+                Icon(painterResource(AppIcon.Settings), "Settings")
+            }
         }
     }
 }

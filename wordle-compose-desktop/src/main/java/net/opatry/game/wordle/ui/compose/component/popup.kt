@@ -24,6 +24,7 @@ package net.opatry.game.wordle.ui.compose.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +39,7 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
-fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
+fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     // TODO Scaffold?
     Column(
         Modifier.background(MaterialTheme.colors.background).fillMaxSize()

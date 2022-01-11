@@ -25,12 +25,14 @@ package net.opatry.game.wordle.ui.compose.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +44,12 @@ import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 
 @Composable
-fun Dialog(modifier: Modifier = Modifier, onClose: () -> Unit, content: @Composable () -> Unit) {
+fun Dialog(
+    title: String? = null,
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Column(
         modifier
             .shadow(24.dp)
@@ -55,6 +62,14 @@ fun Dialog(modifier: Modifier = Modifier, onClose: () -> Unit, content: @Composa
             IconButton(onClick = onClose) {
                 Icon(painterResource(AppIcon.Close), "Close")
             }
+        }
+
+        if (title != null) {
+            Text(
+                title,
+                Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.h3
+            )
         }
 
         content()
