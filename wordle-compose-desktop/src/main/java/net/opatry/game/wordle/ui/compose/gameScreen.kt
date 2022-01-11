@@ -73,6 +73,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.component.Alphabet
 import net.opatry.game.wordle.ui.compose.component.Dialog
@@ -104,7 +105,7 @@ fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-fun GameScreen(viewModel: WordleViewModel) {
+fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val showFirstLaunchSheet by rememberUpdatedState(viewModel.firstLaunch)
     var showHowTo by remember { mutableStateOf(false) }
@@ -242,7 +243,7 @@ fun GameScreen(viewModel: WordleViewModel) {
             exit = slideOutVertically() + fadeOut()
         ) {
             PopupOverlay("Settings", onClose = { showSettings = false }) {
-                SettingsPanel()
+                SettingsPanel(settings)
             }
         }
 

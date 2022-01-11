@@ -40,24 +40,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
-fun SettingsPanel() {
+fun SettingsPanel(settings: Settings) {
     Column {
         Setting("Hard mode", "Any revealed hints must be used in subsequent guesses") {
-            Switch(false, onCheckedChange = { }, enabled = false)
+            Switch(
+                settings.hardMode,
+                onCheckedChange = {},
+                enabled = false
+            )
         }
         Divider()
         Setting("Dark Theme") {
-            Switch(isSystemInDarkTheme, onCheckedChange = { isSystemInDarkTheme = it })
+            Switch(
+                isSystemInDarkTheme,
+                onCheckedChange = {
+                    // TODO UI state should observe directly from settings
+                    // TODO we should extract pure settings business logic from pure UI
+                    settings.enableDarkMode(it)
+                    isSystemInDarkTheme = it
+                }
+            )
         }
         Divider()
         Setting("Color Blind Mode", "High contrast colors") {
-            Switch(isHighContrastMode, onCheckedChange = { isHighContrastMode = it })
+            Switch(
+                isHighContrastMode,
+                onCheckedChange = {
+                    // TODO UI state should observe directly from settings
+                    // TODO we should extract pure settings business logic from pure UI
+                    settings.enableHighContrastMode(it)
+                    isHighContrastMode = it
+                }
+            )
         }
         Divider()
         Setting(label = "Feedback") {

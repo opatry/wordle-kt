@@ -30,16 +30,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import net.opatry.game.wordle.WordleRules
+import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.data.WordleRepository
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
+import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
+import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import net.opatry.game.wordle.words
 import java.io.File
 
+
 private val appDir = File(System.getProperty("user.home"), ".wordle-kt")
-private val dataFile = File(appDir, "records.json").apply {
-    parentFile?.mkdirs()
-}
+private val dataFile = File(appDir, "records.json")
+private val settingsFile = File(appDir, "settings.json")
+
+private val settings = Settings(settingsFile)
 
 // FIXME singleton here otherwise recreated at each recomposition, need to be investigated
 private val viewModel = WordleViewModel(WordleRules(words), WordleRepository(dataFile))
@@ -48,12 +53,15 @@ private val viewModel = WordleViewModel(WordleRules(words), WordleRepository(dat
 @ExperimentalComposeUiApi
 @Composable
 fun WordleApp() {
+    isSystemInDarkTheme = settings.darkMode
+    isHighContrastMode = settings.highContrastMode
+
     WordleComposeTheme {
         Box(
             Modifier.fillMaxSize(),
             Alignment.TopCenter
         ) {
-            GameScreen(viewModel)
+            GameScreen(settings, viewModel)
         }
     }
 }
