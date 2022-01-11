@@ -48,6 +48,7 @@ import net.opatry.game.wordle.WordleStats
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone3
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
+import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
@@ -152,6 +153,14 @@ fun StatProgress(label: String, value: Int, ratio: Float, isHighlighted: Boolean
 
 @Composable
 fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: () -> Unit) {
+    val label = if (isHighContrastMode) {
+        resultLabel
+            .replace("🟨", "🟦")
+            .replace("🟩", "🟧")
+    } else {
+        resultLabel
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -159,7 +168,7 @@ fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: () -> Unit) {
         StatsPanel(stats)
 
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally)) {
-            Text(resultLabel, textAlign = TextAlign.Center)
+            Text(label, textAlign = TextAlign.Center)
 
             Button(onClick = onShare, Modifier.padding(top = 8.dp)) {
                 Text("Share")
