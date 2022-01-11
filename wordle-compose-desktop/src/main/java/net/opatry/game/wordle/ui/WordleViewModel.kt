@@ -174,8 +174,9 @@ class WordleViewModel(private var rules: WordleRules) {
             }
             else -> Unit
         }
+        val oldVictory = victory
         victory = rules.state is State.Won
-        if (victory) {
+        if (victory && !oldVictory) {
             _userFeedback.add(rules.state.message)
             userFeedback = _userFeedback.toList()
         }
