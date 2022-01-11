@@ -22,23 +22,15 @@
 
 package net.opatry.game.wordle.mosaic
 
-import androidx.compose.runtime.Composable
-import com.jakewharton.mosaic.Color
-import com.jakewharton.mosaic.Column
-import com.jakewharton.mosaic.Row
-import com.jakewharton.mosaic.Text
-import com.jakewharton.mosaic.TextStyle
 import com.jakewharton.mosaic.runMosaic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.Answer
-import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
-import net.opatry.game.wordle.mosaic.component.Alphabet
-import net.opatry.game.wordle.mosaic.component.WordleGrid
 import net.opatry.game.wordle.toEmoji
 import net.opatry.game.wordle.ui.WordleViewModel
+import net.opatry.game.wordle.words
 import org.jline.terminal.TerminalBuilder
 
 private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
@@ -67,7 +59,7 @@ fun State.toClipboard(): String {
 fun main() = runMosaic {
     // TODO check terminal is compatible (eg. IDEA is not!)
     var playing = true
-    val viewModel = WordleViewModel(WordleRules(listOf("Hello", "Great", "Tiles", "Tales")))
+    val viewModel = WordleViewModel(WordleRules(words))
 
     setContent {
         GameScreen(viewModel)
