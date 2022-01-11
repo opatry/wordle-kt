@@ -110,14 +110,12 @@ private fun Setting(
 
 @Composable
 private fun SettingLabel(label: String, modifier: Modifier = Modifier, description: String? = null) {
-    Column(modifier, Arrangement.SpaceAround) {
+    Column(modifier, Arrangement.spacedBy(2.dp, Alignment.CenterVertically)) {
         Text(label, Modifier.fillMaxWidth(), style = MaterialTheme.typography.subtitle1)
         if (!description.isNullOrBlank()) {
             Text(
                 description,
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp),
+                Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.caption
             )
         }
