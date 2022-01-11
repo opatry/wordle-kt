@@ -111,7 +111,13 @@ fun GameScreen(viewModel: WordleViewModel) {
     var showStats by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showResultsDialog by remember { mutableStateOf(false) }
-    val modalVisible = arrayOf(showFirstLaunchSheet, showHowTo, showStats, showSettings, showResultsDialog).any { it }
+    val actionsEnabled = arrayOf(
+        showFirstLaunchSheet,
+        showHowTo,
+        showStats,
+        showSettings,
+        showResultsDialog
+    ).none { it }
 
     // TODO retrieve from ViewModel
     val stats = WordleStats(12, intArrayOf(0, 0, 1, 2, 3, 0), 3, 1, 1)
@@ -149,7 +155,7 @@ fun GameScreen(viewModel: WordleViewModel) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Toolbar(
-                enabled = !modalVisible,
+                enabled = actionsEnabled,
                 onHowToClick = { showHowTo = true },
                 onStatsClick = { showStats = true },
                 onSettingsClick = { showSettings = true }
@@ -157,14 +163,14 @@ fun GameScreen(viewModel: WordleViewModel) {
             Divider()
             AnswerPlaceHolder(viewModel.answer, viewModel::restart)
             WordleGrid(viewModel.grid)
-            Alphabet(viewModel.alphabet) { key ->
+            Alphabet(viewModel.alphabet, enabled = actionsEnabled) { key ->
                 handleKey(viewModel, key)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { handleKey(viewModel, Key.Backspace) }) {
+                OutlinedButton(onClick = { handleKey(viewModel, Key.Backspace) }, enabled = actionsEnabled) {
                     Text("⌫")
                 }
-                Button(onClick = { handleKey(viewModel, Key.Enter) }) {
+                Button(onClick = { handleKey(viewModel, Key.Enter) }, enabled = actionsEnabled) {
                     Text("Enter")
                 }
             }

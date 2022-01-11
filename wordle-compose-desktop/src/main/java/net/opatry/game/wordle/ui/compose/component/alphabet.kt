@@ -53,12 +53,12 @@ import net.opatry.game.wordle.ui.compose.theme.keyTextColor
 
 
 @Composable
-fun Alphabet(alphabet: Map<Char, AnswerFlag>, onLetterClick: (Key) -> Unit) {
+fun Alphabet(alphabet: Map<Char, AnswerFlag>, enabled: Boolean = true, onLetterClick: (Key) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         alphabet.keys.chunked(9).forEach { row ->
             Row(horizontalArrangement = Arrangement.SpaceAround) {
                 row.forEach { letter ->
-                    AlphabetLetterCell(letter, alphabet[letter]!!) {
+                    AlphabetLetterCell(letter, alphabet[letter]!!, enabled) {
                         onLetterClick(Key(letter.code))
                     }
                 }
@@ -80,7 +80,7 @@ fun AnswerFlag.keyForegroundColor(): Color = when (this) {
 }
 
 @Composable
-fun AlphabetLetterCell(letter: Char, flag: AnswerFlag, onClick: () -> Unit) {
+fun AlphabetLetterCell(letter: Char, flag: AnswerFlag, enabled: Boolean = true, onClick: () -> Unit) {
     val backgroundColor by animateColorAsState(flag.keyBackgroundColor())
     val foregroundColor by animateColorAsState(flag.keyForegroundColor())
 
@@ -90,7 +90,7 @@ fun AlphabetLetterCell(letter: Char, flag: AnswerFlag, onClick: () -> Unit) {
             .padding(2.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(backgroundColor)
-            .clickable { onClick() }
+            .clickable(enabled = enabled) { onClick() }
             .padding(horizontal = 2.dp, vertical = 4.dp),
         Alignment.Center,
     ) {
