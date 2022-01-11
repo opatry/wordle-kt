@@ -24,8 +24,6 @@ package net.opatry.game.wordle.ui.compose
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -60,7 +58,7 @@ private fun embolden(word: String, sentence: String): AnnotatedString {
 
 @Composable
 fun HowToPanel() {
-    Column(Modifier.verticalScroll(rememberScrollState())) {
+    Column {
         Paragraph(embolden("WORDLE", "Guess the WORDLE in 6 tries."))
         Paragraph("After each guess, the color of the tiles will change to show how close your guess was to the word.")
         Divider()

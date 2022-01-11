@@ -114,7 +114,7 @@ fun GameScreen(viewModel: WordleViewModel) {
     val modalVisible = arrayOf(showFirstLaunchSheet, showHowTo, showStats, showSettings, showResultsDialog).any { it }
 
     // TODO retrieve from ViewModel
-    val stats = WordleStats(12, intArrayOf(0, 0, 1, 2, 3, 0), 1, 1)
+    val stats = WordleStats(12, intArrayOf(0, 0, 1, 2, 3, 0), 3, 1, 1)
 
     LaunchedEffect(viewModel.victory) {
         // FIXME this causes a small freeze when transitioning from !victory to victory
@@ -238,7 +238,7 @@ fun GameScreen(viewModel: WordleViewModel) {
             Dialog(
                 title = "Statistics",
                 Modifier
-                    .size(width = 380.dp, height = 500.dp)
+                    .size(width = 380.dp, height = 620.dp)
                     .padding(top = 50.dp),
                 onClose = { showResultsDialog = false }
             ) {

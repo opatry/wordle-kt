@@ -25,10 +25,12 @@ package net.opatry.game.wordle.ui.compose.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -48,14 +50,13 @@ fun Dialog(
     title: String? = null,
     modifier: Modifier = Modifier,
     onClose: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable () -> Unit
 ) {
     Column(
         modifier
             .shadow(24.dp)
             .clip(RoundedCornerShape(5.dp))
-            .background(MaterialTheme.colors.surface)
-            .padding(8.dp),
+            .background(MaterialTheme.colors.surface),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
@@ -72,6 +73,12 @@ fun Dialog(
             )
         }
 
-        content()
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()).padding(16.dp)
+        ) {
+            content()
+        }
     }
 }

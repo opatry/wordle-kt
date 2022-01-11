@@ -50,25 +50,37 @@ import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 data class WordleStats(
-    val playCount: Int,
+    val playedCount: Int,
     val victoryDistribution: IntArray,
-    val streak: Int,
+    val lastScore: Int, // 0 means lost game
+    val currentStreak: Int,
     val bestStreak: Int,
 ) {
     val victoryCount: Int = victoryDistribution.sum()
-    val victoryRatio: Float = victoryCount / playCount.toFloat()
+    val victoryRatio: Float = if (playedCount > 0) victoryCount / playedCount.toFloat() else 0f
 
     init {
         require(victoryDistribution.size == 6) { "Invalid victory distribution" }
-        require(victoryCount <= playCount) { "There are more victories than played games" }
+        require(victoryCount <= playedCount) { "There are more victories than played games" }
+        if (lastScore > 0) {
+            require(victoryDistribution[lastScore - 1] > 0) { "Last score not in victory distribution" }
+        }
+        require(bestStreak >= currentStreak) { "Best streak is lower than current one" }
+        require(bestStreak <= victoryCount) { "Best streal exceeds victory count" }
     }
 }
 
 @Composable
-fun StatsPanel(stats: WordleStats) {
+fun StatsPanel(stats: WordleStats, highlightLastScore: Boolean = true) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         StatCells(stats)
-        VictoryDistribution(stats.victoryDistribution)
+        val distribution = stats.victoryDistribution
+        val lastScoreIndex = stats.lastScore - 1
+        val highlightedIndex = when {
+            highlightLastScore && lastScoreIndex in distribution.indices -> lastScoreIndex
+            else -> -1
+        }
+        VictoryDistribution(stats.playedCount, stats.victoryDistribution, highlightedIndex)
     }
 }
 
@@ -81,9 +93,9 @@ fun StatCells(stats: WordleStats) {
             .padding(horizontal = 24.dp, vertical = 8.dp),
         Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
     ) {
-        StatCell("Played", stats.playCount)
+        StatCell("Played", stats.playedCount)
         StatCell("Win %", (stats.victoryRatio * 100).toInt())
-        StatCell("Current\nStreak", stats.streak)
+        StatCell("Current\nStreak", stats.currentStreak)
         StatCell("Max\nStreak", stats.bestStreak)
     }
 }
@@ -105,25 +117,32 @@ fun StatCell(label: String, value: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun VictoryDistribution(victoryDistribution: IntArray) {
+fun VictoryDistribution(playedCount: Int, victoryDistribution: IntArray, highlightedIndex: Int) {
     Text(
         "Guess Distribution",
         Modifier.fillMaxWidth(),
         style = MaterialTheme.typography.h3
     )
-    val max = victoryDistribution.maxOrNull() ?: 0
-    Column(
-        Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        victoryDistribution.forEachIndexed { index, count ->
-            StatProgress((index + 1).toString(), count, count / max.toFloat())
+
+    val max = victoryDistribution.maxOrNull()
+    if (max == null || playedCount == 0) {
+        Text("No Data", Modifier.padding(8.dp))
+    } else {
+        Column(
+            Modifier.padding(horizontal = 24.dp, vertical = 8.dp).fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            victoryDistribution.forEachIndexed { index, count ->
+                val ratio = if (max > 0) count / max.toFloat() else 0f
+                StatProgress((index + 1).toString(), count, ratio, index == highlightedIndex)
+            }
         }
     }
 }
 
 @Composable
-fun StatProgress(label: String, value: Int, ratio: Float) {
+fun StatProgress(label: String, value: Int, ratio: Float, isHighlighted: Boolean) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             label,
@@ -139,7 +158,7 @@ fun StatProgress(label: String, value: Int, ratio: Float) {
                 1f,
                 Modifier.fillMaxWidth(ratio.coerceAtLeast(.06f)).height(24.dp),
                 backgroundColor = colorTone7,
-                color = colorTone3
+                color = if (isHighlighted) MaterialTheme.colors.primary else colorTone3
             )
             Text(
                 value.toString(),
@@ -153,17 +172,20 @@ fun StatProgress(label: String, value: Int, ratio: Float) {
 
 @Composable
 fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: () -> Unit) {
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         StatsPanel(stats)
 
-        Spacer(Modifier.height(8.dp))
-        Text(resultLabel, textAlign = TextAlign.Center)
-        Spacer(Modifier.weight(1f))
+        Row(horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally)) {
+            Text(resultLabel, textAlign = TextAlign.Center)
 
-        Button(onClick = onShare) {
-            Text("Share")
-            Spacer(Modifier.width(8.dp))
-            Icon(painterResource(AppIcon.Share), null)
+            Button(onClick = onShare, Modifier.padding(top = 8.dp)) {
+                Text("Share")
+                Spacer(Modifier.width(8.dp))
+                Icon(painterResource(AppIcon.Share), null)
+            }
         }
     }
 }

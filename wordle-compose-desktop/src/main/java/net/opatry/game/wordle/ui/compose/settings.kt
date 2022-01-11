@@ -26,11 +26,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -49,11 +47,7 @@ import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
 fun SettingsPanel() {
-    Column(
-        Modifier
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
-    ) {
+    Column {
         Setting("Hard mode", "Any revealed hints must be used in subsequent guesses") {
             Switch(false, onCheckedChange = { }, enabled = false)
         }
@@ -73,7 +67,7 @@ fun SettingsPanel() {
         }
         Divider()
 
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(24.dp))
 
         Column(Modifier.padding(vertical = 4.dp)) {
             Hint("#203") // TODO word ID
