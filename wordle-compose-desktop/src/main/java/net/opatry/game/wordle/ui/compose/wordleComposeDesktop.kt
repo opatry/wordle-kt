@@ -47,7 +47,7 @@ object DesktopIconProvider : IconProvider {
             AppIcon.Settings -> "ic_settings_outline.xml"
             AppIcon.Refresh -> "ic_refresh.xml"
             AppIcon.Close -> "ic_close.xml"
-            AppIcon.Share -> "ic_share.xml"
+            AppIcon.Share -> "ic_share_outline.xml"
         }
         return painterResource(resourcePath)
     }
