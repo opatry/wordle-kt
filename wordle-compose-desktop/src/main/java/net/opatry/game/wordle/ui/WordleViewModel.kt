@@ -46,7 +46,7 @@ private val victoryMessages = arrayOf(
     "Impressive",
     "Splendid",
     "Great",
-    "Nice"
+    "Phew"
 )
 private val State.message: String
     get() {
