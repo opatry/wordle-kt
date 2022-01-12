@@ -152,7 +152,7 @@ fun StatProgress(label: String, value: Int, ratio: Float, isHighlighted: Boolean
 }
 
 @Composable
-fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: () -> Unit) {
+fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: (String) -> Unit) {
     val label = if (isHighContrastMode) {
         resultLabel
             .replace("🟨", "🟦")
@@ -170,7 +170,7 @@ fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: () -> Unit) {
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally)) {
             Text(label, textAlign = TextAlign.Center)
 
-            Button(onClick = onShare, Modifier.padding(top = 8.dp)) {
+            Button(onClick = { onShare(label) }, Modifier.padding(top = 8.dp)) {
                 Text("Share")
                 Spacer(Modifier.width(8.dp))
                 Icon(painterResource(AppIcon.Share), null)

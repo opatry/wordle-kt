@@ -70,6 +70,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -259,7 +261,13 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                     .padding(top = 50.dp),
                 onClose = { showResultsDialog = false }
             ) {
-                ResultsPanel(statistics, viewModel.stateLabel) { }
+                val clipboard = LocalClipboardManager.current
+                // FIXME need to revise the label thing
+                ResultsPanel(statistics, viewModel.stateLabel) { label ->
+                    clipboard.setText(AnnotatedString(label))
+                    // TODO how to display toast in combination of view model provided ones
+                    //userFeedback += "Copied results to clipboard"
+                }
             }
         }
     }
