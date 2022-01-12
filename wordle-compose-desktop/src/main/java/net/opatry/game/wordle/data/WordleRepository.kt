@@ -63,7 +63,7 @@ class WordleRepository(private val data: File) {
         }
 
         records.clear()
-        records.addAll(newRecords)
+        records.addAll(newRecords ?: emptyList())
     }
 
     suspend fun saveRecords() {
