@@ -54,7 +54,6 @@ class Answer(
     }
 
     companion object {
-        val EMPTY = Answer(CharArray(5) { ' ' }, Array(5) { AnswerFlag.NONE })
         fun computeAnswer(word: String, selectedWord: String): Answer {
             require(word.length == selectedWord.length) { "'$word' and '$selectedWord' should have the same size" }
             val flags = Array(word.length) { AnswerFlag.ABSENT }
@@ -95,12 +94,14 @@ private fun StringBuffer.appendAnswer(answer: Answer) {
 
 sealed class State(
     open val answers: List<Answer>,
-    open val maxTries: UInt
+    open val maxTries: UInt,
+    open val wordSize: Int
 ) {
     data class Playing(
         override val answers: List<Answer>,
-        override val maxTries: UInt
-    ) : State(answers, maxTries) {
+        override val maxTries: UInt,
+        override val wordSize: Int
+    ) : State(answers, maxTries, wordSize) {
         override fun toString(): String {
             return if (answers.isNotEmpty()) {
                 super.toString() + "Keep going… ${answers.size}/$maxTries"
@@ -113,10 +114,11 @@ sealed class State(
     data class Won(
         override val answers: List<Answer>,
         override val maxTries: UInt,
+        override val wordSize: Int,
         val wordleId: Int,
         val selectedWord: String
     ) :
-        State(answers, maxTries) {
+        State(answers, maxTries, wordSize) {
         override fun toString(): String {
             return "Wordle $wordleId ${answers.size}/$maxTries\n" +
                     super.toString() +
@@ -127,10 +129,11 @@ sealed class State(
     data class Lost(
         override val answers: List<Answer>,
         override val maxTries: UInt,
+        override val wordSize: Int,
         val wordleId: Int,
         val selectedWord: String
     ) :
-        State(answers, maxTries) {
+        State(answers, maxTries, wordSize) {
         override fun toString(): String {
             return "Wordle $wordleId X/$maxTries\n" +
                     super.toString() +
@@ -141,7 +144,10 @@ sealed class State(
     override fun toString(): String {
         val buffer = StringBuffer()
         answers.forEach(buffer::appendAnswer)
-        repeat(maxTries.toInt() - answers.size) { buffer.appendAnswer(Answer.EMPTY) }
+        val emptyAnswer = Answer(CharArray(wordSize) { ' ' }, Array(wordSize) { AnswerFlag.NONE })
+        repeat(maxTries.toInt() - answers.size) {
+            buffer.appendAnswer(emptyAnswer)
+        }
         return buffer.toString()
     }
 }
@@ -162,18 +168,28 @@ class WordleRules(
     val words = inWords.map(String::sanitizeForWordle).distinct()
     private val selectedWord = inSelectedWord.sanitizeForWordle()
     private val wordleId = words.indexOf(selectedWord)
+    val wordSize = words.firstOrNull()?.length ?: 0
     var state: State = when {
-        maxTries > 0u -> State.Playing(emptyList(), maxTries)
-        else -> State.Lost(emptyList(), maxTries, wordleId, selectedWord)
+        maxTries > 0u -> State.Playing(emptyList(), maxTries, wordSize)
+        else -> State.Lost(emptyList(), maxTries, wordleId, wordSize, selectedWord)
     }
         private set
 
     init {
-        require(words.all { it.matches(Regex("^[A-Z]{5}$")) }) {
-            "All words should be compound of 5 latin letters"
+        require(words.isNotEmpty()) {
+            "At least one non empty word is required"
+        }
+        require(wordSize > 0) {
+            "Empty word isn't allowed"
+        }
+        require(words.all { it.matches(Regex("^[A-Z]{$wordSize}$")) }) {
+            "All words should be compound of $wordSize latin letters"
         }
         require(words.contains(selectedWord)) {
-            "Selected word ($selectedWord) isn't part of available words ($words)"
+            "Selected word ($selectedWord) isn't part of available words"
+        }
+        require(wordleId in words.indices) {
+            "Can't accurately compute wordle ID"
         }
     }
 
@@ -181,8 +197,8 @@ class WordleRules(
         val sanitized = word.sanitizeForWordle()
         // when checking for a word, no need to consider the game state
         return when {
-            sanitized.length < 5 -> InputState.TOO_SHORT
-            sanitized.length > 5 -> InputState.TOO_LONG
+            sanitized.length < wordSize -> InputState.TOO_SHORT
+            sanitized.length > wordSize -> InputState.TOO_LONG
             !words.contains(sanitized) -> InputState.NOT_IN_DICTIONARY
             else -> InputState.VALID
         }
@@ -200,8 +216,8 @@ class WordleRules(
         }.toList()
 
         state = when {
-            sanitized == selectedWord -> State.Won(answers, maxTries, wordleId, selectedWord)
-            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, wordleId, selectedWord)
+            sanitized == selectedWord -> State.Won(answers, maxTries, wordleId, wordSize, selectedWord)
+            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, wordleId, wordSize, selectedWord)
             else -> playingState.copy(answers = answers)
         }
 

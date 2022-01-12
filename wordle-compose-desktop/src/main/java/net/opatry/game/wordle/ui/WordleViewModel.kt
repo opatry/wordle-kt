@@ -112,11 +112,13 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
         val answers = rules.state.answers.toMutableList()
         val turn = answers.size
         val maxTries = rules.state.maxTries.toInt()
+        val wordSize = rules.wordSize
         if (turn < maxTries) {
-            answers += Answer(userInput.padEnd(5, ' ').toCharArray(), Array(5) { AnswerFlag.NONE })
+            answers += Answer(userInput.padEnd(wordSize, ' ').toCharArray(), Array(wordSize) { AnswerFlag.NONE })
         }
+        val emptyAnswer = Answer(CharArray(wordSize) { ' ' }, Array(wordSize) { AnswerFlag.NONE })
         repeat(maxTries - turn - 1) {
-            answers += Answer.EMPTY
+            answers += emptyAnswer
         }
         grid = answers.toList()
     }
@@ -165,7 +167,7 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     fun updateUserInput(input: String) {
         if (rules.state !is State.Playing) return
 
-        val normalized = input.take(5).uppercase()
+        val normalized = input.take(rules.wordSize).uppercase()
         if (normalized != userInput) {
             userInput = normalized
             updateGrid()

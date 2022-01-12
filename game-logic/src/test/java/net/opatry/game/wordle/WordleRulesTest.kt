@@ -37,9 +37,23 @@ private fun List<Answer>.toWords(): Array<String> = map { it.letters.concatToStr
 @RunWith(JUnit4::class)
 class WordleTest {
     @Test
+    fun `at least one word is required`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            WordleRules(emptyList(), "")
+        }
+    }
+
+    @Test
+    fun `word shouldn't be empty`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            WordleRules(listOf(""), "")
+        }
+    }
+
+    @Test
     fun `answer must be part of available words`() {
         assertThrows(IllegalArgumentException::class.java) {
-            WordleRules(emptyList(), "TOTOT")
+            WordleRules(listOf("TITIT"), "TOTOT")
         }
         WordleRules(listOf("tOTot"), "tOTot")
         WordleRules(listOf("TOTOT", "TITIT"), "TOTOT")
@@ -47,15 +61,9 @@ class WordleTest {
     }
 
     @Test
-    fun `available words should all be 5 char long`() {
+    fun `all words must be the same length`() {
         assertThrows(IllegalArgumentException::class.java) {
-            WordleRules(listOf("A"), "A")
-        }
-        assertThrows(IllegalArgumentException::class.java) {
-            WordleRules(listOf("ABCD"), "ABCD")
-        }
-        assertThrows(IllegalArgumentException::class.java) {
-            WordleRules(listOf("ABCDEF"), "ABCDEF")
+            WordleRules(listOf("ABC", "DEFXYZ"), "ABC")
         }
         val game = WordleRules(listOf("ABCDE"), "ABCDE", 0u)
         assertEquals("ABCDE", (game.state as? State.Lost)?.selectedWord)
