@@ -8,6 +8,9 @@ dependencies {
     implementation(libs.jline) {
         because("need to handle terminal keyboard input")
     }
+    implementation(libs.turtle) {
+        because("need to copy results to clipboard (using `pbcopy`, `xclip`, `clip` or equivalent)")
+    }
     implementation(project(":word-data"))
     implementation(project(":game-logic"))
 }
