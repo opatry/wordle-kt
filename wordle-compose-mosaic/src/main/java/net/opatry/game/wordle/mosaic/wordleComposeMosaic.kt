@@ -25,36 +25,11 @@ package net.opatry.game.wordle.mosaic
 import com.jakewharton.mosaic.runMosaic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
-import net.opatry.game.wordle.toEmoji
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.words
 import org.jline.terminal.TerminalBuilder
-
-private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
-    answer.flags.forEach { append(it.toEmoji()) }
-    append('\n')
-}
-
-fun State.toClipboard(): String {
-    val buffer = StringBuffer()
-    buffer.append(
-        when (this) {
-            is State.Lost -> "Wordle $wordleId X/$maxTries\n"
-            is State.Won -> "Wordle $wordleId ${answers.size}/$maxTries\n"
-            else -> ""
-        }
-    )
-    answers.forEach(buffer::appendClipboardAnswer)
-
-    val clipboard = buffer.toString()
-
-    // FIXME might not be cross platform/portable
-    // TODO "pbcopy <<< $clipboard".runCommand(File(System.getProperty("user.dir")))
-    return clipboard
-}
 
 fun main() = runMosaic {
     // TODO check terminal is compatible (eg. IDEA is not!)
