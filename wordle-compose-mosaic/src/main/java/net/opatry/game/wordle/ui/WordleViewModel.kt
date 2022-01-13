@@ -49,12 +49,17 @@ private val State.message: String
         }
     }
 
-private fun StringBuffer.appendClipboardAnswer(answer: Answer) {
-    answer.flags.map(AnswerFlag::toEmoji).forEach(::append)
-    append('\n')
+private fun StringBuffer.appendAnswer(answer: Answer) {
+    append(
+        answer.flags.joinToString(
+            separator = " ",
+            postfix = "\n",
+            transform = AnswerFlag::toEmoji
+        )
+    ).trimEnd()
 }
 
-private fun State.toClipboard(): String {
+private fun State.toResultString(): String {
     val buffer = StringBuffer()
     buffer.append(
         when (this) {
@@ -63,7 +68,7 @@ private fun State.toClipboard(): String {
             else -> ""
         }
     )
-    answers.forEach(buffer::appendClipboardAnswer)
+    answers.forEach(buffer::appendAnswer)
 
     return buffer.toString()
 }
@@ -73,7 +78,7 @@ class WordleViewModel(private var rules: WordleRules) {
         private set
     var state by mutableStateOf(rules.state)
     val stateLabel: String
-        get() = rules.state.toClipboard()
+        get() = rules.state.toResultString()
     var victory by mutableStateOf(rules.state is State.Won)
         private set
     var answer by mutableStateOf("")

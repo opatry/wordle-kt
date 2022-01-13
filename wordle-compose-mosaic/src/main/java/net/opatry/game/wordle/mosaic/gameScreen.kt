@@ -23,10 +23,14 @@
 package net.opatry.game.wordle.mosaic
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Text
+import com.jakewharton.mosaic.ui.TextStyle
 import net.opatry.game.wordle.State
+import net.opatry.game.wordle.copyToClipboard
 import net.opatry.game.wordle.mosaic.component.Alphabet
 import net.opatry.game.wordle.mosaic.component.WordleGrid
 import net.opatry.game.wordle.ui.WordleViewModel
@@ -46,31 +50,38 @@ fun GameScreen(viewModel: WordleViewModel) {
 
         Text("")
 
+        // There must be stable number of lines for nice UI state.
+        // All states should display 3 lines.
         when (val state = viewModel.state) {
             is State.Won -> {
+                LaunchedEffect(viewModel.state) {
+                    viewModel.stateLabel.copyToClipboard()
+                }
+
                 Text("Wordle <TODO_wordleId> ${state.answers.size}/${state.maxTries}")
-                Text(viewModel.answer)
+                Text("Results copied to clipboard!") // FIXME depends on copyToClipboard success
+                Text(" 🔄 Play again? (y/N)?")
             }
 
             is State.Lost -> {
                 Text("Wordle <TODO_wordleId> X/${state.maxTries}")
-                Text(viewModel.answer)
+                Row {
+                    Text("The answer was ")
+                    Text(
+                        viewModel.answer,
+                        color = Color.BrightWhite,
+                        background = Color.Green,
+                        style = TextStyle.Bold
+                    )
+                }
+                Text(" 🔄 Play again? (y/N)?")
             }
 
             is State.Playing -> {
-                Text(" ➡️ Enter a 5 letter english word")
                 Text("") // TODO display error here if any or define a placeholder on top of grid
+                Text("")
+                Text(" ➡️ Enter a 5 letter english word")
             }
-        }
-
-//        viewModel.state.toClipboard()
-//        println("Results copied to clipboard!")
-
-        // there must be stable number of lines for nice UI state
-        if (viewModel.state !is State.Playing) {
-            Text(" 🔄 Play again? (y/N)? ${viewModel.userInput}")
-        } else {
-            Text("")
         }
     }
 }
