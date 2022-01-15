@@ -25,6 +25,7 @@ package net.opatry.game.wordle.ui.compose
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -32,13 +33,16 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.useResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.singleWindowApplication
+import androidx.compose.ui.window.application
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.IconProvider
 import net.opatry.game.wordle.ui.compose.theme.LocalIconProvider
+import java.awt.Dimension
 
 object DesktopIconProvider : IconProvider {
     @Composable
@@ -58,8 +62,13 @@ object DesktopIconProvider : IconProvider {
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
-fun main() {
-    singleWindowApplication(
+fun main() = application {
+    val defaultSize = DpSize(500.dp, 720.dp)
+    val minSize = DpSize(380.dp, defaultSize.height)
+    val minWindowSize = remember { Dimension(minSize.width.value.toInt(), minSize.height.value.toInt()) }
+
+    Window(
+        onCloseRequest = ::exitApplication,
         title = "Wordle Compose",
         // FIXME can't make iconFile work
         //  Icon in the titlebar of the window (for platforms which support this).
@@ -68,12 +77,13 @@ fun main() {
         icon = BitmapPainter(useResource("icon.png", ::loadImageBitmap)),
         state = WindowState(
             position = WindowPosition(Alignment.Center),
-            width = 500.dp,
-            height = 700.dp
+            width = defaultSize.width,
+            height = defaultSize.height
         ),
-        // TODO how to restrict to a minimum width & height (500x700?)
-        resizable = true,
+        resizable = true
     ) {
+        if (window.minimumSize != minWindowSize) window.minimumSize = minWindowSize
+
         CompositionLocalProvider(LocalIconProvider provides DesktopIconProvider) {
             WordleApp()
         }
