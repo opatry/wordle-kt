@@ -25,6 +25,7 @@ package net.opatry.game.wordle.ui.compose
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
@@ -59,9 +61,18 @@ object DesktopIconProvider : IconProvider {
 fun main() {
     singleWindowApplication(
         title = "Wordle Compose",
-        icon = BitmapPainter(useResource("/icon.png", ::loadImageBitmap)),
-        state = WindowState(width = 500.dp, height = 700.dp),
-        resizable = false,
+        // FIXME can't make iconFile work
+        //  Icon in the titlebar of the window (for platforms which support this).
+        //  On macOS individual windows can't have a separate icon.
+        //  To change the icon in the Dock, set it via `iconFile` in `build.gradle`
+        icon = BitmapPainter(useResource("icon.png", ::loadImageBitmap)),
+        state = WindowState(
+            position = WindowPosition(Alignment.Center),
+            width = 500.dp,
+            height = 700.dp
+        ),
+        // TODO how to restrict to a minimum width & height (500x700?)
+        resizable = true,
     ) {
         CompositionLocalProvider(LocalIconProvider provides DesktopIconProvider) {
             WordleApp()

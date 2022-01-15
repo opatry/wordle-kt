@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -146,6 +147,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         Column(
             Modifier
                 .fillMaxWidth()
+                .padding(bottom = 8.dp)
                 .focusRequester(focusRequester)
                 .focusable(true)
                 .onKeyEvent { event ->
@@ -174,8 +176,13 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                 onSettingsClick = { showSettings = true }
             )
             Divider()
+
             AnswerPlaceHolder(viewModel.answer, viewModel::restart)
+
             WordleGrid(viewModel.grid)
+
+            Spacer(Modifier.weight(1f))
+
             Alphabet(viewModel.alphabet, enabled = actionsEnabled) { key ->
                 handleKey(viewModel, key)
             }
