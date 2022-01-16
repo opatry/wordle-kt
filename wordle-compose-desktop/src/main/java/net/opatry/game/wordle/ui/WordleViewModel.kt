@@ -82,14 +82,17 @@ private fun State.toResultString(): String {
     return buffer.toString()
 }
 
-class WordleViewModel(private var rules: WordleRules, private val repository: WordleRepository) {
+class WordleViewModel(private val dictionary: List<String>, private val repository: WordleRepository) {
+    private val availableWords: List<String>
+        get() = dictionary - repository.allRecords.map(WordleRecord::answer).toSet()
+    private var rules: WordleRules? = null
     var showRules by mutableStateOf(false)
         private set
     var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
     val stateLabel: String
-        get() = rules.state.toResultString()
-    var victory by mutableStateOf(rules.state is State.Won)
+        get() = rules?.state?.toResultString() ?: ""
+    var victory by mutableStateOf(rules?.state is State.Won)
         private set
     var answer by mutableStateOf("")
         private set
@@ -109,13 +112,16 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
             val records = repository.allRecords
             statistics = records.stats()
             showRules = records.isEmpty()
+            restart()
         }
 
-        updateGrid()
-        updateAlphabet()
+        // TODO while repository is loading, we should give feedback to user and it could also be the right time
+        //  to ask for preferred game mode (language, word size)
     }
 
     private fun updateGrid() {
+        val rules = rules ?: return
+
         val answers = rules.state.answers.toMutableList()
         val turn = answers.size
         val maxTries = rules.state.maxTries.toInt()
@@ -131,6 +137,8 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     }
 
     private fun updateAlphabet() {
+        val rules = rules ?: return
+
         // TODO couldn't we make this smarter?
         val answers = rules.state.answers
         val absent = mutableSetOf<Char>()
@@ -164,6 +172,8 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     }
 
     private fun updateAnswer() {
+        val rules = rules ?: return
+
         answer = when (val state = rules.state) {
             is State.Playing -> ""
             is State.Lost -> state.selectedWord
@@ -172,6 +182,8 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     }
 
     fun updateUserInput(input: String) {
+        val rules = rules ?: return
+
         if (rules.state !is State.Playing) return
 
         val normalized = input.take(rules.wordSize).uppercase()
@@ -182,7 +194,8 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     }
 
     fun validateUserInput() {
-        if (rules.state !is State.Playing) return
+        val rules = rules
+        if (rules == null || rules.state !is State.Playing) return
 
         when (rules.playWord(userInput)) {
             InputState.VALID -> {
@@ -191,12 +204,12 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
                 updateAlphabet()
             }
             InputState.NOT_IN_DICTIONARY -> {
-                _userFeedback.add("Not in word list")
+                _userFeedback += "Not in word list"
                 userFeedback = _userFeedback.toList()
                 updateGrid()
             }
             InputState.TOO_SHORT -> {
-                _userFeedback.add("Not enough letters")
+                _userFeedback += "Not enough letters"
                 userFeedback = _userFeedback.toList()
                 updateGrid()
             }
@@ -226,13 +239,22 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
         // notify user
         victory = rules.state is State.Won
         if (victory && !oldVictory) {
-            _userFeedback.add(rules.state.message)
+            _userFeedback += rules.state.message
             userFeedback = _userFeedback.toList()
         }
     }
 
     fun restart() {
-        rules = WordleRules(rules.words)
+        val words = availableWords
+        if (words.isEmpty()) {
+            _userFeedback += "All known words were already played."
+            userFeedback = _userFeedback.toList()
+            return
+        }
+
+        // FIXME wordleId should be stable even when words set changes
+        val rules = WordleRules(words)
+        this.rules = rules
         victory = rules.state is State.Won
         userInput = ""
         _userFeedback.clear()
@@ -243,7 +265,7 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     }
 
     fun consumed(message: String) {
-        _userFeedback.remove(message)
+        _userFeedback -= message
         userFeedback = _userFeedback.toList()
     }
 
