@@ -167,7 +167,9 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     val statistics by rememberUpdatedState(viewModel.statistics)
 
     LaunchedEffect(viewModel.victory) {
-        // FIXME this causes a small freeze when transitioning from !victory to victory
+        // FIXME delay dialog appearance, otherwise causing a small freeze when transitioning from !victory to victory.
+        //  Maybe conflicting animation for dialog appearance & toast?
+        delay(100)
         showStatsDialog = viewModel.victory
     }
 
