@@ -217,7 +217,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             )
             Divider()
 
-            AnswerPlaceHolder(viewModel.answer, viewModel::restart)
+            AnswerPlaceHolder(viewModel.answer, enabled = actionsEnabled, viewModel::restart)
 
             if (viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()) {
                 WordleGrid(viewModel.grid)
@@ -366,7 +366,7 @@ fun Toolbar(
 }
 
 @Composable
-fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
+fun AnswerPlaceHolder(answer: String, enabled: Boolean = true, onRestart: () -> Unit) {
     val isAnswerVisible = answer.isNotEmpty()
     val animatedAlpha by animateFloatAsState(if (isAnswerVisible) 1f else 0f)
     // force 0 without animation when resetting from "xxx" to "" to avoid poor visual
@@ -391,7 +391,7 @@ fun AnswerPlaceHolder(answer: String, onRestart: () -> Unit) {
             )
         }
 
-        IconButton(onClick = onRestart) {
+        IconButton(enabled = enabled, onClick = onRestart) {
             Icon(painterResource(AppIcon.Refresh), "Play again")
         }
     }
