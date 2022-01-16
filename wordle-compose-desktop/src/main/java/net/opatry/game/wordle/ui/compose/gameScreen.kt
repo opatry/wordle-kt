@@ -185,7 +185,6 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             .padding(2.dp),
         contentAlignment = Alignment.TopCenter
     ) {
-        // TODO Scaffold?
         Column(
             Modifier
                 .fillMaxWidth()
@@ -260,53 +259,51 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
 
         AnimatedVisibility(
-            showRulesDialog,
-            enter = fadeIn() + slideInVertically(),
-            exit = slideOutVertically() + fadeOut()
-        ) {
-            Dialog(
-                title = null,
-                Modifier
-                    .size(width = 380.dp, height = 520.dp)
-                    .padding(top = 50.dp),
-                onClose = { viewModel.dismissRules() }
-            ) {
-                HowToPanel()
-            }
-        }
-
-        AnimatedVisibility(
-            showStatsDialog,
-            enter = fadeIn() + scaleIn(),
-            exit = scaleOut() + fadeOut()
-        ) {
-            val lastRecord = viewModel.lastRecord
-            Dialog(
-                title = "Statistics",
-                Modifier
-                    .size(width = 380.dp, if (lastRecord.isVictory) 500.dp else 460.dp)
-                    .padding(top = 50.dp),
-                onClose = { showStatsDialog = false }
-            ) {
-                val clipboard = LocalClipboardManager.current
-                StatsPanel(statistics, lastRecord) {
-                    if (lastRecord.isVictory) {
-                        val lastRecordString = lastRecord.resultString
-                        clipboard.setText(AnnotatedString(lastRecordString))
-                        // TODO how to display toast in combination of view model provided ones
-                        //userFeedback += "Copied results to clipboard"
-                    }
-                }
-            }
-        }
-
-        AnimatedVisibility(
             showSettingsPanel,
             enter = fadeIn() + slideInVertically(),
             exit = slideOutVertically() + fadeOut()
         ) {
             PopupOverlay("Settings", onClose = { showSettingsPanel = false }) {
                 SettingsPanel(settings)
+            }
+        }
+    }
+
+    AnimatedVisibility(
+        showRulesDialog,
+        enter = fadeIn() + slideInVertically(),
+        exit = slideOutVertically() + fadeOut()
+    ) {
+        Dialog(
+            title = null,
+            Modifier
+                .size(width = 380.dp, height = 520.dp),
+            onClose = { viewModel.dismissRules() }
+        ) {
+            HowToPanel()
+        }
+    }
+
+    AnimatedVisibility(
+        showStatsDialog,
+        enter = fadeIn() + scaleIn(),
+        exit = scaleOut() + fadeOut()
+    ) {
+        val lastRecord = viewModel.lastRecord
+        Dialog(
+            title = "Statistics",
+            Modifier
+                .size(width = 380.dp, 450.dp),
+            onClose = { showStatsDialog = false }
+        ) {
+            val clipboard = LocalClipboardManager.current
+            StatsPanel(statistics, lastRecord) {
+                if (lastRecord.isVictory) {
+                    val lastRecordString = lastRecord.resultString
+                    clipboard.setText(AnnotatedString(lastRecordString))
+                    // TODO how to display toast in combination of view model provided ones
+                    //userFeedback += "Copied results to clipboard"
+                }
             }
         }
     }
