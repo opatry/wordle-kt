@@ -83,7 +83,7 @@ private fun State.toResultString(): String {
 }
 
 class WordleViewModel(private var rules: WordleRules, private val repository: WordleRepository) {
-    var firstLaunch by mutableStateOf(true)
+    var showRules by mutableStateOf(false)
         private set
     var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
@@ -106,7 +106,9 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
     init {
         GlobalScope.launch(Dispatchers.Main) {
             repository.loadRecords()
-            statistics = repository.allRecords.stats()
+            val records = repository.allRecords
+            statistics = records.stats()
+            showRules = records.isEmpty()
         }
 
         updateGrid()
@@ -245,7 +247,7 @@ class WordleViewModel(private var rules: WordleRules, private val repository: Wo
         userFeedback = _userFeedback.toList()
     }
 
-    fun firstLaunchDone() {
-        firstLaunch = false
+    fun dismissRules() {
+        showRules = false
     }
 }

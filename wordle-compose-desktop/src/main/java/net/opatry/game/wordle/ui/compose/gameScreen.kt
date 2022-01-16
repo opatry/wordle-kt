@@ -110,13 +110,13 @@ fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
 @Composable
 fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
-    val showFirstLaunchSheet by rememberUpdatedState(viewModel.firstLaunch)
+    val showRulesDialog by rememberUpdatedState(viewModel.showRules)
     var showHowTo by remember { mutableStateOf(false) }
     var showStats by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showResultsDialog by remember { mutableStateOf(false) }
     val dialogVisible = arrayOf(
-        showFirstLaunchSheet,
+        showRulesDialog,
         showHowTo,
         showStats,
         showSettings,
@@ -159,7 +159,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                             showStats = false
                             showSettings = false
                             showResultsDialog = false
-                            viewModel.firstLaunchDone()
+                            viewModel.dismissRules()
                             true
                         }
                         actionsEnabled -> handleKey(viewModel, event.key)
@@ -215,7 +215,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
 
         AnimatedVisibility(
-            showFirstLaunchSheet,
+            showRulesDialog,
             enter = fadeIn() + slideInVertically(),
             exit = slideOutVertically() + fadeOut()
         ) {
@@ -224,7 +224,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                 Modifier
                     .size(width = 380.dp, height = 520.dp)
                     .padding(top = 50.dp),
-                onClose = { viewModel.firstLaunchDone() }
+                onClose = { viewModel.dismissRules() }
             ) {
                 HowToPanel()
             }
