@@ -57,9 +57,10 @@ private fun embolden(word: String, sentence: String): AnnotatedString {
 }
 
 @Composable
-fun HowToPanel() {
+fun HowToPanel(maxTries: Int = 6, wordSize: Int = 5) {
     Column {
-        Paragraph(embolden("WORDLE", "Guess the WORDLE in 6 tries."))
+        Paragraph(embolden("WORDLE", "Guess the WORDLE in $maxTries tries."))
+        Paragraph("Each guess must be a valid $wordSize letter word. Hit the enter button to submit.")
         Paragraph("After each guess, the color of the tiles will change to show how close your guess was to the word.")
         Divider()
 
@@ -92,7 +93,7 @@ private fun Paragraph(
     text: String,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.body2) {
-    Paragraph(text = AnnotatedString(text), modifier = modifier.padding(vertical = 8.dp), style = style)
+    Paragraph(text = AnnotatedString(text), modifier = modifier.padding(bottom = 8.dp), style = style)
 }
 
 @Composable
