@@ -125,7 +125,7 @@ class WordleRules(
     inSelectedWord: String = inWords.random(),
     private val maxTries: Int = 6
 ) {
-    val words = inWords.map(String::sanitizeForWordle).distinct()
+    val words = inWords.map(String::sanitizeForWordle).distinct().filterNot(String::isBlank)
     private val selectedWord = inSelectedWord.sanitizeForWordle()
     val wordSize = words.firstOrNull()?.length ?: 0
     var state: State = when {
@@ -141,10 +141,12 @@ class WordleRules(
         require(wordSize > 0) {
             "Empty word isn't allowed"
         }
-        require(words.all { it.matches(Regex("^[A-Z]{$wordSize}$")) }) {
-            "All words should be compound of $wordSize latin letters"
+        val wordleRegex = Regex("^[A-Z]{$wordSize}$")
+        require(words.all { it.matches(wordleRegex) }) {
+            val invalid = words.filterNot { it.matches(wordleRegex) }
+            "All words should be compound of $wordSize latin letters (${invalid.size}): $invalid"
         }
-        require(words.contains(selectedWord)) {
+        require(selectedWord in words) {
             "Selected word ($selectedWord) isn't part of available words"
         }
     }
