@@ -36,8 +36,8 @@ import net.opatry.game.wordle.WordleRules
 import net.opatry.game.wordle.WordleStats
 import net.opatry.game.wordle.data.WordleRecord
 import net.opatry.game.wordle.data.WordleRepository
+import net.opatry.game.wordle.sanitizeForWordle
 import net.opatry.game.wordle.stats
-import net.opatry.game.wordle.toEmoji
 import java.util.*
 
 private val victoryMessages = arrayOf(
@@ -58,40 +58,18 @@ private val State.message: String
         }
     }
 
-private fun StringBuffer.appendAnswer(answer: Answer) {
-    append(
-        answer.flags.joinToString(
-            separator = " ",
-            postfix = "\n",
-            transform = AnswerFlag::toEmoji
-        )
-    ).trimEnd()
-}
-
-private fun State.toResultString(): String {
-    val buffer = StringBuffer()
-    buffer.append(
-        when (this) {
-            is State.Lost -> "Wordle $wordleId X/$maxTries\n"
-            is State.Won -> "Wordle $wordleId ${answers.size}/$maxTries\n"
-            else -> ""
-        }
-    )
-    answers.forEach(buffer::appendAnswer)
-
-    return buffer.toString()
-}
-
-class WordleViewModel(private val dictionary: List<String>, private val repository: WordleRepository) {
+class WordleViewModel(inDictionary: List<String>, private val repository: WordleRepository) {
+    private val dictionary = inDictionary.map(kotlin.String::sanitizeForWordle)
     private val availableWords: List<String>
         get() = dictionary - repository.allRecords.map(WordleRecord::answer).toSet()
+    val lastRecord: WordleRecord?
+        get() = repository.allRecords.lastOrNull()
+    private var wordleId: Int = -1
     private var rules: WordleRules? = null
     var showRules by mutableStateOf(false)
         private set
     var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
-    val stateLabel: String
-        get() = rules?.state?.toResultString() ?: ""
     var victory by mutableStateOf(rules?.state is State.Won)
         private set
     var answer by mutableStateOf("")
@@ -124,7 +102,7 @@ class WordleViewModel(private val dictionary: List<String>, private val reposito
 
         val answers = rules.state.answers.toMutableList()
         val turn = answers.size
-        val maxTries = rules.state.maxTries.toInt()
+        val maxTries = rules.state.maxTries
         val wordSize = rules.wordSize
         if (turn < maxTries) {
             answers += Answer(userInput.padEnd(wordSize, ' ').toCharArray(), Array(wordSize) { AnswerFlag.NONE })
@@ -223,7 +201,9 @@ class WordleViewModel(private val dictionary: List<String>, private val reposito
             repository.addRecord(
                 WordleRecord(
                     Calendar.getInstance().time,
+                    wordleId,
                     answer,
+                    rules.state.maxTries,
                     rules.state.answers.map {
                         it.letters.concatToString()
                     }
@@ -245,15 +225,19 @@ class WordleViewModel(private val dictionary: List<String>, private val reposito
     }
 
     fun restart() {
-        val words = availableWords
-        if (words.isEmpty()) {
+        val availableWords = availableWords
+        if (availableWords.isEmpty()) {
             _userFeedback += "All known words were already played."
             userFeedback = _userFeedback.toList()
             return
         }
 
-        // FIXME wordleId should be stable even when words set changes
-        val rules = WordleRules(words)
+        wordleId = -1
+        // pick wordleId among full dictionary to keep stability
+        while (wordleId !in availableWords.indices) {
+            wordleId = dictionary.indices.random()
+        }
+        val rules = WordleRules(availableWords, availableWords[wordleId])
         this.rules = rules
         victory = rules.state is State.Won
         userInput = ""

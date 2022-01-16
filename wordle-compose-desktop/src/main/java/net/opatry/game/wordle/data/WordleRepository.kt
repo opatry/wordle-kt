@@ -31,7 +31,9 @@ import java.util.*
 
 data class WordleRecord(
     val date: Date,
+    val wordleId: Int,
     val answer: String,
+    val maxTries: Int,
     val guesses: List<String>,
 )
 

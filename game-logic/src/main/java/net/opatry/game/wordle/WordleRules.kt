@@ -85,71 +85,31 @@ class Answer(
     }
 }
 
-private fun StringBuffer.appendAnswer(answer: Answer) {
-    answer.letters.forEachIndexed { index, char ->
-        append("$char${answer.flags[index].toEmoji()}")
-    }
-    append("\n")
-}
 
 sealed class State(
     open val answers: List<Answer>,
-    open val maxTries: UInt,
+    open val maxTries: Int,
     open val wordSize: Int
 ) {
     data class Playing(
         override val answers: List<Answer>,
-        override val maxTries: UInt,
+        override val maxTries: Int,
         override val wordSize: Int
-    ) : State(answers, maxTries, wordSize) {
-        override fun toString(): String {
-            return if (answers.isNotEmpty()) {
-                super.toString() + "Keep going… ${answers.size}/$maxTries"
-            } else {
-                super.toString()
-            }
-        }
-    }
+    ) : State(answers, maxTries, wordSize)
 
     data class Won(
         override val answers: List<Answer>,
-        override val maxTries: UInt,
+        override val maxTries: Int,
         override val wordSize: Int,
-        val wordleId: Int,
         val selectedWord: String
-    ) :
-        State(answers, maxTries, wordSize) {
-        override fun toString(): String {
-            return "Wordle $wordleId ${answers.size}/$maxTries\n" +
-                    super.toString() +
-                    "Congrats! You found the correct answer 🎉: $selectedWord"
-        }
-    }
+    ) : State(answers, maxTries, wordSize)
 
     data class Lost(
         override val answers: List<Answer>,
-        override val maxTries: UInt,
+        override val maxTries: Int,
         override val wordSize: Int,
-        val wordleId: Int,
         val selectedWord: String
-    ) :
-        State(answers, maxTries, wordSize) {
-        override fun toString(): String {
-            return "Wordle $wordleId X/$maxTries\n" +
-                    super.toString() +
-                    "Doh! You didn't find the answer 🤭: $selectedWord"
-        }
-    }
-
-    override fun toString(): String {
-        val buffer = StringBuffer()
-        answers.forEach(buffer::appendAnswer)
-        val emptyAnswer = Answer(CharArray(wordSize) { ' ' }, Array(wordSize) { AnswerFlag.NONE })
-        repeat(maxTries.toInt() - answers.size) {
-            buffer.appendAnswer(emptyAnswer)
-        }
-        return buffer.toString()
-    }
+    ) : State(answers, maxTries, wordSize)
 }
 
 enum class InputState {
@@ -163,15 +123,14 @@ enum class InputState {
 class WordleRules(
     inWords: List<String>,
     inSelectedWord: String = inWords.random(),
-    private val maxTries: UInt = 6u
+    private val maxTries: Int = 6
 ) {
     val words = inWords.map(String::sanitizeForWordle).distinct()
     private val selectedWord = inSelectedWord.sanitizeForWordle()
-    private val wordleId = words.indexOf(selectedWord)
     val wordSize = words.firstOrNull()?.length ?: 0
     var state: State = when {
-        maxTries > 0u -> State.Playing(emptyList(), maxTries, wordSize)
-        else -> State.Lost(emptyList(), maxTries, wordleId, wordSize, selectedWord)
+        maxTries > 0 -> State.Playing(emptyList(), maxTries, wordSize)
+        else -> State.Lost(emptyList(), maxTries, wordSize, selectedWord)
     }
         private set
 
@@ -187,9 +146,6 @@ class WordleRules(
         }
         require(words.contains(selectedWord)) {
             "Selected word ($selectedWord) isn't part of available words"
-        }
-        require(wordleId in words.indices) {
-            "Can't accurately compute wordle ID"
         }
     }
 
@@ -216,8 +172,8 @@ class WordleRules(
         }.toList()
 
         state = when {
-            sanitized == selectedWord -> State.Won(answers, maxTries, wordleId, wordSize, selectedWord)
-            answers.size.toUInt() == maxTries -> State.Lost(answers, maxTries, wordleId, wordSize, selectedWord)
+            sanitized == selectedWord -> State.Won(answers, maxTries, wordSize, selectedWord)
+            answers.size == maxTries -> State.Lost(answers, maxTries, wordSize, selectedWord)
             else -> playingState.copy(answers = answers)
         }
 

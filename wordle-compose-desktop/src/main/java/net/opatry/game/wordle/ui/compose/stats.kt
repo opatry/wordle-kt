@@ -45,23 +45,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.WordleStats
+import net.opatry.game.wordle.data.WordleRecord
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone3
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
-import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
+val WordleStats.highlightedIndex: Int
+    get() = when (val lastScoreIndex = lastScore - 1) {
+        in victoryDistribution.indices -> lastScoreIndex
+        else -> -1
+    }
+
 @Composable
-fun StatsPanel(stats: WordleStats, highlightLastScore: Boolean = true) {
+fun StatsFigures(stats: WordleStats) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         StatCells(stats)
-        val distribution = stats.victoryDistribution
-        val lastScoreIndex = stats.lastScore - 1
-        val highlightedIndex = when {
-            highlightLastScore && lastScoreIndex in distribution.indices -> lastScoreIndex
-            else -> -1
-        }
-        VictoryDistribution(stats.playedCount, stats.victoryDistribution, highlightedIndex)
+
+        VictoryDistribution(stats.playedCount, stats.victoryDistribution, stats.highlightedIndex)
     }
 }
 
@@ -152,25 +153,15 @@ fun StatProgress(label: String, value: Int, ratio: Float, isHighlighted: Boolean
 }
 
 @Composable
-fun ResultsPanel(stats: WordleStats, resultLabel: String, onShare: (String) -> Unit) {
-    val label = if (isHighContrastMode) {
-        resultLabel
-            .replace("🟨", "🟦")
-            .replace("🟩", "🟧")
-    } else {
-        resultLabel
-    }
-
+fun StatsPanel(stats: WordleStats, lastRecord: WordleRecord?, onShare: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        StatsPanel(stats)
+        StatsFigures(stats)
 
-        Row(horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally)) {
-            Text(label, textAlign = TextAlign.Center)
-
-            Button(onClick = { onShare(label) }, Modifier.padding(top = 8.dp)) {
+        if (lastRecord != null && lastRecord.isVictory) {
+            Button(onClick = onShare, Modifier.padding(top = 8.dp)) {
                 Text("Share")
                 Spacer(Modifier.width(8.dp))
                 Icon(painterResource(AppIcon.Share), null)

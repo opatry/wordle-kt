@@ -22,6 +22,47 @@
 
 package net.opatry.game.wordle
 
+
+val AnswerFlag.toEmoji: String
+    get() = when (this) {
+        AnswerFlag.NONE -> "⬜"
+        AnswerFlag.PRESENT -> "🟨"
+        AnswerFlag.ABSENT -> "⬛"
+        AnswerFlag.CORRECT -> "🟩"
+    }
+
+private fun StringBuffer.appendAnswer(answer: Answer) {
+    answer.letters.forEachIndexed { index, char ->
+        append("$char${answer.flags[index].toEmoji}")
+    }
+    append("\n")
+}
+
+fun State.toString(wordleId: Int): String {
+    val buffer = StringBuffer()
+    val (prefix, suffix) = when (this) {
+        is State.Won -> "Wordle $wordleId ${answers.size}/$maxTries" to "Congrats! You found the correct answer 🎉: $selectedWord"
+        is State.Lost -> "Wordle $wordleId X/$maxTries" to "Doh! You didn't find the answer 🤭: $selectedWord"
+        is State.Playing -> "" to if (answers.isNotEmpty()) "Keep going… ${answers.size}/$maxTries" else ""
+    }
+
+    if (prefix.isNotEmpty()) {
+        buffer.append(prefix).append('\n')
+    }
+
+    answers.forEach(buffer::appendAnswer)
+    val emptyAnswer = Answer(CharArray(wordSize) { ' ' }, Array(wordSize) { AnswerFlag.NONE })
+    repeat(maxTries - answers.size) {
+        buffer.appendAnswer(emptyAnswer)
+    }
+
+    if (suffix.isNotEmpty()) {
+        buffer.append(suffix).append('\n')
+    }
+
+    return buffer.toString()
+}
+
 private val InputState.cause: String
     get() = when (this) {
         InputState.VALID -> ""
@@ -34,7 +75,8 @@ private val InputState.cause: String
 fun main() {
     var playing = true
     while (playing) {
-        val rules = WordleRules(words)
+        val wordleId = words.indices.random()
+        val rules = WordleRules(words, words[wordleId])
 
         println(
             """
@@ -44,7 +86,7 @@ fun main() {
             """.trimIndent()
         )
 
-        println(rules.state.toString())
+        println(rules.state.toString(wordleId))
         while (rules.state is State.Playing) {
             print(" ➡️ Enter a 5 letter english word: ")
             val word = readLine().toString()
@@ -55,7 +97,7 @@ fun main() {
             } else {
                 println(" ❌ '$word' is invalid: ${inputState.cause}")
             }
-            println(rules.state.toString())
+            println(rules.state.toString(wordleId))
         }
 
         print(" 🔄 Play again? (y/N) ")

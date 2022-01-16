@@ -76,7 +76,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import net.opatry.game.wordle.Answer
+import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.data.Settings
+import net.opatry.game.wordle.data.WordleRecord
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.component.Alphabet
 import net.opatry.game.wordle.ui.compose.component.Dialog
@@ -85,7 +88,46 @@ import net.opatry.game.wordle.ui.compose.component.WordleGrid
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone1
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
+import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.painterResource
+
+val AnswerFlag.toEmoji: String
+    get() = when (this) {
+        AnswerFlag.NONE -> "⬜"
+        AnswerFlag.PRESENT -> if (isHighContrastMode) "🟦" else "🟨"
+        AnswerFlag.ABSENT -> "⬛"
+        AnswerFlag.CORRECT -> if (isHighContrastMode) "🟧" else "🟩"
+    }
+
+private fun StringBuffer.appendAsAnswer(word: String, selectedWord: String) {
+    val answer = Answer.computeAnswer(word, selectedWord)
+    append(
+        answer.flags.joinToString(
+            separator = " ",
+            postfix = "\n",
+            transform = AnswerFlag::toEmoji
+        )
+    ).trimEnd()
+}
+
+val WordleRecord?.isVictory: Boolean
+    get() = this != null && answer == guesses.lastOrNull()
+
+private val WordleRecord?.resultString: String
+    get() {
+        if (this == null) return ""
+
+        val buffer = StringBuffer()
+        if (isVictory) {
+            buffer.append("Wordle $wordleId ${guesses.size}/$maxTries\n")
+        } else {
+            buffer.append("Wordle $wordleId X/$maxTries\n")
+        }
+
+        guesses.forEach { buffer.appendAsAnswer(it, answer) }
+
+        return buffer.toString()
+    }
 
 @ExperimentalComposeUiApi
 fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
@@ -111,16 +153,14 @@ fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
 fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val showRulesDialog by rememberUpdatedState(viewModel.showRules)
-    var showHowTo by remember { mutableStateOf(false) }
-    var showStats by remember { mutableStateOf(false) }
-    var showSettings by remember { mutableStateOf(false) }
-    var showResultsDialog by remember { mutableStateOf(false) }
+    var showRulesPanel by remember { mutableStateOf(false) }
+    var showStatsDialog by remember { mutableStateOf(false) }
+    var showSettingsPanel by remember { mutableStateOf(false) }
     val dialogVisible = arrayOf(
         showRulesDialog,
-        showHowTo,
-        showStats,
-        showSettings,
-        showResultsDialog
+        showRulesPanel,
+        showStatsDialog,
+        showSettingsPanel,
     ).any { it }
     val actionsEnabled = !dialogVisible
 
@@ -128,7 +168,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
 
     LaunchedEffect(viewModel.victory) {
         // FIXME this causes a small freeze when transitioning from !victory to victory
-        showResultsDialog = viewModel.victory
+        showStatsDialog = viewModel.victory
     }
 
     val focusRequester = FocusRequester()
@@ -155,10 +195,9 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                         event.type != KeyEventType.KeyUp -> false
                         dialogVisible && event.key == Key.Escape -> {
                             // FIXME a bit fragile if a new one is added
-                            showHowTo = false
-                            showStats = false
-                            showSettings = false
-                            showResultsDialog = false
+                            showRulesPanel = false
+                            showStatsDialog = false
+                            showSettingsPanel = false
                             viewModel.dismissRules()
                             true
                         }
@@ -171,9 +210,9 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         ) {
             Toolbar(
                 enabled = actionsEnabled,
-                onHowToClick = { showHowTo = true },
-                onStatsClick = { showStats = true },
-                onSettingsClick = { showSettings = true }
+                onHowToClick = { showRulesPanel = true },
+                onStatsClick = { showStatsDialog = true },
+                onSettingsClick = { showSettingsPanel = true }
             )
             Divider()
 
@@ -205,11 +244,11 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
 
         AnimatedVisibility(
-            showHowTo,
+            showRulesPanel,
             enter = fadeIn() + slideInVertically(),
             exit = slideOutVertically() + fadeOut()
         ) {
-            PopupOverlay("How to play", onClose = { showHowTo = false }) {
+            PopupOverlay("How to play", onClose = { showRulesPanel = false }) {
                 HowToPanel()
             }
         }
@@ -231,50 +270,37 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
 
         AnimatedVisibility(
-            showStats,
-            enter = fadeIn() + slideInVertically(),
-            exit = slideOutVertically() + fadeOut()
-        ) {
-            Dialog(
-                title = "Statistics",
-                Modifier
-                    .size(width = 380.dp, height = 460.dp)
-                    .padding(top = 50.dp),
-                onClose = { showStats = false }
-            ) {
-                StatsPanel(statistics)
-            }
-        }
-
-        AnimatedVisibility(
-            showSettings,
-            enter = fadeIn() + slideInVertically(),
-            exit = slideOutVertically() + fadeOut()
-        ) {
-            PopupOverlay("Settings", onClose = { showSettings = false }) {
-                SettingsPanel(settings)
-            }
-        }
-
-        AnimatedVisibility(
-            showResultsDialog,
+            showStatsDialog,
             enter = fadeIn() + scaleIn(),
             exit = scaleOut() + fadeOut()
         ) {
+            val lastRecord = viewModel.lastRecord
             Dialog(
                 title = "Statistics",
                 Modifier
-                    .size(width = 380.dp, height = 620.dp)
+                    .size(width = 380.dp, if (lastRecord.isVictory) 500.dp else 460.dp)
                     .padding(top = 50.dp),
-                onClose = { showResultsDialog = false }
+                onClose = { showStatsDialog = false }
             ) {
                 val clipboard = LocalClipboardManager.current
-                // FIXME need to revise the label thing
-                ResultsPanel(statistics, viewModel.stateLabel) { label ->
-                    clipboard.setText(AnnotatedString(label))
-                    // TODO how to display toast in combination of view model provided ones
-                    //userFeedback += "Copied results to clipboard"
+                StatsPanel(statistics, lastRecord) {
+                    if (lastRecord.isVictory) {
+                        val lastRecordString = lastRecord.resultString
+                        clipboard.setText(AnnotatedString(lastRecordString))
+                        // TODO how to display toast in combination of view model provided ones
+                        //userFeedback += "Copied results to clipboard"
+                    }
                 }
+            }
+        }
+
+        AnimatedVisibility(
+            showSettingsPanel,
+            enter = fadeIn() + slideInVertically(),
+            exit = slideOutVertically() + fadeOut()
+        ) {
+            PopupOverlay("Settings", onClose = { showSettingsPanel = false }) {
+                SettingsPanel(settings)
             }
         }
     }
