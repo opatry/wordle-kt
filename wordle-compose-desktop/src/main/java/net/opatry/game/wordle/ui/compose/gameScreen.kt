@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -276,8 +275,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     ) {
         Dialog(
             title = null,
-            Modifier
-                .size(width = 380.dp, height = 520.dp),
+            Modifier.width(380.dp),
             onClose = { viewModel.dismissRules() }
         ) {
             HowToPanel()
@@ -292,8 +290,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         val lastRecord = viewModel.lastRecord
         Dialog(
             title = "Statistics",
-            Modifier
-                .size(width = 380.dp, 450.dp),
+            Modifier.width(380.dp),
             onClose = { showStatsDialog = false }
         ) {
             val clipboard = LocalClipboardManager.current
