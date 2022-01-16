@@ -68,6 +68,8 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
     private var rules: WordleRules? = null
     var showRules by mutableStateOf(false)
         private set
+    var loading by mutableStateOf(true)
+        private set
     var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
     var victory by mutableStateOf(rules?.state is State.Won)
@@ -91,6 +93,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
             statistics = records.stats()
             showRules = records.isEmpty()
             restart()
+            loading = false
         }
 
         // TODO while repository is loading, we should give feedback to user and it could also be the right time

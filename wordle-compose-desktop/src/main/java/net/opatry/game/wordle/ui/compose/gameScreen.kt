@@ -162,7 +162,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         showStatsDialog,
         showSettingsPanel,
     ).any { it }
-    val actionsEnabled = !dialogVisible
+    val actionsEnabled = dialogVisible.not() && viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()
 
     val statistics by rememberUpdatedState(viewModel.statistics)
 
@@ -218,20 +218,24 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
 
             AnswerPlaceHolder(viewModel.answer, viewModel::restart)
 
-            WordleGrid(viewModel.grid)
+            if (viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()) {
+                WordleGrid(viewModel.grid)
 
-            Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
 
-            Alphabet(viewModel.alphabet, enabled = actionsEnabled) { key ->
-                handleKey(viewModel, key)
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { handleKey(viewModel, Key.Backspace) }, enabled = actionsEnabled) {
-                    Text("⌫")
+                Alphabet(viewModel.alphabet, enabled = actionsEnabled) { key ->
+                    handleKey(viewModel, key)
                 }
-                Button(onClick = { handleKey(viewModel, Key.Enter) }, enabled = actionsEnabled) {
-                    Text("Enter")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { handleKey(viewModel, Key.Backspace) }, enabled = actionsEnabled) {
+                        Text("⌫")
+                    }
+                    Button(onClick = { handleKey(viewModel, Key.Enter) }, enabled = actionsEnabled) {
+                        Text("Enter")
+                    }
                 }
+            } else if (!viewModel.loading) {
+                Text("No game data available", color = MaterialTheme.colors.error)
             }
         }
 
