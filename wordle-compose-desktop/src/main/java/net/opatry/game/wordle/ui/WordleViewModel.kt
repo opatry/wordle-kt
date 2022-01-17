@@ -105,6 +105,10 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         private set
     var requestedDialog by mutableStateOf<AppDialog?>(null)
         private set
+    private val _actionsEnabled: Boolean
+        get() = rules != null && grid.isNotEmpty() && alphabet.isNotEmpty() && requestedDialog == null
+    var actionsEnabled by mutableStateOf(_actionsEnabled)
+        private set
 
     init {
         scope.launch(Dispatchers.Main) {
@@ -221,6 +225,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         }
 
         updateEndOfGame()
+        actionsEnabled = _actionsEnabled
 
         // save data and compute stats
         if (rules.state !is State.Playing && answer.isNotEmpty()) {
@@ -279,6 +284,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         updateGrid()
         updateAlphabet()
         updateEndOfGame()
+        actionsEnabled = _actionsEnabled
     }
 
     fun pushMessage(message: String) {
@@ -294,9 +300,11 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
     fun requestDialog(dialog: AppDialog) {
         // FIXME shouldn't we check for another one is already being displayed? priority? stack?
         requestedDialog = dialog
+        actionsEnabled = _actionsEnabled
     }
 
     fun dismissDialog() {
         requestedDialog = null
+        actionsEnabled = _actionsEnabled
     }
 }

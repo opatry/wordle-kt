@@ -137,10 +137,10 @@ fun WordleViewModel.handleKey(key: Key, letter: Char): Boolean {
 fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val requestedDialog by rememberUpdatedState(viewModel.requestedDialog)
-    // FIXME "complex" decision to move at ViewModel level
-    val actionsEnabled = requestedDialog == null && viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()
-
+    val actionsEnabled by rememberUpdatedState(viewModel.actionsEnabled)
     val statistics by rememberUpdatedState(viewModel.statistics)
+    val grid by rememberUpdatedState(viewModel.grid)
+    val alphabet by rememberUpdatedState(viewModel.alphabet)
 
     val focusRequester = FocusRequester()
     LaunchedEffect(Unit) {
@@ -190,12 +190,12 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             )
 
             // FIXME "complex" decision to move at ViewModel level
-            if (viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()) {
-                WordleGrid(viewModel.grid)
+            if (grid.isNotEmpty() && alphabet.isNotEmpty()) {
+                WordleGrid(grid)
 
                 Spacer(Modifier.weight(1f))
 
-                Alphabet(viewModel.alphabet, enabled = actionsEnabled) { letter ->
+                Alphabet(alphabet, enabled = actionsEnabled) { letter ->
                     viewModel.handleKey(Key(letter.code), letter)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
