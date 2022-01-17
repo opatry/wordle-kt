@@ -182,11 +182,9 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             )
             Divider()
 
-            // FIXME "complex" decision to move at ViewModel level
-            val canShowGameControl = viewModel.userFeedback.isEmpty()
             EndOfGameControl(
                 label = viewModel.endOfGameAnswer,
-                canRestart = viewModel.canRestart && canShowGameControl,
+                canRestart = viewModel.canRestart,
                 enabled = actionsEnabled,
                 viewModel::restart
             )
@@ -239,10 +237,8 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         HowToPanel()
     }
 
-    // FIXME "complex" decision to move at ViewModel level
-    val canShowStats = viewModel.userFeedback.isEmpty()
     Dialog(
-        visible = requestedDialog == AppDialog.STATS_DIALOG && canShowStats,
+        visible = requestedDialog == AppDialog.STATS_DIALOG,
         title = "Statistics",
         Modifier.width(380.dp),
         onClose = viewModel::dismissDialog

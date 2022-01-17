@@ -30,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.InputState
@@ -81,8 +82,8 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         private set
     var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
-    var victory by mutableStateOf(rules?.state is State.Won)
-        private set
+    val victory: Boolean
+        get() = rules?.state is State.Won
     private val answer: String
         get() = when (val state = rules?.state) {
             is State.Lost -> state.selectedWord
@@ -200,6 +201,8 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         val rules = rules
         if (rules == null || rules.state !is State.Playing) return
 
+        val oldVictory = victory
+
         when (rules.playWord(userInput)) {
             InputState.VALID -> {
                 userInput = ""
@@ -216,7 +219,6 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
             }
             else -> Unit
         }
-        val oldVictory = victory
 
         updateEndOfGame()
 
@@ -241,14 +243,17 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         }
 
         // notify user
-        victory = rules.state is State.Won
         if (victory && !oldVictory) {
             pushMessage(rules.state.message)
         }
         if (rules.state !is State.Playing) {
             scope.launch {
                 // slightly delay letting player consume information update
-                delay(500)
+                withContext(Dispatchers.Default) {
+                    do {
+                        delay(250)
+                    } while (_userFeedback.isNotEmpty())
+                }
                 requestDialog(AppDialog.STATS_DIALOG)
             }
         }
@@ -268,7 +273,6 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         }
         val rules = WordleRules(availableWords, availableWords[wordleId])
         this.rules = rules
-        victory = rules.state is State.Won
         userInput = ""
         _userFeedback.clear()
         userFeedback = _userFeedback.toList()
