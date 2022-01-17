@@ -27,8 +27,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -268,39 +266,29 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
     }
 
-    AnimatedVisibility(
+    Dialog(
         showRulesDialog,
-        enter = fadeIn() + slideInVertically(),
-        exit = slideOutVertically() + fadeOut()
+        title = null,
+        Modifier.width(380.dp),
+        onClose = { viewModel.dismissRules() }
     ) {
-        Dialog(
-            title = null,
-            Modifier.width(380.dp),
-            onClose = { viewModel.dismissRules() }
-        ) {
-            HowToPanel()
-        }
+        HowToPanel()
     }
 
-    AnimatedVisibility(
-        showStatsDialog,
-        enter = fadeIn() + scaleIn(),
-        exit = scaleOut() + fadeOut()
+    Dialog(
+        visible = showStatsDialog,
+        title = "Statistics",
+        Modifier.width(380.dp),
+        onClose = { showStatsDialog = false }
     ) {
         val lastRecord = viewModel.lastRecord
-        Dialog(
-            title = "Statistics",
-            Modifier.width(380.dp),
-            onClose = { showStatsDialog = false }
-        ) {
-            val clipboard = LocalClipboardManager.current
-            StatsPanel(statistics, lastRecord) {
-                if (lastRecord.isVictory) {
-                    val lastRecordString = lastRecord.resultString
-                    clipboard.setText(AnnotatedString(lastRecordString))
-                    // TODO how to display toast in combination of view model provided ones
-                    //userFeedback += "Copied results to clipboard"
-                }
+        val clipboard = LocalClipboardManager.current
+        StatsPanel(statistics, lastRecord) {
+            if (lastRecord.isVictory) {
+                val lastRecordString = lastRecord.resultString
+                clipboard.setText(AnnotatedString(lastRecordString))
+                // TODO how to display toast in combination of view model provided ones
+                //userFeedback += "Copied results to clipboard"
             }
         }
     }

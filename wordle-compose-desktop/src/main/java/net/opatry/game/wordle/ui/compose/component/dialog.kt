@@ -22,6 +22,12 @@
 
 package net.opatry.game.wordle.ui.compose.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -49,55 +55,63 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 
+@ExperimentalAnimationApi
 @Composable
 fun Dialog(
+    visible: Boolean,
     title: String? = null,
     modifier: Modifier = Modifier,
     modal: Boolean = false,
     onClose: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    // fullscreen background for the dim effect, clickable to dismiss (unless modal)
-    // the dialog itself is also clickable and does nothing to prevent dismiss when clicking on dialog area
-    Box(
-        Modifier
-            .background(MaterialTheme.colors.surface.copy(alpha = ContentAlpha.medium))
-            .clickable(MutableInteractionSource(), indication = null, onClick = {
-                if (!modal) {
-                    onClose()
-                }
-            })
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + scaleIn(),
+        exit = scaleOut() + fadeOut()
     ) {
-        Column(
-            modifier
-                .shadow(24.dp)
-                .clip(RoundedCornerShape(5.dp))
-                .clickable(MutableInteractionSource(), indication = null, onClick = {})
-                .wrapContentHeight()
-                .background(MaterialTheme.colors.surface),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // fullscreen background for the dim effect, clickable to dismiss (unless modal)
+        // the dialog itself is also clickable and does nothing to prevent dismiss when clicking on dialog area
+        Box(
+            Modifier
+                .background(MaterialTheme.colors.surface.copy(alpha = ContentAlpha.medium))
+                .clickable(MutableInteractionSource(), indication = null, onClick = {
+                    if (!modal) {
+                        onClose()
+                    }
+                })
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
-                IconButton(onClick = onClose) {
-                    Icon(painterResource(AppIcon.Close), "Close")
-                }
-            }
-
-            if (title != null) {
-                Text(
-                    title,
-                    Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.h3
-                )
-            }
-
-            Box(
-                Modifier
-                    .verticalScroll(rememberScrollState()).padding(16.dp)
+            Column(
+                modifier
+                    .shadow(24.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .clickable(MutableInteractionSource(), indication = null, onClick = {})
+                    .wrapContentHeight()
+                    .background(MaterialTheme.colors.surface),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                content()
+                Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
+                    IconButton(onClick = onClose) {
+                        Icon(painterResource(AppIcon.Close), "Close")
+                    }
+                }
+
+                if (title != null) {
+                    Text(
+                        title,
+                        Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.h3
+                    )
+                }
+
+                Box(
+                    Modifier
+                        .verticalScroll(rememberScrollState()).padding(16.dp)
+                ) {
+                    content()
+                }
             }
         }
     }
