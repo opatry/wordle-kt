@@ -235,14 +235,6 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             }
         }
 
-        Column(Modifier.padding(top = 80.dp)) {
-            userFeedback.forEach { message ->
-                Toast(message, Modifier.padding(bottom = 4.dp)) {
-                    viewModel.consumed(message)
-                }
-            }
-        }
-
         PopupOverlay(
             showRulesPanel,
             "How to play",
@@ -281,9 +273,14 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             if (lastRecord.isVictory) {
                 val lastRecordString = lastRecord.resultString
                 clipboard.setText(AnnotatedString(lastRecordString))
-                // TODO how to display toast in combination of view model provided ones
-                //userFeedback += "Copied results to clipboard"
+                viewModel.pushMessage("Copied results to clipboard")
             }
+        }
+    }
+
+    Column(Modifier.padding(top = 80.dp)) {
+        userFeedback.forEach { message ->
+            Toast(message, Modifier.padding(bottom = 4.dp), viewModel::consumeMessage)
         }
     }
 }

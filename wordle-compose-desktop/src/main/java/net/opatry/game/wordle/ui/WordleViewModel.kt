@@ -185,13 +185,11 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
                 updateAlphabet()
             }
             InputState.NOT_IN_DICTIONARY -> {
-                _userFeedback += "Not in word list"
-                userFeedback = _userFeedback.toList()
+                pushMessage("Not in word list")
                 updateGrid()
             }
             InputState.TOO_SHORT -> {
-                _userFeedback += "Not enough letters"
-                userFeedback = _userFeedback.toList()
+                pushMessage("Not enough letters")
                 updateGrid()
             }
             else -> Unit
@@ -222,16 +220,14 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         // notify user
         victory = rules.state is State.Won
         if (victory && !oldVictory) {
-            _userFeedback += rules.state.message
-            userFeedback = _userFeedback.toList()
+            pushMessage(rules.state.message)
         }
     }
 
     fun restart() {
         val availableWords = availableWords
         if (availableWords.isEmpty()) {
-            _userFeedback += "All known words were already played."
-            userFeedback = _userFeedback.toList()
+            pushMessage("All known words were already played.")
             return
         }
 
@@ -251,7 +247,12 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         updateAnswer()
     }
 
-    fun consumed(message: String) {
+    fun pushMessage(message: String) {
+        _userFeedback += message
+        userFeedback = _userFeedback.toList()
+    }
+
+    fun consumeMessage(message: String) {
         _userFeedback -= message
         userFeedback = _userFeedback.toList()
     }
