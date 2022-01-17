@@ -160,7 +160,7 @@ fun StatsPanel(stats: WordleStats, lastRecord: WordleRecord?, onShare: () -> Uni
     ) {
         StatsFigures(stats)
 
-        if (lastRecord != null && lastRecord.isVictory) {
+        if (lastRecord != null) {
             Button(onClick = onShare, Modifier.padding(top = 8.dp)) {
                 Text("Share")
                 Spacer(Modifier.width(8.dp))

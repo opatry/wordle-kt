@@ -271,11 +271,9 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         val lastRecord = viewModel.lastRecord
         val clipboard = LocalClipboardManager.current
         StatsPanel(statistics, lastRecord) {
-            if (lastRecord.isVictory) {
-                val lastRecordString = lastRecord.resultString
-                clipboard.setText(AnnotatedString(lastRecordString))
-                viewModel.pushMessage("Copied results to clipboard")
-            }
+            val lastRecordString = lastRecord.resultString
+            clipboard.setText(AnnotatedString(lastRecordString))
+            viewModel.pushMessage("Copied results to clipboard")
         }
     }
 
