@@ -53,9 +53,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -115,18 +115,17 @@ private val WordleRecord?.resultString: String
     }
 
 @ExperimentalComposeUiApi
-fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
-    val userInput = viewModel.userInput
+fun WordleViewModel.handleKey(key: Key, letter: Char): Boolean {
     when (key.keyCode) {
         in Key.A.keyCode..Key.Z.keyCode ->
-            viewModel.updateUserInput(userInput + key.nativeKeyCode.toChar())
+            updateUserInput(userInput + letter)
         Key.Backspace.keyCode ->
             if (userInput.isNotEmpty()) {
-                viewModel.updateUserInput(userInput.dropLast(1))
+                updateUserInput(userInput.dropLast(1))
             }
         Key.NumPadEnter.keyCode,
         Key.Enter.keyCode ->
-            viewModel.validateUserInput()
+            validateUserInput()
         else -> return false
     }
     return true
@@ -168,7 +167,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                             viewModel.dismissDialog()
                             true
                         }
-                        actionsEnabled -> handleKey(viewModel, event.key)
+                        actionsEnabled -> viewModel.handleKey(event.key, event.utf16CodePoint.toChar())
                         else -> false
                     }
                 },
@@ -198,14 +197,14 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
 
                 Spacer(Modifier.weight(1f))
 
-                Alphabet(viewModel.alphabet, enabled = actionsEnabled) { key ->
-                    handleKey(viewModel, key)
+                Alphabet(viewModel.alphabet, enabled = actionsEnabled) { letter ->
+                    viewModel.handleKey(Key(letter.code), letter)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { handleKey(viewModel, Key.Backspace) }, enabled = actionsEnabled) {
+                    OutlinedButton(onClick = { viewModel.handleKey(Key.Backspace, '\b') }, enabled = actionsEnabled) {
                         Text("⌫")
                     }
-                    Button(onClick = { handleKey(viewModel, Key.Enter) }, enabled = actionsEnabled) {
+                    Button(onClick = { viewModel.handleKey(Key.Enter, '\n') }, enabled = actionsEnabled) {
                         Text("Enter")
                     }
                 }

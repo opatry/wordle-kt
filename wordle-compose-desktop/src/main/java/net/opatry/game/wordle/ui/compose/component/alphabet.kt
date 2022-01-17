@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.AnswerFlag
@@ -53,13 +52,13 @@ import net.opatry.game.wordle.ui.compose.theme.keyTextColor
 
 
 @Composable
-fun Alphabet(alphabet: Map<Char, AnswerFlag>, enabled: Boolean = true, onLetterClick: (Key) -> Unit) {
+fun Alphabet(alphabet: Map<Char, AnswerFlag>, enabled: Boolean = true, onLetterClick: (Char) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         alphabet.keys.chunked(9).forEach { row ->
             Row(horizontalArrangement = Arrangement.SpaceAround) {
                 row.forEach { letter ->
                     AlphabetLetterCell(letter, alphabet[letter]!!, enabled) {
-                        onLetterClick(Key(letter.code))
+                        onLetterClick(letter)
                     }
                 }
             }
