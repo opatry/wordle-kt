@@ -27,8 +27,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -245,24 +243,20 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             }
         }
 
-        AnimatedVisibility(
+        PopupOverlay(
             showRulesPanel,
-            enter = fadeIn() + slideInVertically(),
-            exit = slideOutVertically() + fadeOut()
+            "How to play",
+            onClose = { showRulesPanel = false }
         ) {
-            PopupOverlay("How to play", onClose = { showRulesPanel = false }) {
-                HowToPanel()
-            }
+            HowToPanel()
         }
 
-        AnimatedVisibility(
+        PopupOverlay(
             showSettingsPanel,
-            enter = fadeIn() + slideInVertically(),
-            exit = slideOutVertically() + fadeOut()
+            "Settings",
+            onClose = { showSettingsPanel = false }
         ) {
-            PopupOverlay("Settings", onClose = { showSettingsPanel = false }) {
-                SettingsPanel(settings)
-            }
+            SettingsPanel(settings)
         }
     }
 

@@ -22,6 +22,11 @@
 
 package net.opatry.game.wordle.ui.compose.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,28 +47,38 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 @Composable
-fun PopupOverlay(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
-    // TODO Scaffold?
-    Column(
-        Modifier.background(MaterialTheme.colors.background).fillMaxSize()
+fun PopupOverlay(
+    visible: Boolean,
+    title: String,
+    onClose: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(),
+        exit = slideOutVertically() + fadeOut()
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                title,
-                Modifier.weight(1f),
-                style = MaterialTheme.typography.h3
-            )
-            IconButton(onClick = onClose) {
-                Icon(painterResource(AppIcon.Close), "Close")
-            }
-        }
-
-        Box(
-            Modifier
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+        Column(
+            Modifier.background(MaterialTheme.colors.background).fillMaxSize()
         ) {
-            content()
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    title,
+                    Modifier.weight(1f),
+                    style = MaterialTheme.typography.h3
+                )
+                IconButton(onClick = onClose) {
+                    Icon(painterResource(AppIcon.Close), "Close")
+                }
+            }
+
+            Box(
+                Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                content()
+            }
         }
     }
 }
