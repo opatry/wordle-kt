@@ -84,13 +84,14 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.colorTone1
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
+import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 
 val AnswerFlag.toEmoji: String
     get() = when (this) {
-        AnswerFlag.NONE -> "⬜"
+        AnswerFlag.NONE -> if (isSystemInDarkTheme) "⬜" else "⬛"
         AnswerFlag.PRESENT -> if (isHighContrastMode) "🟦" else "🟨"
-        AnswerFlag.ABSENT -> "⬛"
+        AnswerFlag.ABSENT -> if (isSystemInDarkTheme) "⬛" else "⬜"
         AnswerFlag.CORRECT -> if (isHighContrastMode) "🟧" else "🟩"
     }
 
