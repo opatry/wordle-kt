@@ -25,8 +25,10 @@ package net.opatry.game.wordle.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
@@ -58,7 +60,16 @@ private val State.message: String
         }
     }
 
+enum class AppDialog {
+    SETTINGS_PANEL,
+    HOWTO_PANEL,
+    HOWTO_DIALOG,
+    STATS_DIALOG,
+}
+
 class WordleViewModel(inDictionary: List<String>, private val repository: WordleRepository) {
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
     private val dictionary = inDictionary.map(kotlin.String::sanitizeForWordle)
     private val availableWords: List<String>
         get() = dictionary - repository.allRecords.map(WordleRecord::answer).toSet()
@@ -66,15 +77,21 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         get() = repository.allRecords.lastOrNull()
     private var wordleId: Int = -1
     private var rules: WordleRules? = null
-    var showRules by mutableStateOf(false)
-        private set
     var loading by mutableStateOf(true)
         private set
     var statistics: WordleStats by mutableStateOf(repository.allRecords.stats())
         private set
     var victory by mutableStateOf(rules?.state is State.Won)
         private set
-    var answer by mutableStateOf("")
+    private val answer: String
+        get() = when (val state = rules?.state) {
+            is State.Lost -> state.selectedWord
+            is State.Won -> state.selectedWord
+            else -> ""
+        }
+    var endOfGameAnswer by mutableStateOf("")
+        private set
+    var canRestart by mutableStateOf(false)
         private set
     var grid by mutableStateOf<List<Answer>>(emptyList())
         private set
@@ -85,13 +102,17 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
     private val _userFeedback = mutableListOf<String>()
     var userFeedback by mutableStateOf(_userFeedback.toList())
         private set
+    var requestedDialog by mutableStateOf<AppDialog?>(null)
+        private set
 
     init {
-        GlobalScope.launch(Dispatchers.Main) {
+        scope.launch(Dispatchers.Main) {
             repository.loadRecords()
             val records = repository.allRecords
             statistics = records.stats()
-            showRules = records.isEmpty()
+            if (records.isEmpty()) {
+                requestedDialog = AppDialog.HOWTO_DIALOG
+            }
             restart()
             loading = false
         }
@@ -152,14 +173,15 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         this.alphabet = alphabet.toMap()
     }
 
-    private fun updateAnswer() {
+    private fun updateEndOfGame() {
         val rules = rules ?: return
-
-        answer = when (val state = rules.state) {
-            is State.Playing -> ""
-            is State.Lost -> state.selectedWord
-            is State.Won -> state.selectedWord
+        endOfGameAnswer = if (rules.state is State.Lost) {
+            answer
+        } else {
+            ""
         }
+
+        canRestart = rules.state !is State.Playing
     }
 
     fun updateUserInput(input: String) {
@@ -195,7 +217,8 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
             else -> Unit
         }
         val oldVictory = victory
-        updateAnswer()
+
+        updateEndOfGame()
 
         // save data and compute stats
         if (rules.state !is State.Playing && answer.isNotEmpty()) {
@@ -210,7 +233,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
                     }
                 )
             )
-            GlobalScope.launch(Dispatchers.Default) {
+            scope.launch(Dispatchers.Default) {
                 repository.saveRecords()
             }
 
@@ -221,6 +244,13 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         victory = rules.state is State.Won
         if (victory && !oldVictory) {
             pushMessage(rules.state.message)
+        }
+        if (rules.state !is State.Playing) {
+            scope.launch {
+                // slightly delay letting player consume information update
+                delay(500)
+                requestDialog(AppDialog.STATS_DIALOG)
+            }
         }
     }
 
@@ -233,7 +263,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
 
         wordleId = -1
         // pick wordleId among full dictionary to keep stability
-        while (wordleId !in availableWords.indices) {
+        while (wordleId !in availableWords.indices && availableWords.isNotEmpty()) {
             wordleId = dictionary.indices.random()
         }
         val rules = WordleRules(availableWords, availableWords[wordleId])
@@ -244,7 +274,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         userFeedback = _userFeedback.toList()
         updateGrid()
         updateAlphabet()
-        updateAnswer()
+        updateEndOfGame()
     }
 
     fun pushMessage(message: String) {
@@ -257,7 +287,12 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         userFeedback = _userFeedback.toList()
     }
 
-    fun dismissRules() {
-        showRules = false
+    fun requestDialog(dialog: AppDialog) {
+        // FIXME shouldn't we check for another one is already being displayed? priority? stack?
+        requestedDialog = dialog
+    }
+
+    fun dismissDialog() {
+        requestedDialog = null
     }
 }

@@ -22,12 +22,7 @@
 
 package net.opatry.game.wordle.ui.compose
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,9 +31,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -49,15 +44,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
@@ -68,21 +58,20 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import net.opatry.game.wordle.Answer
 import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.data.WordleRecord
+import net.opatry.game.wordle.ui.AppDialog
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.component.Alphabet
+import net.opatry.game.wordle.ui.compose.component.AutoDismissToast
 import net.opatry.game.wordle.ui.compose.component.Dialog
 import net.opatry.game.wordle.ui.compose.component.PopupOverlay
+import net.opatry.game.wordle.ui.compose.component.Toast
 import net.opatry.game.wordle.ui.compose.component.WordleGrid
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
-import net.opatry.game.wordle.ui.compose.theme.colorTone1
-import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import net.opatry.game.wordle.ui.compose.theme.painterResource
@@ -148,26 +137,11 @@ fun handleKey(viewModel: WordleViewModel, key: Key): Boolean {
 @Composable
 fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
-    val showRulesDialog by rememberUpdatedState(viewModel.showRules)
-    var showRulesPanel by remember { mutableStateOf(false) }
-    var showStatsDialog by remember { mutableStateOf(false) }
-    var showSettingsPanel by remember { mutableStateOf(false) }
-    val dialogVisible = arrayOf(
-        showRulesDialog,
-        showRulesPanel,
-        showStatsDialog,
-        showSettingsPanel,
-    ).any { it }
-    val actionsEnabled = dialogVisible.not() && viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()
+    val requestedDialog by rememberUpdatedState(viewModel.requestedDialog)
+    // FIXME "complex" decision to move at ViewModel level
+    val actionsEnabled = requestedDialog == null && viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()
 
     val statistics by rememberUpdatedState(viewModel.statistics)
-
-    LaunchedEffect(viewModel.victory) {
-        // FIXME delay dialog appearance, otherwise causing a small freeze when transitioning from !victory to victory.
-        //  Maybe conflicting animation for dialog appearance & toast?
-        delay(100)
-        showStatsDialog = viewModel.victory
-    }
 
     val focusRequester = FocusRequester()
     LaunchedEffect(Unit) {
@@ -190,12 +164,8 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                 .onKeyEvent { event ->
                     when {
                         event.type != KeyEventType.KeyUp -> false
-                        dialogVisible && event.key == Key.Escape -> {
-                            // FIXME a bit fragile if a new one is added
-                            showRulesPanel = false
-                            showStatsDialog = false
-                            showSettingsPanel = false
-                            viewModel.dismissRules()
+                        requestedDialog != null && event.key == Key.Escape -> {
+                            viewModel.dismissDialog()
                             true
                         }
                         actionsEnabled -> handleKey(viewModel, event.key)
@@ -205,16 +175,24 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Toolbar(
+            GameToolbar(
                 enabled = actionsEnabled,
-                onHowToClick = { showRulesPanel = true },
-                onStatsClick = { showStatsDialog = true },
-                onSettingsClick = { showSettingsPanel = true }
+                onHowToClick = { viewModel.requestDialog(AppDialog.HOWTO_PANEL) },
+                onStatsClick = { viewModel.requestDialog(AppDialog.STATS_DIALOG) },
+                onSettingsClick = { viewModel.requestDialog(AppDialog.SETTINGS_PANEL) }
             )
             Divider()
 
-            AnswerPlaceHolder(viewModel.answer, enabled = actionsEnabled, viewModel::restart)
+            // FIXME "complex" decision to move at ViewModel level
+            val canShowGameControl = viewModel.userFeedback.isEmpty()
+            EndOfGameControl(
+                label = viewModel.endOfGameAnswer,
+                canRestart = viewModel.canRestart && canShowGameControl,
+                enabled = actionsEnabled,
+                viewModel::restart
+            )
 
+            // FIXME "complex" decision to move at ViewModel level
             if (viewModel.grid.isNotEmpty() && viewModel.alphabet.isNotEmpty()) {
                 WordleGrid(viewModel.grid)
 
@@ -237,36 +215,38 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
 
         PopupOverlay(
-            showRulesPanel,
-            "How to play",
-            onClose = { showRulesPanel = false }
+            visible = requestedDialog == AppDialog.HOWTO_PANEL,
+            title = "How to play",
+            onClose = viewModel::dismissDialog
         ) {
             HowToPanel()
         }
 
         PopupOverlay(
-            showSettingsPanel,
-            "Settings",
-            onClose = { showSettingsPanel = false }
+            visible = requestedDialog == AppDialog.SETTINGS_PANEL,
+            title = "Settings",
+            onClose = viewModel::dismissDialog
         ) {
             SettingsPanel(settings)
         }
     }
 
     Dialog(
-        showRulesDialog,
+        visible = requestedDialog == AppDialog.HOWTO_DIALOG,
         title = null,
         Modifier.width(380.dp),
-        onClose = { viewModel.dismissRules() }
+        onClose = viewModel::dismissDialog
     ) {
         HowToPanel()
     }
 
+    // FIXME "complex" decision to move at ViewModel level
+    val canShowStats = viewModel.userFeedback.isEmpty()
     Dialog(
-        visible = showStatsDialog,
+        visible = requestedDialog == AppDialog.STATS_DIALOG && canShowStats,
         title = "Statistics",
         Modifier.width(380.dp),
-        onClose = { showStatsDialog = false }
+        onClose = viewModel::dismissDialog
     ) {
         val lastRecord = viewModel.lastRecord
         val clipboard = LocalClipboardManager.current
@@ -279,40 +259,13 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
 
     Column(Modifier.padding(top = 80.dp)) {
         userFeedback.forEach { message ->
-            Toast(message, Modifier.padding(bottom = 4.dp), viewModel::consumeMessage)
+            AutoDismissToast(message, Modifier.padding(bottom = 4.dp), viewModel::consumeMessage)
         }
     }
 }
 
 @Composable
-fun Toast(label: String, modifier: Modifier = Modifier, onDismiss: (String) -> Unit) {
-    var visible by remember { mutableStateOf(true) }
-    LaunchedEffect(label) {
-        delay(1000)
-        visible = false
-        delay(300)
-        onDismiss(label)
-    }
-
-    AnimatedVisibility(
-        visible,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Text(
-            label,
-            modifier
-                .clip(RoundedCornerShape(4.dp))
-                .background(colorTone1)
-                .padding(8.dp),
-            color = colorTone7,
-            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
-        )
-    }
-}
-
-@Composable
-fun Toolbar(
+fun GameToolbar(
     enabled: Boolean,
     onHowToClick: () -> Unit,
     onStatsClick: () -> Unit,
@@ -341,33 +294,20 @@ fun Toolbar(
 }
 
 @Composable
-fun AnswerPlaceHolder(answer: String, enabled: Boolean = true, onRestart: () -> Unit) {
-    val isAnswerVisible = answer.isNotEmpty()
-    val animatedAlpha by animateFloatAsState(if (isAnswerVisible) 1f else 0f)
-    // force 0 without animation when resetting from "xxx" to "" to avoid poor visual
-    val alpha = if (isAnswerVisible) animatedAlpha else 0f
-
+fun EndOfGameControl(label: String, canRestart: Boolean, enabled: Boolean = true, onRestart: () -> Unit) {
     Row(
-        Modifier.alpha(alpha),
+        Modifier.height(48.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        Box(
-            Modifier
-                .padding(2.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(MaterialTheme.colors.primary)
-                .padding(4.dp)
-        ) {
-            Text(
-                answer,
-                color = MaterialTheme.colors.onPrimary,
-                style = MaterialTheme.typography.h2
-            )
+        if (label.isNotEmpty()) {
+            Toast(label)
         }
 
-        IconButton(enabled = enabled, onClick = onRestart) {
-            Icon(painterResource(AppIcon.Refresh), "Play again")
+        if (canRestart) {
+            IconButton(enabled = enabled, onClick = onRestart) {
+                Icon(painterResource(AppIcon.Refresh), "Play again")
+            }
         }
     }
 }
