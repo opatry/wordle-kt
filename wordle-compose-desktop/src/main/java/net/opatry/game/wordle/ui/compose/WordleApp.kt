@@ -29,13 +29,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.intl.Locale
+import net.opatry.game.wordle.Dictionary
+import net.opatry.game.wordle.allDictionaries
 import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.data.WordleRepository
+import net.opatry.game.wordle.loadWords
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
-import net.opatry.game.wordle.words
 import java.io.File
 
 
@@ -46,7 +49,15 @@ private val settingsFile = File(appDir, "settings.json")
 private val settings = Settings(settingsFile)
 
 // FIXME singleton here otherwise recreated at each recomposition, need to be investigated
-private val viewModel = WordleViewModel(words, WordleRepository(dataFile))
+val validDictionaries = allDictionaries
+    .filter { it.wordSize in 4..8 }
+    .sortedWith(compareBy(Dictionary::language, Dictionary::wordSize))
+val defaultDictionary = validDictionaries
+    .find { it.language == Locale.current.language && it.wordSize == 5 }
+    ?: validDictionaries.firstOrNull { it.language == Locale.current.language }
+    ?: validDictionaries.firstOrNull()
+    ?: error("Can't find any dictionary")
+private val viewModel = WordleViewModel(defaultDictionary.loadWords(), WordleRepository(dataFile))
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi

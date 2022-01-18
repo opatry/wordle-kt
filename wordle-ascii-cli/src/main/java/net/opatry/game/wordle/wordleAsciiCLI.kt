@@ -73,6 +73,10 @@ private val InputState.cause: String
     }
 
 fun main() {
+    val words = allDictionaries
+        .find { it.language == "en" && it.wordSize == 5 }
+        ?.loadWords()
+        ?: error("Can't find default dictionary")
     var playing = true
     while (playing) {
         val wordleId = words.indices.random()
