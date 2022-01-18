@@ -27,7 +27,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -69,7 +68,7 @@ fun Toast(label: String, modifier: Modifier = Modifier) {
     Text(
         label,
         modifier
-            .clip(RoundedCornerShape(4.dp))
+            .clip(MaterialTheme.shapes.small)
             .background(colorTone1)
             .padding(8.dp),
         color = colorTone7,

@@ -85,7 +85,7 @@ fun WordleComposeTheme(
     MaterialTheme(
         colors = if (darkTheme) darkColorPalette(highContrastMode) else lightColorPalette(highContrastMode),
         typography = typography,
-        shapes = Shapes(medium = RoundedCornerShape(4.dp)),
+        shapes = Shapes(small = RoundedCornerShape(4.dp), medium = RoundedCornerShape(4.dp)),
         content = {
             Surface(color = MaterialTheme.colors.surface) {
                 content()

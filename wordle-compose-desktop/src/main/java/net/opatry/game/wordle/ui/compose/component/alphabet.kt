@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -87,7 +86,7 @@ fun AlphabetLetterCell(letter: Char, flag: AnswerFlag, enabled: Boolean = true, 
         Modifier
             .size(width = 36.dp, height = 48.dp)
             .padding(2.dp)
-            .clip(RoundedCornerShape(4.dp))
+            .clip(MaterialTheme.shapes.small)
             .background(backgroundColor)
             .clickable(enabled = enabled) { onClick() }
             .padding(horizontal = 2.dp, vertical = 4.dp),

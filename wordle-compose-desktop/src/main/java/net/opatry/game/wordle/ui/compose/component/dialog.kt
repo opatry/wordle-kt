@@ -38,7 +38,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -86,7 +85,7 @@ fun Dialog(
             Column(
                 modifier
                     .shadow(24.dp)
-                    .clip(RoundedCornerShape(5.dp))
+                    .clip(MaterialTheme.shapes.medium)
                     .clickable(MutableInteractionSource(), indication = null, onClick = {})
                     .wrapContentHeight()
                     .background(MaterialTheme.colors.surface),
