@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -148,10 +148,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
     }
 
     Box(
-        Modifier
-            .fillMaxHeight()
-            .width(400.dp)
-            .padding(2.dp),
+        Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
         Column(
@@ -252,7 +249,12 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         }
     }
 
-    Column(Modifier.padding(top = 80.dp)) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         userFeedback.forEach { message ->
             AutoDismissToast(message, Modifier.padding(bottom = 4.dp), viewModel::consumeMessage)
         }

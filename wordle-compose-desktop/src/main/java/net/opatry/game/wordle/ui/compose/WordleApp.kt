@@ -23,55 +23,99 @@
 package net.opatry.game.wordle.ui.compose
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.Dictionary
-import net.opatry.game.wordle.allDictionaries
 import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.data.WordleRepository
 import net.opatry.game.wordle.loadWords
 import net.opatry.game.wordle.ui.WordleViewModel
+import net.opatry.game.wordle.ui.compose.component.DictionaryPicker
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import java.io.File
 
-
-private val appDir = File(System.getProperty("user.home"), ".wordle-kt")
-private val dataFile = File(appDir, "records.json")
-private val settingsFile = File(appDir, "settings.json")
-
-private val settings = Settings(settingsFile)
-
-// FIXME singleton here otherwise recreated at each recomposition, need to be investigated
-val validDictionaries = allDictionaries
-    .filter { it.wordSize in 4..8 }
-    .sortedWith(compareBy(Dictionary::language, Dictionary::wordSize))
-val defaultDictionary = validDictionaries
-    .find { it.language == Locale.current.language && it.wordSize == 5 }
-    ?: validDictionaries.firstOrNull { it.language == Locale.current.language }
-    ?: validDictionaries.firstOrNull()
-    ?: error("Can't find any dictionary")
-private val viewModel = WordleViewModel(defaultDictionary.loadWords(), WordleRepository(dataFile))
-
+@ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-fun WordleApp() {
+fun WordleApp(settings: Settings, dataFile: File, dictionaries: List<Dictionary>) {
     isSystemInDarkTheme = settings.darkMode
     isHighContrastMode = settings.highContrastMode
 
+    var selectedDictionary by remember {
+        mutableStateOf(
+            // force choice if no choice
+            if (dictionaries.size == 1)
+                dictionaries.first()
+            else
+                null
+        )
+    }
+
     WordleComposeTheme {
-        Box(
-            Modifier.fillMaxSize(),
-            Alignment.TopCenter
-        ) {
-            GameScreen(settings, viewModel)
+        // FIXME why nesting 2 Boxes is needed to center 400.dp width content...
+        Box(Modifier.fillMaxSize(), Alignment.TopCenter) {
+            Box(Modifier.fillMaxHeight().width(400.dp)) {
+                when (val dict = selectedDictionary) {
+                    null -> {
+                        // TODO define a preselected one?
+                        //  1. last used if any
+                        //  2. find current locale with 5 letters
+                        //  3. none
+                        DictionaryPicker(dictionaries) { dictionary ->
+                            selectedDictionary = dictionary
+                        }
+                    }
+                    else -> {
+                        var words by remember { mutableStateOf(emptyList<String>()) }
+                        LaunchedEffect(dict) {
+                            withContext(Dispatchers.IO) {
+                                words = dict.loadWords()
+                            }
+                        }
+                        if (words.isNotEmpty()) {
+                            val viewModel = WordleViewModel(words, WordleRepository(dataFile))
+                            DisposableEffect(dict) {
+                                onDispose {
+                                    viewModel.onCleared()
+                                }
+                            }
+                            GameScreen(settings, viewModel)
+                        } else {
+                            Column(
+                                Modifier.fillMaxSize(),
+                                Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                                Alignment.CenterHorizontally
+                            ) {
+                                CircularProgressIndicator()
+                                Text("Loading words…")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

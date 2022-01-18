@@ -23,6 +23,7 @@
 package net.opatry.game.wordle.ui.compose.theme
 
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -87,7 +89,10 @@ fun WordleComposeTheme(
         typography = typography,
         shapes = Shapes(small = RoundedCornerShape(4.dp), medium = RoundedCornerShape(4.dp)),
         content = {
-            Surface(color = MaterialTheme.colors.surface) {
+            Surface(
+                Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.surface
+            ) {
                 content()
             }
         }

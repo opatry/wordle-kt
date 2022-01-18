@@ -126,6 +126,8 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
         //  to ask for preferred game mode (language, word size)
     }
 
+    fun onCleared() = Unit
+
     private fun updateGrid() {
         val rules = rules ?: return
 

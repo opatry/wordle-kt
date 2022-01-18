@@ -23,6 +23,7 @@
 package net.opatry.game.wordle.ui.compose
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -39,10 +40,14 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import net.opatry.game.wordle.Dictionary
+import net.opatry.game.wordle.allDictionaries
+import net.opatry.game.wordle.data.Settings
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.IconProvider
 import net.opatry.game.wordle.ui.compose.theme.LocalIconProvider
 import java.awt.Dimension
+import java.io.File
 
 object DesktopIconProvider : IconProvider {
     @Composable
@@ -60,12 +65,23 @@ object DesktopIconProvider : IconProvider {
     }
 }
 
+private val appDir = File(System.getProperty("user.home"), ".wordle-kt")
+private val dataFile = File(appDir, "records.json")
+private val settingsFile = File(appDir, "settings.json")
+
+private val settings = Settings(settingsFile)
+
+@ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 fun main() = application {
     val defaultSize = DpSize(500.dp, 720.dp)
     val minSize = DpSize(380.dp, defaultSize.height)
     val minWindowSize = remember { Dimension(minSize.width.value.toInt(), minSize.height.value.toInt()) }
+
+    val validDictionaries = allDictionaries
+        .filter { it.wordSize in 4..8 }
+        .sortedWith(compareBy(Dictionary::language, Dictionary::wordSize))
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -85,7 +101,7 @@ fun main() = application {
         if (window.minimumSize != minWindowSize) window.minimumSize = minWindowSize
 
         CompositionLocalProvider(LocalIconProvider provides DesktopIconProvider) {
-            WordleApp()
+            WordleApp(settings, dataFile, validDictionaries)
         }
     }
 }
