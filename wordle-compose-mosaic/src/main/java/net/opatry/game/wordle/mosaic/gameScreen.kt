@@ -58,12 +58,12 @@ fun GameScreen(viewModel: WordleViewModel) {
                     viewModel.stateLabel.copyToClipboard()
                 }
 
-                Text("Wordle ${state.wordleId} ${state.answers.size}/${state.maxTries}")
+                Text("Wordle <TODO_state.wordleId> ${state.answers.size}/${state.maxTries}")
                 Text("Results copied to clipboard!") // FIXME depends on copyToClipboard success
                 Text(" 🔄 Play again? (y/N)?")
             }
             is State.Lost -> {
-                Text("Wordle ${state.wordleId} X/${state.maxTries}")
+                Text("Wordle <TODO_state.wordleId> X/${state.maxTries}")
                 Row {
                     Text("The answer was ")
                     Text(

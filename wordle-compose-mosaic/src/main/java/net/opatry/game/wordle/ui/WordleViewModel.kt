@@ -30,7 +30,6 @@ import net.opatry.game.wordle.AnswerFlag
 import net.opatry.game.wordle.InputState
 import net.opatry.game.wordle.State
 import net.opatry.game.wordle.WordleRules
-import net.opatry.game.wordle.toEmoji
 
 private val victoryMessages = arrayOf(
     "Genius",
@@ -64,8 +63,8 @@ private fun State.toResultString(): String {
     val buffer = StringBuffer()
     buffer.append(
         when (this) {
-            is State.Lost -> "Wordle $wordleId X/$maxTries\n"
-            is State.Won -> "Wordle $wordleId ${answers.size}/$maxTries\n"
+            is State.Lost -> "Wordle <TODO_wordleId> X/$maxTries\n"
+            is State.Won -> "Wordle <TODO_wordleId> ${answers.size}/$maxTries\n"
             else -> ""
         }
     )
