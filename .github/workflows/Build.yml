@@ -16,7 +16,9 @@ jobs:
         distribution: 'adopt'
 
     - name: Build
-      run: ./gradlew --no-daemon assemble
+      run: |
+            ./syncComposeSharedSources.sh
+            ./gradlew --no-daemon assemble
 
     - name: Test
       run: ./gradlew --no-daemon test

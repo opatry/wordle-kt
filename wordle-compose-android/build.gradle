@@ -21,38 +21,46 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
-    id 'org.jetbrains.compose' version '1.0.0'
-    id 'application'
+    id 'com.android.application'
+    id 'kotlin-android'
 }
 
-repositories {
-    // Needed to fetch material icons for Desktop
-    maven {
-        url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+def compose_version = '1.0.5'
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        applicationId "net.opatry.games.wordle"
+        minSdkVersion 23
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_version
     }
 }
 
-group 'net.opatry.game'
-version '1.0.0'
-
 dependencies {
-    implementation(compose.desktop.currentOs)
-
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 
-    // TODO depends on such icons when compatible with up to date compiler & runtime
-    //  For now, having this as dependency leads to `Unresolved reference: loadImageBitmap`
-    //  If using compiler plugin 1.0.0 (instead of 1.0.1) with Kotlin 1.5.31, still compilation issue
-    //  When removed such error, crashes at runtime: java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.DpKt.DpSize-YgX7TsA(float, float)'
-//    implementation 'androidx.compose.material:material-icons-core-desktop:1.0.0-beta06'
-//    implementation 'androidx.compose.material:material-icons-extended-desktop:1.0.0-beta06'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
 
-    implementation(project(':word-data'))
-    implementation(project(':game-logic'))
-}
+    implementation "androidx.compose.ui:ui:${compose_version}"
+    implementation "androidx.compose.ui:ui-tooling:${compose_version}"
+    implementation "androidx.compose.foundation:foundation:${compose_version}"
+    implementation "androidx.compose.material:material:${compose_version}"
+    implementation 'androidx.activity:activity-compose:1.4.0'
 
-application {
-    mainClass = 'net.opatry.game.wordle.ui.compose.WordleComposeDesktopKt'
+    implementation 'com.google.accompanist:accompanist-insets:0.21.4-beta'
+
+    implementation project(':word-data')
+    implementation project(':game-logic')
 }
