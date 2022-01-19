@@ -56,7 +56,9 @@ import java.util.*
 fun DictionaryPicker(dictionaries: List<Dictionary>, onSelect: (Dictionary) -> Unit) {
     var selectedDictionary by remember { mutableStateOf<Dictionary?>(null) }
     Column(
-        Modifier.fillMaxSize(),
+        Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
     ) {
