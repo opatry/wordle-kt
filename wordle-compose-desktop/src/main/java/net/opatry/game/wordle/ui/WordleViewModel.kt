@@ -115,11 +115,13 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
             repository.loadRecords()
             val records = repository.allRecords
             statistics = records.stats()
-            if (records.isEmpty()) {
-                requestedDialog = AppDialog.HOWTO_DIALOG
-            }
             restart()
             loading = false
+
+            if (records.isEmpty()) {
+                delay(500)
+                requestedDialog = AppDialog.HOWTO_DIALOG
+            }
         }
 
         // TODO while repository is loading, we should give feedback to user and it could also be the right time
