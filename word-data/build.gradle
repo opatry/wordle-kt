@@ -54,7 +54,7 @@ abstract class DictionariesKtTask extends DefaultTask {
             it.append('val allDictionaries = arrayOf(\n')
             dictionaryResourceNames.forEach { resourceName ->
                 def (_, language, wordSize) = (resourceName =~ ~/words_([a-z]{2})_([\d]+)\.txt/)[0]
-                it.append('\tDictionary(language = "' + language + '", wordSize = ' + wordSize + ', resourceName = "' + resourceName + '"),\n')
+                it.append('    Dictionary(language = "' + language + '", wordSize = ' + wordSize + ', resourceName = "' + resourceName + '"),\n')
             }
             it.append(')\n')
         }
