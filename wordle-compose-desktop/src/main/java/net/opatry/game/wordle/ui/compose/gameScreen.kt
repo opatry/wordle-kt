@@ -114,17 +114,15 @@ private val WordleRecord?.resultString: String
         return buffer.toString()
     }
 
-@ExperimentalComposeUiApi
-fun WordleViewModel.handleKey(key: Key, letter: Char): Boolean {
-    when (key.keyCode) {
-        in Key.A.keyCode..Key.Z.keyCode ->
+fun WordleViewModel.handleKey(letter: Char): Boolean {
+    when (letter.uppercaseChar()) {
+        in 'A'..'Z' ->
             updateUserInput(userInput + letter)
-        Key.Backspace.keyCode ->
+        '\b' ->
             if (userInput.isNotEmpty()) {
                 updateUserInput(userInput.dropLast(1))
             }
-        Key.NumPadEnter.keyCode,
-        Key.Enter.keyCode ->
+        '\n' ->
             validateUserInput()
         else -> return false
     }
@@ -164,7 +162,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                             viewModel.dismissDialog()
                             true
                         }
-                        actionsEnabled -> viewModel.handleKey(event.key, event.utf16CodePoint.toChar())
+                        actionsEnabled -> viewModel.handleKey(event.utf16CodePoint.toChar())
                         else -> false
                     }
                 },
@@ -193,13 +191,13 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
                 Spacer(Modifier.weight(1f))
 
                 Alphabet(alphabet, enabled = actionsEnabled) { letter ->
-                    viewModel.handleKey(Key(letter.code), letter)
+                    viewModel.handleKey(letter)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { viewModel.handleKey(Key.Backspace, '\b') }, enabled = actionsEnabled) {
+                    OutlinedButton(onClick = { viewModel.handleKey('\b') }, enabled = actionsEnabled) {
                         Text("⌫")
                     }
-                    Button(onClick = { viewModel.handleKey(Key.Enter, '\n') }, enabled = actionsEnabled) {
+                    Button(onClick = { viewModel.handleKey('\n') }, enabled = actionsEnabled) {
                         Text("Enter")
                     }
                 }
