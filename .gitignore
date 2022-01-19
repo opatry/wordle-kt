@@ -11,3 +11,7 @@ word-data/out/
 
 .DS_Store
 
+wordle-compose-desktop/bin/
+wordle-ascii-cli/bin/
+word-data/bin/
+game-logic/bin/
