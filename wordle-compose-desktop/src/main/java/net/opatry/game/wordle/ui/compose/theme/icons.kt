@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.painter.Painter
 
 
 enum class AppIcon {
+    Launcher,
     Open,
     Help,
     Settings,

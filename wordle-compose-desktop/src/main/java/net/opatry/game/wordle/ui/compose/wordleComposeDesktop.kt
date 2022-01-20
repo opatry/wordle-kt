@@ -53,6 +53,7 @@ object DesktopIconProvider : IconProvider {
     @Composable
     override fun providePainter(icon: AppIcon): Painter {
         val resourcePath = when (icon) {
+            AppIcon.Launcher -> "icon.png"
             AppIcon.Open -> "ic_open_in.xml"
             AppIcon.Help -> "ic_help_outline.xml"
             AppIcon.Settings -> "ic_settings_outline.xml"

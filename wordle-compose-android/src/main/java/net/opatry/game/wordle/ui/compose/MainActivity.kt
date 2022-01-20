@@ -55,6 +55,7 @@ object AndroidIconProvider : IconProvider {
     @Composable
     override fun providePainter(icon: AppIcon): Painter {
         val drawableRes = when (icon) {
+            AppIcon.Launcher -> R.drawable.ic_close // TODO R.mipmap.ic_launcher
             AppIcon.Open -> R.drawable.ic_open_in
             AppIcon.Help -> R.drawable.ic_help_outline
             AppIcon.Settings -> R.drawable.ic_settings_outline

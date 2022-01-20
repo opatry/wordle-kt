@@ -119,3 +119,28 @@ fun WordleApp(settings: Settings, dataFile: File, dictionaries: List<Dictionary>
         }
     }
 }
+
+@ExperimentalAnimationApi
+@Composable
+fun Intro(onDone: () -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(250)
+        visible = true
+        delay(750)
+        onDone()
+    }
+
+    AnimatedVisibility(visible, enter = scaleIn()) {
+        Box(
+            Modifier.fillMaxSize(),
+            Alignment.Center
+        ) {
+            Image(
+                painterResource(AppIcon.Launcher),
+                null,
+                Modifier.size(192.dp)
+            )
+        }
+    }
+}
