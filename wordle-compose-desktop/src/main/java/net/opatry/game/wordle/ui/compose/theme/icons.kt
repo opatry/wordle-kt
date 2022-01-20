@@ -34,6 +34,7 @@ enum class AppIcon {
     Settings,
     Refresh,
     Close,
+    Back,
     Share,
     Leaderboard,
 }

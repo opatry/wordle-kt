@@ -132,7 +132,7 @@ fun WordleViewModel.handleKey(letter: Char): Boolean {
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
-fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
+fun GameScreen(settings: Settings, viewModel: WordleViewModel, onClose: () -> Unit) {
     val userFeedback by rememberUpdatedState(viewModel.userFeedback)
     val requestedDialog by rememberUpdatedState(viewModel.requestedDialog)
     val actionsEnabled by rememberUpdatedState(viewModel.actionsEnabled)
@@ -171,6 +171,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
         ) {
             GameToolbar(
                 enabled = actionsEnabled,
+                onBackClick = onClose,
                 onHowToClick = { viewModel.requestDialog(AppDialog.HOWTO_PANEL) },
                 onStatsClick = { viewModel.requestDialog(AppDialog.STATS_DIALOG) },
                 onSettingsClick = { viewModel.requestDialog(AppDialog.SETTINGS_PANEL) }
@@ -262,6 +263,7 @@ fun GameScreen(settings: Settings, viewModel: WordleViewModel) {
 @Composable
 fun GameToolbar(
     enabled: Boolean,
+    onBackClick: () -> Unit,
     onHowToClick: () -> Unit,
     onStatsClick: () -> Unit,
     onSettingsClick: () -> Unit
@@ -270,8 +272,14 @@ fun GameToolbar(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onHowToClick, enabled = enabled) {
-            Icon(painterResource(AppIcon.Help), "How to play")
+        Row {
+            // FIXME either on close/back icon (where?) calling onClose() or settings -> dictionaries calling onDictionaryPickerRequest()?
+            IconButton(onClick = onBackClick, enabled = enabled) {
+                Icon(painterResource(AppIcon.Back), "Pick another dictionary")
+            }
+            IconButton(onClick = onHowToClick, enabled = enabled) {
+                Icon(painterResource(AppIcon.Help), "How to play")
+            }
         }
 
         Text("Wordle", Modifier.weight(1f), style = MaterialTheme.typography.h1)

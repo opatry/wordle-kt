@@ -46,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.Dictionary
 import java.util.*
@@ -54,7 +53,17 @@ import java.util.*
 
 @ExperimentalFoundationApi
 @Composable
-fun DictionaryPicker(dictionaries: List<Dictionary>, onSelect: (Dictionary) -> Unit) {
+fun DictionaryPicker(dictionaries: List<Dictionary>, onSelect: (Dictionary?) -> Unit) {
+    if (dictionaries.size <= 1) {
+        onSelect(dictionaries.firstOrNull())
+        return
+    }
+
+    // TODO define a preselected one?
+    //  1. last used if any
+    //  2. find current locale with 5 letters
+    //  3. none
+
     var selectedDictionary by remember { mutableStateOf<Dictionary?>(null) }
     Column(
         Modifier

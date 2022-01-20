@@ -61,6 +61,7 @@ object AndroidIconProvider : IconProvider {
             AppIcon.Settings -> R.drawable.ic_settings_outline
             AppIcon.Refresh -> R.drawable.ic_refresh
             AppIcon.Close -> R.drawable.ic_close
+            AppIcon.Back -> R.drawable.ic_back
             AppIcon.Share -> R.drawable.ic_share_outline
             AppIcon.Leaderboard -> R.drawable.ic_leaderboard_outline
         }

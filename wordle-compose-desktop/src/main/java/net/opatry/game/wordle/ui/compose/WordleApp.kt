@@ -22,15 +22,22 @@
 
 package net.opatry.game.wordle.ui.compose
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -42,8 +49,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import net.opatry.game.wordle.Dictionary
 import net.opatry.game.wordle.data.Settings
@@ -51,10 +60,20 @@ import net.opatry.game.wordle.data.WordleRepository
 import net.opatry.game.wordle.loadWords
 import net.opatry.game.wordle.ui.WordleViewModel
 import net.opatry.game.wordle.ui.compose.component.DictionaryPicker
+import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.WordleComposeTheme
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
+import net.opatry.game.wordle.ui.compose.theme.painterResource
 import java.io.File
+
+sealed class Screen {
+    object Intro : Screen()
+    data class Loading(val dictionary: Dictionary) : Screen()
+    object DictionaryPicker : Screen()
+    object NoDictionaryAvailable : Screen()
+    data class Game(val dictionary: Dictionary, val words: List<String>) : Screen()
+}
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -64,54 +83,42 @@ fun WordleApp(settings: Settings, dataFile: File, dictionaries: List<Dictionary>
     isSystemInDarkTheme = settings.darkMode
     isHighContrastMode = settings.highContrastMode
 
-    var selectedDictionary by remember {
-        mutableStateOf(
-            // force choice if no choice
-            if (dictionaries.size == 1)
-                dictionaries.first()
-            else
-                null
-        )
-    }
+    var screenState by remember { mutableStateOf<Screen>(Screen.Intro) }
 
     WordleComposeTheme {
         // FIXME why nesting 2 Boxes is needed to center 400.dp width content...
         Box(Modifier.fillMaxSize(), Alignment.TopCenter) {
             Box(Modifier.fillMaxHeight().width(400.dp)) {
-                when (val dict = selectedDictionary) {
-                    null -> {
-                        // TODO define a preselected one?
-                        //  1. last used if any
-                        //  2. find current locale with 5 letters
-                        //  3. none
-                        DictionaryPicker(dictionaries) { dictionary ->
-                            selectedDictionary = dictionary
+                // TODO Crossfade transition?
+                when (val screen = screenState) {
+                    is Screen.Intro -> Intro {
+                        screenState = Screen.DictionaryPicker
+                    }
+                    is Screen.DictionaryPicker -> DictionaryPicker(dictionaries) { dictionary ->
+                        screenState = if (dictionary != null) {
+                            Screen.Loading(dictionary)
+                        } else {
+                            Screen.NoDictionaryAvailable
                         }
                     }
-                    else -> {
-                        var words by remember { mutableStateOf(emptyList<String>()) }
-                        LaunchedEffect(dict) {
-                            withContext(Dispatchers.IO) {
-                                words = dict.loadWords()
+                    is Screen.NoDictionaryAvailable -> Text(
+                        "No game data available",
+                        Modifier.fillMaxWidth().padding(16.dp),
+                        color = MaterialTheme.colors.error,
+                        textAlign = TextAlign.Center
+                    )
+                    is Screen.Loading -> WordLoader(screen.dictionary) { words ->
+                        screenState = Screen.Game(screen.dictionary, words)
+                    }
+                    is Screen.Game -> {
+                        val viewModel = WordleViewModel(screen.words, WordleRepository(dataFile))
+                        DisposableEffect(screen.dictionary) {
+                            onDispose {
+                                viewModel.onCleared()
                             }
                         }
-                        if (words.isNotEmpty()) {
-                            val viewModel = WordleViewModel(words, WordleRepository(dataFile))
-                            DisposableEffect(dict) {
-                                onDispose {
-                                    viewModel.onCleared()
-                                }
-                            }
-                            GameScreen(settings, viewModel)
-                        } else {
-                            Column(
-                                Modifier.fillMaxSize(),
-                                Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                                Alignment.CenterHorizontally
-                            ) {
-                                CircularProgressIndicator()
-                                Text("Loading words…")
-                            }
+                        GameScreen(settings, viewModel) {
+                            screenState = Screen.DictionaryPicker
                         }
                     }
                 }
@@ -142,5 +149,23 @@ fun Intro(onDone: () -> Unit) {
                 Modifier.size(192.dp)
             )
         }
+    }
+}
+
+@Composable
+fun WordLoader(dictionary: Dictionary, onLoad: (List<String>) -> Unit) {
+    LaunchedEffect(dictionary) {
+        withContext(Dispatchers.IO) {
+            onLoad(dictionary.loadWords())
+        }
+    }
+
+    Column(
+        Modifier.fillMaxSize(),
+        Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+        Text("Loading words…")
     }
 }
