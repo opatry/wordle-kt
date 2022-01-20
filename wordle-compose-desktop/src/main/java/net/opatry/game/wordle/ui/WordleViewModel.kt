@@ -121,6 +121,7 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
             if (records.isEmpty()) {
                 delay(500)
                 requestedDialog = AppDialog.HOWTO_DIALOG
+                actionsEnabled = _actionsEnabled
             }
         }
 
