@@ -91,7 +91,7 @@ fun Dialog(
                     .background(MaterialTheme.colors.surface),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(Modifier.fillMaxWidth(), Alignment.TopEnd) {
+                Box(Modifier.fillMaxWidth().padding(8.dp), Alignment.TopEnd) {
                     IconButton(onClick = onClose) {
                         Icon(painterResource(AppIcon.Close), "Close")
                     }
