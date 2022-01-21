@@ -111,7 +111,11 @@ fun WordleApp(settings: Settings, dataFile: File, dictionaries: List<Dictionary>
                         screenState = Screen.Game(screen.dictionary, words)
                     }
                     is Screen.Game -> {
-                        val viewModel = WordleViewModel(screen.words, WordleRepository(dataFile))
+                        val viewModel = WordleViewModel(
+                            screen.words,
+                            screen.dictionary.qualifier == "official",
+                            WordleRepository(dataFile)
+                        )
                         DisposableEffect(screen.dictionary) {
                             onDispose {
                                 viewModel.onCleared()

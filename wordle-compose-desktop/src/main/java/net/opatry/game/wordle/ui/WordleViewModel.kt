@@ -68,7 +68,11 @@ enum class AppDialog {
     STATS_DIALOG,
 }
 
-class WordleViewModel(inDictionary: List<String>, private val repository: WordleRepository) {
+class WordleViewModel(
+    inDictionary: List<String>,
+    private val isOfficialDictionary: Boolean,
+    private val repository: WordleRepository
+) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val dictionary = inDictionary.map(kotlin.String::sanitizeForWordle)
@@ -276,12 +280,37 @@ class WordleViewModel(inDictionary: List<String>, private val repository: Wordle
             return
         }
 
-        wordleId = -1
-        // pick wordleId among full dictionary to keep stability
-        while (wordleId !in availableWords.indices && availableWords.isNotEmpty()) {
-            wordleId = dictionary.indices.random()
+        val (dictionary, wordleId) = if (isOfficialDictionary) {
+            // The official dictionary isn't sorted and index is the order
+            // > the word array index increments each day from a fixed game epoch timestamp (only one puzzle per day!)
+            // Wordle t0 = is 'Sat Jun 19 2021 00:00:00 GMT+0200' (timestamp to consider for index 0 of the dictionary)
+            // Explanation here: https://github.com/hannahcode/wordle
+            val index = with(Calendar.getInstance()) {
+                val oneDayInMs = 1000 * 60 * 60 * 24
+                // reset today's date at 00:00:00.000
+                set(Calendar.HOUR, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+                val today = timeInMillis
+                // reset date to Wordle t0 at 00:00:00.000
+                set(Calendar.YEAR, 2021)
+                set(Calendar.MONTH, Calendar.JUNE)
+                set(Calendar.DAY_OF_MONTH, 19)
+                val t0 = timeInMillis
+                // we now can compute a reliable milliseconds diff between today and Wordle t0 giving the word index for today
+                ((today - t0) / oneDayInMs.toFloat()).toInt()
+            }
+            dictionary to index.coerceIn(dictionary.indices)
+        } else {
+            var wordleId = -1
+            // pick wordleId among full dictionary to keep stability
+            while (wordleId !in availableWords.indices && availableWords.isNotEmpty()) {
+                wordleId = dictionary.indices.random()
+            }
+            availableWords to wordleId
         }
-        val rules = WordleRules(availableWords, availableWords[wordleId])
+        val rules = WordleRules(dictionary, dictionary[wordleId])
         this.rules = rules
         userInput = ""
         _userFeedback.clear()
