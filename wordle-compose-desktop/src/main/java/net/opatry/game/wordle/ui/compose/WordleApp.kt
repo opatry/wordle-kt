@@ -66,6 +66,7 @@ import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import net.opatry.game.wordle.ui.compose.theme.painterResource
 import java.io.File
+import kotlin.time.ExperimentalTime
 
 sealed class Screen {
     object Intro : Screen()
@@ -75,6 +76,7 @@ sealed class Screen {
     data class Game(val dictionary: Dictionary, val words: List<String>) : Screen()
 }
 
+@ExperimentalTime
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi

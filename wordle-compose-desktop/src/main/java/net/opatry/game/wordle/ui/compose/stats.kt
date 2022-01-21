@@ -26,6 +26,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,10 +47,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.opatry.game.wordle.WordleStats
 import net.opatry.game.wordle.data.WordleRecord
+import net.opatry.game.wordle.ui.compose.component.NextWordleCountDown
+import net.opatry.game.wordle.ui.compose.component.VerticalDivider
 import net.opatry.game.wordle.ui.compose.theme.AppIcon
+import net.opatry.game.wordle.ui.compose.theme.colorTone1
 import net.opatry.game.wordle.ui.compose.theme.colorTone3
 import net.opatry.game.wordle.ui.compose.theme.colorTone7
 import net.opatry.game.wordle.ui.compose.theme.painterResource
+import java.util.*
+import kotlin.time.ExperimentalTime
 
 val WordleStats.highlightedIndex: Int
     get() = when (val lastScoreIndex = lastScore - 1) {
@@ -152,6 +158,16 @@ fun StatProgress(label: String, value: Int, ratio: Float, isHighlighted: Boolean
     }
 }
 
+private val today: Date
+    get() = with(Calendar.getInstance()) {
+        set(Calendar.HOUR, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 1)
+        time
+    }
+
+@ExperimentalTime
 @Composable
 fun StatsPanel(stats: WordleStats, lastRecord: WordleRecord?, onShare: () -> Unit) {
     Column(
@@ -161,10 +177,32 @@ fun StatsPanel(stats: WordleStats, lastRecord: WordleRecord?, onShare: () -> Uni
         StatsFigures(stats)
 
         if (lastRecord != null) {
-            Button(onClick = onShare, Modifier.padding(top = 8.dp)) {
-                Text("Share")
-                Spacer(Modifier.width(8.dp))
-                Icon(painterResource(AppIcon.Share), null)
+            Row(
+                Modifier.height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // If a game was already played today, display countdown until tomorrow
+                if (lastRecord.date >= today) {
+                    NextWordleCountDown(
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    )
+                    VerticalDivider(color = colorTone1)
+                }
+
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(onClick = onShare) {
+                        Text("Share")
+                        Spacer(Modifier.width(8.dp))
+                        Icon(painterResource(AppIcon.Share), null)
+                    }
+                }
             }
         }
     }

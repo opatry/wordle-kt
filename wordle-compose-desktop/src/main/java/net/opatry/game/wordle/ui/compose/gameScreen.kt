@@ -75,6 +75,7 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.isHighContrastMode
 import net.opatry.game.wordle.ui.compose.theme.isSystemInDarkTheme
 import net.opatry.game.wordle.ui.compose.theme.painterResource
+import kotlin.time.ExperimentalTime
 
 val AnswerFlag.toEmoji: String
     get() = when (this) {
@@ -129,6 +130,7 @@ fun WordleViewModel.handleKey(letter: Char): Boolean {
     return true
 }
 
+@ExperimentalTime
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable

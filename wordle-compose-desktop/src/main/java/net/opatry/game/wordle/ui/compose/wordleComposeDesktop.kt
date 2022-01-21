@@ -48,6 +48,7 @@ import net.opatry.game.wordle.ui.compose.theme.IconProvider
 import net.opatry.game.wordle.ui.compose.theme.LocalIconProvider
 import java.awt.Dimension
 import java.io.File
+import kotlin.time.ExperimentalTime
 
 object DesktopIconProvider : IconProvider {
     @Composable
@@ -73,6 +74,7 @@ private val settingsFile = File(appDir, "settings.json")
 
 private val settings = Settings(settingsFile)
 
+@ExperimentalTime
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
