@@ -291,7 +291,7 @@ class WordleViewModel(
                 set(Calendar.HOUR, 0)
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+                set(Calendar.MILLISECOND, 1)
                 val today = timeInMillis
                 // reset date to Wordle t0 at 00:00:00.000
                 set(Calendar.YEAR, 2021)
