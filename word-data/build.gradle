@@ -17,7 +17,7 @@ abstract class DictionariesKtTask extends DefaultTask {
     @PathSensitive(PathSensitivity.ABSOLUTE)
     // TODO we should consider all (active) sourceSets
     FileCollection resources = project.files(project.sourceSets.main.resources).filter {
-        it.name =~ ~/words_[a-z]{2}_[\d]+\.txt/
+        it.name =~ ~/words_[a-z]{2}_[\d]+_?(.*)\.txt/
     }
 
     @OutputDirectory
@@ -53,8 +53,8 @@ abstract class DictionariesKtTask extends DefaultTask {
             it.append('\n\n')
             it.append('val allDictionaries = arrayOf(\n')
             dictionaryResourceNames.forEach { resourceName ->
-                def (_, language, wordSize) = (resourceName =~ ~/words_([a-z]{2})_([\d]+)\.txt/)[0]
-                it.append('    Dictionary(language = "' + language + '", wordSize = ' + wordSize + ', resourceName = "' + resourceName + '"),\n')
+                def (_, language, wordSize, qualifier) = (resourceName =~ ~/words_([a-z]{2})_([\d]+)_?(.*)\.txt/)[0]
+                it.append('    Dictionary(language = "' + language + '", wordSize = ' + wordSize + ', resourceName = "' + resourceName + '", qualifier = "' + qualifier + '"),\n')
             }
             it.append(')\n')
         }

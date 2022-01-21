@@ -26,5 +26,6 @@ package net.opatry.game.wordle
 class Dictionary(
     val language: String,
     val wordSize: Int,
-    val resourceName: String
+    val resourceName: String,
+    val qualifier: String,
 )

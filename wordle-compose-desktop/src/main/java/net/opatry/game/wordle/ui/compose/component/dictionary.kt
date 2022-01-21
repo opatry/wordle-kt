@@ -91,7 +91,7 @@ fun DictionaryPicker(dictionaries: List<Dictionary>, onSelect: (Dictionary?) -> 
                     )
                 }
                 items(dictionaries) { dictionary ->
-                    WordSizeRow(dictionary.wordSize, dictionary == selectedDictionary) {
+                    WordSizeRow(dictionary.wordSize, dictionary.qualifier, dictionary == selectedDictionary) {
                         selectedDictionary = dictionary
                     }
                 }
@@ -126,7 +126,7 @@ fun LanguageRow(language: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun WordSizeRow(wordSize: Int, isSelected: Boolean, onSelect: () -> Unit) {
+private fun WordSizeRow(wordSize: Int, qualifier: String, isSelected: Boolean, onSelect: () -> Unit) {
     val (foregroundColor, backgroundColor) = when (isSelected) {
         true -> MaterialTheme.colors.onPrimary to MaterialTheme.colors.primary
         else -> LocalContentColor.current to Color.Transparent
@@ -142,8 +142,9 @@ private fun WordSizeRow(wordSize: Int, isSelected: Boolean, onSelect: () -> Unit
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val suffix = if (qualifier.isNotBlank()) " ($qualifier)" else ""
         Text(
-            "$wordSize letter words",
+            "$wordSize letter words$suffix",
             color = foregroundColor
         )
     }
