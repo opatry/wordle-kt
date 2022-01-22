@@ -57,6 +57,7 @@ private fun lightColorPalette(highContrastMode: Boolean): Colors {
         background = colorTone7,
         surface = colorTone7,
         onPrimary = white,
+        onSecondary = white,
         onBackground = colorTone1,
         onSurface = colorTone1,
     )
@@ -73,6 +74,7 @@ private fun darkColorPalette(highContrastMode: Boolean): Colors {
         background = colorTone7,
         surface = colorTone7,
         onPrimary = white,
+        onSecondary = white,
         onBackground = colorTone1,
         onSurface = colorTone1,
     )
