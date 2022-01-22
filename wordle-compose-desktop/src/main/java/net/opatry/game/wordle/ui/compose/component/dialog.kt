@@ -58,7 +58,7 @@ import net.opatry.game.wordle.ui.compose.theme.painterResource
 @Composable
 fun Dialog(
     visible: Boolean,
-    title: String? = null,
+    title: String?,
     modifier: Modifier = Modifier,
     modal: Boolean = false,
     onClose: () -> Unit,
