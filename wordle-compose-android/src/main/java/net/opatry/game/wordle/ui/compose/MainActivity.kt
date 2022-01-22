@@ -49,6 +49,7 @@ import net.opatry.game.wordle.ui.compose.theme.AppIcon
 import net.opatry.game.wordle.ui.compose.theme.IconProvider
 import net.opatry.game.wordle.ui.compose.theme.LocalIconProvider
 import java.io.File
+import kotlin.time.ExperimentalTime
 
 
 object AndroidIconProvider : IconProvider {
@@ -69,6 +70,7 @@ object AndroidIconProvider : IconProvider {
     }
 }
 
+@ExperimentalTime
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
