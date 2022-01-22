@@ -31,11 +31,48 @@ android {
     compileSdkVersion 31
 
     defaultConfig {
-        applicationId "net.opatry.games.wordle"
+        applicationId 'net.opatry.games.wordle'
         minSdkVersion 23
         targetSdkVersion 31
         versionCode 1
-        versionName "1.0"
+        versionName '0.1.0'
+
+        resConfigs 'en', 'fr'
+    }
+
+    signingConfigs {
+        dev {
+            storeFile file('dev.keystore')
+            storePassword 'devdev'
+            keyAlias 'dev'
+            keyPassword 'devdev'
+        }
+        prod {
+            def keystoreFilePath = findProperty('playstore.keystore.file') ?: null
+            storeFile = keystoreFilePath ? file(keystoreFilePath) : null
+            storePassword = findProperty('playstore.keystore.password')
+            keyAlias = 'wordle_compose_android'
+            keyPassword = findProperty('playstore.keystore.key_password')
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.dev
+        }
+        release {
+            // we allow dev signing config in release build when not in CI to allow release builds on dev machine
+            def ciBuild = findProperty('ci') ?: false
+            if (signingConfigs.prod.storeFile == null && !ciBuild) {
+                signingConfig signingConfigs.dev
+            } else {
+                signingConfig signingConfigs.prod
+            }
+
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
 
     lintOptions {

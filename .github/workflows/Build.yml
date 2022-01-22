@@ -1,6 +1,12 @@
-name: Build
+name: Build, Test, Check, Package
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build:
@@ -18,10 +24,13 @@ jobs:
     - name: Build
       run: |
             ./syncComposeSharedSources.sh
-            ./gradlew --no-daemon assemble
+            ./gradlew --no-daemon compileReleaseSources
 
     - name: Test
-      run: ./gradlew --no-daemon test
+      run: ./gradlew --no-daemon test -x testDebug
+
+    - name: Lint
+      run: ./gradlew --no-daemon :wordle-compose-android:lintRelease -x lint
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1.26
@@ -30,5 +39,17 @@ jobs:
         files: ./**/build/test-results/test/TEST-*.xml
 
     - name: Dist
-      run: ./gradlew --no-daemon assembleDist
-
+      env:
+        PLAYSTORE_SECRET_PASSPHRASE: ${{ secrets.PLAYSTORE_SECRET_PASSPHRASE }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+      run: |
+            playstore_file=$(_ci/decrypt_keystore.sh)
+            ./gradlew --no-daemon \
+              -Pci=true \
+              -Pplaystore.keystore.file="$playstore_file" \
+              -Pplaystore.keystore.password="$KEYSTORE_PASSWORD" \
+              -Pplaystore.keystore.key_password="$KEYSTORE_KEY_PASSWORD" \
+              :wordle-compose-desktop:assembleDist \
+              :wordle-compose-android:assembleRelease \
+              -x lint
