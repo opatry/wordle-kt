@@ -3,3 +3,5 @@ src/main/java/net/opatry/game/wordle/data/
 src/main/java/net/opatry/game/wordle/WordleStats.kt
 src/main/java/net/opatry/game/wordle/ui/
 !src/main/java/net/opatry/game/wordle/ui/MainActivity.kt
+src/main/res/drawable/ic_*.xml
+!src/main/res/drawable/ic_launcher_foreground.xml
