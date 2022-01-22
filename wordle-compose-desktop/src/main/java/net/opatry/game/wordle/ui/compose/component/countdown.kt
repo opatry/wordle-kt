@@ -44,18 +44,15 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun NextWordleCountDown(modifier: Modifier = Modifier) {
     var now by remember { mutableStateOf(Calendar.getInstance().timeInMillis) }
-    val (today, tomorrow) = with(Calendar.getInstance()) {
+    val tomorrow = with(Calendar.getInstance()) {
         timeInMillis = now
-        // today
         set(Calendar.HOUR, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 1)
-        val today = timeInMillis
         // tomorrow
         add(Calendar.DATE, 1)
-        val tomorrow = timeInMillis
-        today to tomorrow
+        timeInMillis
     }
     LaunchedEffect(now) {
         // delay at most 1 second
