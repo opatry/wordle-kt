@@ -23,6 +23,7 @@
 package net.opatry.game.wordle
 
 import net.opatry.game.wordle.data.WordleRecord
+import kotlin.math.max
 
 data class WordleStats(
     val playedCount: Int,
@@ -69,7 +70,7 @@ fun List<WordleRecord>.stats(): WordleStats {
         } else {
             currentStreak = 0
         }
-        bestStreak = Integer.max(currentStreak, bestStreak)
+        bestStreak = max(currentStreak, bestStreak)
     }
     return WordleStats(playedCount, victoryDistribution, lastScore, currentStreak, bestStreak)
 }
