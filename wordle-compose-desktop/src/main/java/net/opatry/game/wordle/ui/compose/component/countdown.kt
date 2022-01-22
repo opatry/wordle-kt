@@ -46,12 +46,13 @@ fun NextWordleCountDown(modifier: Modifier = Modifier) {
     var now by remember { mutableStateOf(Calendar.getInstance().timeInMillis) }
     val tomorrow = with(Calendar.getInstance()) {
         timeInMillis = now
+        // tomorrow
+        add(Calendar.DATE, 1)
         set(Calendar.HOUR, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 1)
-        // tomorrow
-        add(Calendar.DATE, 1)
+        set(Calendar.MILLISECOND, 0)
+        set(Calendar.AM_PM, Calendar.AM)
         timeInMillis
     }
     LaunchedEffect(now) {
