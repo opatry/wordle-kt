@@ -163,7 +163,8 @@ private val today: Date
         set(Calendar.HOUR, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 1)
+        set(Calendar.MILLISECOND, 0)
+        set(Calendar.AM_PM, Calendar.AM)
         time
     }
 
