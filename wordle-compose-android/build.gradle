@@ -75,7 +75,7 @@ android {
         }
     }
 
-    lintOptions {
+    lint {
         checkDependencies true
     }
 
