@@ -53,3 +53,10 @@ jobs:
               :wordle-compose-desktop:assembleDist \
               :wordle-compose-android:assembleRelease \
               -x lint
+
+    - name: Archive app APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: wordle-compose-android-release.apk
+        path: wordle-compose-android/build/outputs/apk/release/wordle-compose-android-release.apk
+      if: github.ref == 'refs/heads/master'
