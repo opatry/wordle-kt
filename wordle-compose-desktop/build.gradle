@@ -22,7 +22,7 @@
 
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id 'org.jetbrains.compose' version '1.0.0'
+    id 'org.jetbrains.compose' version '1.2.0-alpha01-dev755'
     id 'application'
 }
 
@@ -39,8 +39,13 @@ version '1.0.0'
 dependencies {
     implementation(compose.desktop.currentOs)
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4')
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4') {
+        because 'requires Dispatchers.Main & co at runtime for Jvm'
+        // java.lang.IllegalStateException: Module with the Main dispatcher is missing. Add dependency providing the Main dispatcher, e.g. 'kotlinx-coroutines-android' and ensure it has the same version as 'kotlinx-coroutines-core'
+        // see also https://github.com/JetBrains/compose-jb/releases/tag/v1.1.1
+    }
+    implementation('com.google.code.gson:gson:2.9.0')
 
     // TODO depends on such icons when compatible with up to date compiler & runtime
     //  For now, having this as dependency leads to `Unresolved reference: loadImageBitmap`
