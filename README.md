@@ -109,11 +109,29 @@ Congrats! You found the correct answer 🎉: HELLO
 
 </details>
 
+### Compose Mosaic mode
+
+![](raw/wordle-mosaic.png)
+
+In a compatible terminal, build the binary distribution and execute it:
+
+```bash
+$ ./gradlew wordle-compose-mosaic:installDist
+$ ./wordle-compose-mosaic/build/install/wordle-compose-mosaic/bin/wordle-compose-mosaic
+```
+
+Or you can simply execute the convenience `runWordleMosaic.sh` script doing the same.
+
+```bash
+$ ./runWordleMosaic.sh 
+```
+
 ## Tech Stack
 
 * [Kotlin](https://kotlinlang.org/)
 * [Jetbrains Compose for Desktop](https://www.jetbrains.com/lp/compose/)
 * [Jetpack Compose for Android](https://developer.android.com/jetpack/compose)
+* [Mosaic Compose for Console UI](https://github.com/JakeWharton/mosaic)
 
 ## Development
 

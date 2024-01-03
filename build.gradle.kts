@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.jetbrains.compose) apply false
+    alias(libs.plugins.mosaic) apply false
 }
 
 allprojects {

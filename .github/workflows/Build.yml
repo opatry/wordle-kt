@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: |
             ./syncComposeSharedSources.sh
-            ./gradlew --no-daemon compileReleaseSources
+            ./gradlew --no-daemon compileReleaseSources assembleDist
 
     - name: Test
       run: ./gradlew --no-daemon test
@@ -51,5 +51,6 @@ jobs:
               -Pplaystore.keystore.password="$KEYSTORE_PASSWORD" \
               -Pplaystore.keystore.key_password="$KEYSTORE_KEY_PASSWORD" \
               :wordle-compose-desktop:assembleDist \
+              :wordle-compose-mosaic:assembleDist \
               :wordle-compose-android:assembleRelease \
               -x lint
