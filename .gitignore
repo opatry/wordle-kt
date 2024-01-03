@@ -1,6 +1,10 @@
 .gradle/
 *.iml
 
+.idea/deploymentTargetDropDown.xml
+.idea/kotlinc.xml
+.idea/migrations.xml
+
 local.properties
 
 build/

@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/opatry/wordle-kt/workflows/Build/badge.svg)](https://github.com/opatry/wordle-kt/actions/workflows/Build.yml)
+[![Build Status](https://github.com/opatry/wordle-kt/actions/workflows/Build.yml/badge.svg)](https://github.com/opatry/wordle-kt/actions/workflows/Build.yml)
 
 # Wordle Compose
 

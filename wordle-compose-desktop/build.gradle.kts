@@ -21,43 +21,41 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
-    id 'org.jetbrains.compose' version '1.2.0-alpha01-dev755'
-    id 'application'
+    alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.jetbrains.compose)
+    application
 }
 
 repositories {
     // Needed to fetch material icons for Desktop
-    maven {
-        url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
-    }
+    maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
-group 'net.opatry.game'
-version '1.0.0'
+group = "net.opatry.game"
+version = libs.versions.wordleKt.get()
 
 dependencies {
     implementation(compose.desktop.currentOs)
 
-    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4')
-    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4') {
-        because 'requires Dispatchers.Main & co at runtime for Jvm'
-        // java.lang.IllegalStateException: Module with the Main dispatcher is missing. Add dependency providing the Main dispatcher, e.g. 'kotlinx-coroutines-android' and ensure it has the same version as 'kotlinx-coroutines-core'
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.swing) {
+        because("requires Dispatchers.Main & co at runtime for Jvm")
+        // java.lang.IllegalStateException: Module with the Main dispatcher is missing. Add dependency providing the Main dispatcher, e.g. "kotlinx-coroutines-android" and ensure it has the same version as "kotlinx-coroutines-core"
         // see also https://github.com/JetBrains/compose-jb/releases/tag/v1.1.1
     }
-    implementation('com.google.code.gson:gson:2.9.0')
+    implementation(libs.gson)
 
     // TODO depends on such icons when compatible with up to date compiler & runtime
     //  For now, having this as dependency leads to `Unresolved reference: loadImageBitmap`
     //  If using compiler plugin 1.0.0 (instead of 1.0.1) with Kotlin 1.5.31, still compilation issue
-    //  When removed such error, crashes at runtime: java.lang.NoSuchMethodError: 'long androidx.compose.ui.unit.DpKt.DpSize-YgX7TsA(float, float)'
-//    implementation 'androidx.compose.material:material-icons-core-desktop:1.0.0-beta06'
-//    implementation 'androidx.compose.material:material-icons-extended-desktop:1.0.0-beta06'
+    //  When removed such error, crashes at runtime: java.lang.NoSuchMethodError: "long androidx.compose.ui.unit.DpKt.DpSize-YgX7TsA(float, float)"
+//    implementation "androidx.compose.material:material-icons-core-desktop:1.0.0-beta06"
+//    implementation "androidx.compose.material:material-icons-extended-desktop:1.0.0-beta06"
 
-    implementation(project(':word-data'))
-    implementation(project(':game-logic'))
+    implementation(project(":word-data"))
+    implementation(project(":game-logic"))
 }
 
 application {
-    mainClass = 'net.opatry.game.wordle.ui.compose.WordleComposeDesktopKt'
+    mainClass = "net.opatry.game.wordle.ui.compose.WordleComposeDesktopKt"
 }
