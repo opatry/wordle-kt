@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'adopt'
 
     - name: Build
@@ -27,16 +27,16 @@ jobs:
             ./gradlew --no-daemon compileReleaseSources
 
     - name: Test
-      run: ./gradlew --no-daemon test -x testDebug
+      run: ./gradlew --no-daemon test
 
     - name: Lint
       run: ./gradlew --no-daemon :wordle-compose-android:lintRelease -x lint
 
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1.26
-      if: failure()
+    - name: Publish Test Reports
+      uses: mikepenz/action-junit-report@v4
+      if: success() || failure()
       with:
-        files: ./**/build/test-results/test/TEST-*.xml
+        report_paths: '**/build/test-results/test/TEST-*.xml'
 
     - name: Dist
       env:

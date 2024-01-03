@@ -1,0 +1,49 @@
+[versions]
+
+wordleKt = "0.1.0"
+
+agp = "8.1.0"
+
+compileSdk = "34"
+minSdk = "21"
+targetSdk = "34"
+
+kotlin = "1.9.10"
+kotlinx-coroutines = "1.7.3"
+
+compose = "1.5.3"
+
+[libraries]
+kotlin = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+
+androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
+androidx-activity-compose = "androidx.activity:activity-compose:1.8.2"
+
+androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+androidx-compose-uiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+
+jetbrains-compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
+jetbrains-compose-material-icons-extended-desktop = { module = "org.jetbrains.compose.material:material-icons-extended-desktop", version.ref = "compose" }
+jetbrains-compose-material-desktop = { module = "org.jetbrains.compose.material:material-desktop", version.ref = "compose" }
+
+accompanist-insets = "com.google.accompanist:accompanist-insets:0.25.1"
+
+gson = "com.google.code.gson:gson:2.10.1"
+
+junit4 = "junit:junit:4.13.2"
+
+[bundles]
+jetbrains-compose = [ "jetbrains-compose-material", "jetbrains-compose-material-desktop", "jetbrains-compose-material-icons-extended-desktop" ]
+androidx-compose = [ "androidx-compose-ui", "androidx-compose-uiTooling", "androidx-compose-foundation", "androidx-compose-material" ]
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }

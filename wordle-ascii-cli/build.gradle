@@ -1,9 +1,0 @@
-plugins {
-    id 'java-library'
-    id 'kotlin'
-}
-
-dependencies {
-    implementation(project(':word-data'))
-    implementation(project(':game-logic'))
-}
