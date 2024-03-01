@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":word-data"))
-    implementation(project(":game-logic"))
+    implementation(projects.wordData)
+    implementation(projects.gameLogic)
 }

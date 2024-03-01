@@ -25,18 +25,6 @@
 
 The main UI is displayed in Android devices.
 
-For now, the setup is made quick & dirty and needs improvements (maybe using Kotlin Multi Platform project?).
-Sources from the desktop version needs to be copied into the Android project.
-
-```sh
-./syncComposeSharedSources.sh
-```
-
-Any edit made in the Android copy should be done in the original desktop module afterwards.
-
-Extracting Compose code common to Desktop & Android apps in a shared module would clean this mess but might require specific Gradle setup.
-Reason why it might be better to use KMP project setup.
-
 Android support is still very rough and a nice to have for now.
 
 ### ASCII/Console mode
@@ -129,14 +117,14 @@ $ ./runWordleMosaic.sh
 ## Tech Stack
 
 * [Kotlin](https://kotlinlang.org/)
-* [Jetbrains Compose for Desktop](https://www.jetbrains.com/lp/compose/)
-* [Jetpack Compose for Android](https://developer.android.com/jetpack/compose)
+* [Kotlin Multiplatform](https://www.jetbrains.com/kotlin-multiplatform/)
 * [Mosaic Compose for Console UI](https://github.com/JakeWharton/mosaic)
 
 ## Development
 
 To build and run the desktop application, run the following command
 
+// FIXME
 ```bash
 ./gradlew run
 ```
@@ -149,6 +137,7 @@ To run tests, run the following command
 
 To build and package desktop application, run the following command
 
+// FIXME
 ```bash
 ./gradlew assembleDist
 ```
@@ -158,7 +147,7 @@ To build and package desktop application, run the following command
 ```
 The MIT License (MIT)
 
-Copyright (c) 2022 Olivier Patry
+Copyright (c) 2024 Olivier Patry
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

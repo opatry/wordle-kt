@@ -11,8 +11,8 @@ dependencies {
     implementation(libs.turtle) {
         because("need to copy results to clipboard (using `pbcopy`, `xclip`, `clip` or equivalent)")
     }
-    implementation(project(":word-data"))
-    implementation(project(":game-logic"))
+    implementation(projects.wordData)
+    implementation(projects.gameLogic)
 }
 
 application {

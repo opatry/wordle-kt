@@ -48,10 +48,6 @@ android {
         jvmToolchain(17)
     }
 
-    lint {
-        disable += "InvalidVectorPath"
-    }
-
     signingConfigs {
         create("dev") {
             storeFile = file("dev.keystore")
@@ -88,6 +84,7 @@ android {
     }
 
     lint {
+        disable += "InvalidVectorPath"
         checkDependencies = true
     }
 
@@ -101,16 +98,5 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.gson)
-
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity.compose)
-
-    implementation(libs.bundles.androidx.compose)
-
-    implementation(libs.accompanist.insets)
-
-    implementation(project(":word-data"))
-    implementation(project(":game-logic"))
+    implementation(projects.wordleComposeApp)
 }

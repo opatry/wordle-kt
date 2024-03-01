@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Wordle Compose</string>
+    <string name="wordle_title">Wordle</string>
+    <string name="loading_data">Loading words…</string>
+    <string name="no_data_available">No game data available</string>
+    <string name="main_nav_back_to_dictionaries">Pick another dictionary</string>
+    <string name="main_nav_how_to_play">How to play</string>
+    <string name="main_nav_statistics">Statistics</string>
+    <string name="main_nav_settings">Settings</string>
+    <string name="how_to_play_dialog_title">How to play</string>
+    <string name="statistics_dialog_title">Statistics</string>
+    <string name="stats_dialog_copy_notification">Copied results to clipboard</string>
+    <string name="settings_dialog_title">Settings</string>
+    <string name="next_wordle">Next Wordle</string>
+    <string name="dictionary_choose_title">Choose the dictionary to use</string>
+    <string name="dictionary_select_button">Select</string>
+    <string name="dictionary_word_size_with_qualifier">%1$d letter words (%2$s)</string>
+    <string name="dictionary_word_size">%d letter words</string>
+    <string name="close_icon_content_description">Close</string>
+    <string name="play_again">Play again</string>
+    <string name="stats_share">Share</string>
+    <string name="stats_played">Played</string>
+    <string name="stats_win_ratio">Win %</string>
+    <string name="stats_current_streak">Current\nStreak</string>
+    <string name="stats_max_streak">Max\nStreak</string>
+    <string name="stats_guess_distribution_title">Guess Distribution</string>
+    <string name="stats_guess_distribution_no_data">No Data</string>
+    <string name="setting_hard_mode_title">Hard mode</string>
+    <string name="setting_hard_mode_desc">Any revealed hints must be used in subsequent guesses</string>
+    <string name="setting_dark_theme_title">Dark Theme</string>
+    <string name="setting_color_blind_title">Color Blind Mode</string>
+    <string name="setting_color_blind_desc">High contrast colors</string>
+    <string name="setting_feedback_title">Feedback</string>
+    <string name="setting_feedback_open_outside">Open outside to provide feedback</string>
+</resources>

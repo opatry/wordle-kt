@@ -20,3 +20,4 @@ wordle-ascii-cli/bin/
 word-data/bin/
 game-logic/bin/
 _ci/playstore.keystore
+.idea/artifacts/*.xml
