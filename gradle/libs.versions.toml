@@ -2,16 +2,17 @@
 
 wordleKt = "0.1.0"
 
-agp = "8.1.0"
+agp = "8.2.0"
 
 compileSdk = "34"
 minSdk = "21"
 targetSdk = "34"
 
-kotlin = "1.9.10"
+kotlin = "1.9.22"
 kotlinx-coroutines = "1.7.3"
 
-compose = "1.5.3"
+compose-compiler = "1.5.10"
+compose = "1.6.0"
 
 [libraries]
 kotlin = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -50,4 +51,4 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-mosaic = { id = "com.jakewharton.mosaic", version = "0.9.1" }
+mosaic = { id = "com.jakewharton.mosaic", version = "0.11.0" }
