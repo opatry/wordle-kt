@@ -32,10 +32,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import net.opatry.game.wordle.Dictionary
-import net.opatry.game.wordle.allDictionaries
-import net.opatry.game.wordle.data.Settings
-import java.io.File
+import net.opatry.game.wordle.WordleApplication
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -43,20 +40,19 @@ import kotlin.time.ExperimentalTime
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity() {
+    // quick & dirty DI
+    private val settings by lazy {
+        (application as WordleApplication).settings
+    }
+    private val dataFile by lazy {
+        (application as WordleApplication).dataFile
+    }
+    private val validDictionaries by lazy {
+        (application as WordleApplication).dictionaries
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // TODO inject
-        val dataFile = File(filesDir, "records.json")
-        val settingsFile = File(filesDir, "settings.json")
-
-        // TODO inject
-        val settings = Settings(settingsFile)
-
-        // TODO inject
-        val validDictionaries = allDictionaries
-            .filter { it.wordSize in 4..8 }
-            .sortedWith(compareBy(Dictionary::language, Dictionary::wordSize))
 
         setContent {
             Box(Modifier.background(MaterialTheme.colors.surface)) {
