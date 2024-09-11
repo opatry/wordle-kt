@@ -69,9 +69,9 @@ fun GameScreen(viewModel: WordleViewModel) {
                     Text("The answer was ")
                     Text(
                         viewModel.answer,
-                        color = Color.BrightWhite,
+                        color = Color.White,
                         background = Color.Green,
-                        style = TextStyle.Bold
+                        textStyle = TextStyle.Bold
                     )
                 }
                 Text(" 🔄 Play again? (y/N)?")

@@ -1,6 +1,5 @@
 plugins {
-    id 'java-library'
-    id 'kotlin'
+    alias(libs.plugins.jetbrains.kotlin.multiplatform)
 }
 
 abstract class DictionariesKtTask extends DefaultTask {
@@ -16,8 +15,8 @@ abstract class DictionariesKtTask extends DefaultTask {
     @InputFiles
     @PathSensitive(PathSensitivity.ABSOLUTE)
     // TODO we should consider all (active) sourceSets
-    FileCollection resources = project.files(project.sourceSets.main.resources).filter {
-        it.name =~ ~/words_[a-z]{2}_[\d]+_?(.*)\.txt/
+    FileCollection resources = project.layout.projectDirectory.dir("src/commonMain/resources").asFileTree.matching {
+        include("**/*.txt")
     }
 
     @OutputDirectory
@@ -29,10 +28,12 @@ abstract class DictionariesKtTask extends DefaultTask {
     def execute() {
         def dictionaryResourceNames = []
         // FIXME relative to depends on each file source dir
-        def resourcesDir = project.file('src/main/resources')
+        def resourcesDir = project.file('src/commonMain/resources')
         resources.files.forEach { file ->
             // TODO File.relativeTo like in Kotlin
-            dictionaryResourceNames += file.absolutePath.minus(resourcesDir.absolutePath)
+            if (file.name.matches(/words_[a-z]{2}_\d+_?(.*)\.txt/)) {
+                dictionaryResourceNames += file.absolutePath - resourcesDir.absolutePath
+            }
         }
         generateDictionariesFile(dictionaryResourceNames)
     }
@@ -51,7 +52,7 @@ abstract class DictionariesKtTask extends DefaultTask {
             it.append('// ' + new Date() + '\n')
             it.append('package ' + packageName + '\n')
             it.append('\n\n')
-            it.append('val allDictionaries = arrayOf(\n')
+            it.append('val allDictionaries = arrayOf<Dictionary>(\n')
             dictionaryResourceNames.forEach { resourceName ->
                 def (_, language, wordSize, qualifier) = (resourceName =~ ~/words_([a-z]{2})_([\d]+)_?(.*)\.txt/)[0]
                 it.append('    Dictionary(language = "' + language + '", wordSize = ' + wordSize + ', resourceName = "' + resourceName + '", qualifier = "' + qualifier + '"),\n')
@@ -65,10 +66,21 @@ def generateDictionariesKt = tasks.register("generateDictionariesKt", Dictionari
     packageName = "net.opatry.game.wordle"
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir(generateDictionariesKt)
-        }
+//tasks.named("compileKotlin") {
+//    dependsOn("generateDictionariesKt")
+//}
+
+//getTasksByName("compileKotlin").dependsOn("generateDictionariesKt")
+
+//tasks.withType(KotlinCompile).configureEach {
+//    dependsOn("generateDictionariesKt")
+//}
+
+
+kotlin {
+    jvm()
+
+    sourceSets {
+        commonMain.kotlin.srcDir(generateDictionariesKt)
     }
 }

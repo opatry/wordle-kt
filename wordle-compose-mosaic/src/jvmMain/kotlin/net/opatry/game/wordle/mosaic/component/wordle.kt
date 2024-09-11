@@ -64,15 +64,15 @@ fun WordleGrid(grid: List<Answer>) {
 fun AnswerFlag.cellColors(): Pair<Color, Color> = when (this) {
     AnswerFlag.NONE -> Color.Black to Color.White
     AnswerFlag.PRESENT -> Color.Black to Color.Yellow
-    AnswerFlag.ABSENT -> Color.BrightWhite to Color.Black
-    AnswerFlag.CORRECT -> Color.BrightWhite to Color.Green
+    AnswerFlag.ABSENT -> Color.White to Color.Black
+    AnswerFlag.CORRECT -> Color.White to Color.Green
 }
 
 @Composable
 fun WordleCharCell(char: Char, flag: AnswerFlag) {
     val (foregroundColor, backgroundColor) =
         if (flag == AnswerFlag.NONE && !char.isWhitespace())
-            Color.Black to Color.BrightWhite
+            Color.Black to Color.White
         else
             flag.cellColors()
 
@@ -83,7 +83,7 @@ fun WordleCharCell(char: Char, flag: AnswerFlag) {
                 " $char ",
                 color = foregroundColor,
                 background = backgroundColor,
-                style = TextStyle.Bold
+                textStyle = TextStyle.Bold
             )
         }
     }

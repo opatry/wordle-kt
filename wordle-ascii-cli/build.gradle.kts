@@ -1,9 +1,15 @@
 plugins {
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.jetbrains.kotlin.multiplatform)
     application
 }
 
-dependencies {
-    implementation(project(":word-data"))
-    implementation(project(":game-logic"))
+kotlin {
+    jvm()
+
+    sourceSets {
+        jvmMain.dependencies {
+            implementation(project(":word-data"))
+            implementation(project(":game-logic"))
+        }
+    }
 }

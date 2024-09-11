@@ -1,7 +1,13 @@
 plugins {
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.jetbrains.kotlin.multiplatform)
 }
 
-dependencies {
-    testImplementation(libs.junit4)
+kotlin {
+    jvm()
+
+    sourceSets {
+        jvmTest.dependencies {
+            implementation(libs.junit4)
+        }
+    }
 }

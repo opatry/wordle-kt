@@ -37,6 +37,7 @@ suspend fun main() = runMosaic {
     val words = allDictionaries
         .find { it.language == "en" && it.wordSize == 5 }
         ?.loadWords()
+        ?.takeUnless(List<*>::isEmpty)
         ?: error("Can't find default dictionary")
     var playing = true
     val viewModel = WordleViewModel(WordleRules(words))

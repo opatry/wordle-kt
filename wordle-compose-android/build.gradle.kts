@@ -23,6 +23,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.compose.compiler)
 }
 
 android {
@@ -95,9 +96,13 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.get()
-    }
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = libs.versions.compose.get()
+//    }
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
 }
 
 dependencies {
